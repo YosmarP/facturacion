@@ -1,0 +1,2609 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billage 20.0</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/empty.css">
+    <link rel="stylesheet" href="assets/css/evol-colorpicker.min.css">
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/fullcalendar.min.css">
+    <link rel="stylesheet" href="assets/css/fullcalendar.print.css">
+    <link rel="stylesheet" href="assets/css/jquery.tagit.css">
+    <link rel="stylesheet" href="assets/css/main.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/tagit.ui-zendesk.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.colors.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.min.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.table.css">
+</head>
+
+<body><main>
+			
+
+<!-- Div para alertas jquery -->
+<div id="billage-utils-alert" class="popup divAlertPopup"></div>
+
+<script>
+	// Usuario
+	var idUsr = "46886";
+	var imgUsr = "";
+	var nameUsr = "Poner nombre";
+	var rolUsr = "1";
+	sessionStorage.setItem('session-user-id', idUsr);
+
+	// Usuario
+	var idEmpresa = "19546";
+
+	var pageContext = '/saas';
+
+	var context = '/saas';
+	queryInit(context);
+	billageUtilsInit(context);
+
+	//29-06-2018
+	//billageUtilsAvoidPasteDefault();
+	billageCombos();
+
+	billageSnippetInit();
+
+	var _alertPopup = function (h, w, data, funcOk) {
+		var t = $('#billage-utils-alert');
+		var l = $('<div/>').height(h).width(w).append(data);
+		t.empty().append(l);
+
+		console.log(data+':'+ t.attr('id'));
+		dmslib.Widget.verPopup(t.attr('id'), null, context +'/session-expired');
+	};
+
+	var _alertSessionExpiredPopup = function (data) {
+		window.location = context;
+	};
+
+	var _alertAjaxErrorPopup = function (e,jqXHR,ajaxSettings,thrownError) {
+		_alertPopup(200, 300, $('<span/>').append(data), function () {
+			window.location = context;
+		});
+	};
+
+	var interval = 31 * 60;	//1 minuto mas q el timeout de session
+	//interval = 1;			//para hacer pruebas desmarcar
+
+	var timer = billageUtilsCheckSessionExpired(function () {
+		try {
+			_alertSessionExpiredPopup();
+		} catch (e) { }
+		clearInterval(timer);
+	},
+	interval);
+
+	(function ($) {
+		$.fn.extend({
+			limiter: function (limit, elem) {
+				$(this).on("change keyup focus", function () {
+					setCount(this, elem);
+				});
+				function setCount(src, elem) {
+					var chars = src.value.length;
+
+					if (chars > limit) {
+						src.value = src.value.substr(0, limit);
+						chars = limit;
+					}
+					elem.html(limit - chars);
+				}
+
+				setCount($(this)[0], elem);
+			}
+		});
+	})(jQuery);
+</script>
+	
+			<!-- CAPA GRIS -->
+			<div id="dgris"></div>
+	
+			<!-- MENU TOP -->
+			
+
+
+
+
+
+
+
+<nav id="navbarTop" class="navbar navbar-fixed-top navbar-billage">
+	<!-- USER TRIAL -->
+	
+
+	<!-- Brand and toggle get grouped for better mobile display -->
+	<div class="navbar-header">
+		<a href="#" class="avatar navbar-btn collapsed" data-toggle="collapse" data-target="#bNavPerfil" aria-expanded="false">
+			
+			
+				<span title="Poner nombre" class="avatar-no-image">PN</span>
+			
+			<i class="fa fa-angle-down" aria-hidden="true"></i>
+		</a>
+		
+		<a class="navbar-recompensas-link ml5" href="/saas/partner/partner-panel">
+			Saldo <strong> €</strong><span class="hidden-xs">&nbsp;| 80€ por amigo</span>
+		</a>
+		
+		<button type="button" class="navbar-btn btn-transparent topBuscador" data-container="body" data-toggle="popover" data-original-title="" title=""><i class="fa fa-search"></i></button>
+
+		<a class="navbar-btn navbar-shortcut" href="index.html#onboarding"><i class="fa fa-plus"></i></a>
+
+		<a class="navbar-brand" href="index.html">
+			<img src="/saas/img/logo/billage.svg">
+		</a>
+		
+			<a id="menuToggle" class="navbar-brand toggle-btn" href="#menu-toggle"></a>
+		
+		
+		
+	</div>
+
+	<div id="bNavbar" class="collapse navbar-collapse">
+
+		<ul class="nav navbar-nav navbar-center">
+			<li>
+				<a id="accDirecto" class="navbar-shortcut">
+					<img title="Accesos directos" class="i-icon" src="/saas/img/icons/icons/white/plus.svg">
+				</a>
+			</li>
+		</ul>
+
+		<ul class="nav navbar-nav navbar-right">
+			
+ 				<li>
+					<button type="button" class="btn btn-search topBuscador" data-container="body" data-toggle="popover" data-original-title="" title="">
+						<img src="/saas/img/icons/icons/white/search.svg">
+					</button>
+				</li>
+				
+				<li class="navbar-recompensas">
+					<a class="navbar-recompensas-link" href="/saas/partner/partner-panel">
+						Saldo <strong>€</strong><span class="hidden-xs hidden-sm hidden-md">&nbsp;| 80€ por amigo</span>
+					</a>
+				</li>					
+
+				<li class="separador hidden-sm"></li>
+			 	<li>
+					<a id="mailMenu" title="Mensajes" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+						<img title="Mensajes" src="/saas/img/icons/icons/white/mail.svg">
+						<sup class="badge"></sup>
+					</a>
+				</li>
+				<li class="separador hidden-sm"></li>
+				
+					<li class="hidden-sm">
+						<a target="_blank" href="https://help.getbillage.com">
+							<img title="Ayuda" src="/saas/img/icons/menu/ayuda.svg">
+						</a>
+					</li>
+					
+
+			
+
+			<li class="dropdown">
+				<a href="#" class="avatar dropdown-toggle toggle-ajustes" data-toggle="dropdown">
+					
+					
+						<span title="Poner nombre" class="avatar-no-image">PN</span>
+					
+					<i class="fa fa-angle-down" aria-hidden="true"></i>
+				</a>
+				<ul class="dropdown-menu dropdown-menu-right dropdown-arrow">
+					
+
+
+
+
+
+
+
+
+
+	<li class="nav-perfil ">
+		<a href="/saas/my-profile">
+			Mi Perfil
+		</a>	
+	</li>
+	
+	
+		<li class="nav-empresa ">
+			<a onclick="dmslib.Widget.verPopup('divEditEmpresa',null,'/saas/companies/view-edit?id=19546')">
+				Datos de mi negocio
+				
+				
+			</a>
+		</li>
+		
+		
+		
+		<li class="nav-contratacion hidden-xs ">
+			<a href="/saas/companies/view-company-contract?id=19546">Mi suscripción</a>
+		</li>			
+	
+	
+	
+
+	
+	
+	
+	<li class="divider"></li>	
+	
+	
+	
+	
+		
+			<li class="nav-usuarios hidden-xs ">
+				<a href="/saas/users/list">Usuarios</a>
+			</li>
+		
+	
+	
+	<li class="nav-ajustes" onclick="dmslib.Widget.verPopup(&quot;divMenuAjustes&quot;, null, pageContext + &quot;/menu-settings&quot;);">
+		<a>Ajustes e importaciones</a>
+	</li>
+	
+ 	<li class="nav-mail visible-xs-block">
+		<a id="mailMenuResponsive" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+			Mensajes
+		</a>
+	</li>	
+	
+			
+		<li class="nav-integraciones">
+			<a href="/saas/integrations">Integraciones</a>
+		</li>
+		
+		<li class="nav-store">
+			<a href="/saas/store/billage-store">Billage store</a>
+		</li>
+	
+	
+	
+		<li class="nav-invita ">
+			<a href="/saas/partner/partner-panel">
+				Saldo <strong>€</strong>
+			</a>
+		</li>
+	
+
+	<li class="divider"></li>						
+
+
+<li class="nav-logout">
+	<a id="perfil" class="aMainMenu" href="/saas/logout">Cerrar sesión</a>
+</li>		
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<div id="bNavPerfil" class="collapse navbar-collapse" aria-expanded="false">
+		<ul class="nav navbar-nav">
+			
+				<li class="nav-help">
+					<a target="_blank" href="https://help.getbillage.com">Ayuda</a>
+				</li>
+			
+			
+
+
+
+
+
+
+
+
+
+	<li class="nav-perfil ">
+		<a href="/saas/my-profile">
+			Mi Perfil
+		</a>	
+	</li>
+	
+	
+		<li class="nav-empresa ">
+			<a onclick="dmslib.Widget.verPopup('divEditEmpresa',null,'/saas/companies/view-edit?id=19546')">
+				Datos de mi negocio
+				
+				
+			</a>
+		</li>
+		
+		
+		
+		<li class="nav-contratacion hidden-xs ">
+			<a href="/saas/companies/view-company-contract?id=19546">Mi suscripción</a>
+		</li>			
+	
+	
+	
+
+	
+	
+	
+	<li class="divider"></li>	
+	
+	
+	
+	
+		
+			<li class="nav-usuarios hidden-xs ">
+				<a href="/saas/users/list">Usuarios</a>
+			</li>
+		
+	
+	
+	<li class="nav-ajustes" onclick="dmslib.Widget.verPopup(&quot;divMenuAjustes&quot;, null, pageContext + &quot;/menu-settings&quot;);">
+		<a>Ajustes e importaciones</a>
+	</li>
+	
+ 	<li class="nav-mail visible-xs-block">
+		<a id="mailMenuResponsive" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+			Mensajes
+		</a>
+	</li>	
+	
+			
+		<li class="nav-integraciones">
+			<a href="/saas/integrations">Integraciones</a>
+		</li>
+		
+		<li class="nav-store">
+			<a href="/saas/store/billage-store">Billage store</a>
+		</li>
+	
+	
+	
+		<li class="nav-invita ">
+			<a href="/saas/partner/partner-panel">
+				Saldo <strong>€</strong>
+			</a>
+		</li>
+	
+
+	<li class="divider"></li>						
+
+
+<li class="nav-logout">
+	<a id="perfil" class="aMainMenu" href="/saas/logout">Cerrar sesión</a>
+</li>
+		</ul>
+	</div>
+</nav>
+
+<div id="divAccDirecto" class="fast-call" hidden="">
+	<div class="container">
+		<header>
+			<h1>Crear una nueva oportunidad, proyecto, factura y más</h1>
+			<button type="button" id="closeDiv" class="btn-icon btn-close"></button>
+		</header>
+
+		<section>
+			<div class="media media-comercial">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/vender.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Comercial</h4>
+			       		
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearoportunidad.html'">Oportunidad</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearcampanas.html';">Campaña</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearactividades.html'">Actividad comercial</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpresupuestos.html">Presupuesto</a>
+	</p>
+
+					
+				</div>
+			</div>
+
+			<div class="media media-project">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/organizar.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Proyectos</h4>
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearproyectos.html'">Proyecto</p>
+
+
+					
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='creartareas.html'">Tarea de proyecto</p>
+
+
+					
+					
+					<p class="fast-call-caller a fast-call-popup timetracking-play">
+						Registro de tiempos
+					</p>
+				</div>
+			</div>
+
+			<div class="media media-biling">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/cobrar.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Facturación</h4>
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearfacturas.html">Factura de venta</a>
+	</p>
+
+					
+
+						
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearalbaran.html">Albarán de venta</a>
+	</p>
+
+					
+
+						
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpedidosVentas.html">Pedido de venta</a>
+	</p>
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="creargastos.html">Gasto</a>
+	</p>
+
+					
+
+					    
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpedidosCompras.html">Pedido de compra</a>
+	</p>
+
+					
+				</div>
+			</div>
+
+			<div class="media">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/general.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">General</h4>
+				
+				
+					
+					
+					
+				
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNewAccount',null,'/saas/accounts/ver-alta')">Empresa</p>
+
+
+			
+	       		
+				
+					
+					
+					
+				
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNuevoContacto',null,'/saas/contacts/ver-alta')">Contacto</p>
+
+
+			
+			
+		        
+		            
+		            
+		        	
+		        
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNewDoc',null,'/saas/documents/edit-popup')">Documentos</p>
+
+
+			
+			
+		        
+		            
+		            
+		            
+		        
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNuevoProducto',null,'/saas/products/ver-alta')">Producto</p>
+
+
+			
+				</div>
+			</div>
+		</section>
+	</div>
+</div>
+
+
+<div id="popover-top-search" class="hide">
+	<form action="/saas/search">
+		<div class="input-group search-input ">
+			<input type="text" name="cadena" class="form-control input-sm disable-clear" placeholder="Buscar" value="" pattern=".{4,}" autocomplete="off" oninvalid="setCustomValidity('Debes introducir al menos 4 carácteres para realizar la búsqueda')" oninput="setCustomValidity('')" required="">
+			<span class="input-group-addon">
+				<button type="submit" id="serachBtn" class="btn btn-search">
+					<img src="/saas/img/icons/icons/white/search.svg">
+				</button>
+			</span>
+		</div>
+	</form>
+ </div>
+
+<script>
+	$(function() {
+		
+		
+		$(document).on("click", ".toggle-ajustes", function(e) {
+			var obj = $("#sidebarAjustes");
+			
+			if (obj.is(":visible")) {
+				$(".nav-ajustes").hide();
+			}
+			else{
+				$(".nav-ajustes").show();
+			}
+		});		
+		
+		$(document).on("click", ".menu-configuracion .dropdown-submenu", function(e) {
+			var li = $(this);
+			
+			if(!li.hasClass("li-submenu")) {
+				e.stopImmediatePropagation();
+				if (li.hasClass("active")) {
+					li.parents(".menu-configuracion").find(".dropdown-menu").slideUp(350);
+					setTimeout(function() {
+						li.removeClass("active");
+					}, 400);
+				}
+				else {
+					//if
+					li.parents(".menu-configuracion").find(".dropdown-menu").slideUp(350);
+					setTimeout(function() {
+						li.parents(".menu-configuracion").find(".active").removeClass("active");
+						li.addClass("active").find(".dropdown-menu").slideDown();
+					}, 400);
+				}
+			}
+		});
+
+		// search
+		$(document).on("focus", "#inpSearch", function(e) {
+			$(this).closest(".search-input").addClass("focus");
+		}).on("blur", "#inpSearch", function(e) {
+			if( $(this).val() == "" ) 
+				$(this).closest(".search-input").removeClass("focus");
+		});
+
+		// popover buscador
+		$(".topBuscador").popover({
+			trigger: "manual",
+			placement: "bottom",
+			html: true,
+			content: function() {
+				return $('#popover-top-search').html();
+			},
+			template: '<div class="popover popover-topBuscador popover-xs"><div class="arrow arrow-dark"></div><div class="popover-content"></div></div>'
+		}).click(function(e){
+		    $(this).popover('toggle');
+		    $(".popover-topBuscador .form-control").focus();
+		    e.preventDefault();
+		});
+
+		$('body').click(function(e) {
+			var target = $(e.target);
+			if(!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+				$(".popover-topBuscador").hide();
+			}
+		});
+
+	});
+
+	$(".navbar-shortcut").click(function() {
+		if( $("#divAccDirecto").is(":visible") ) 
+			$("#divAccDirecto").hide();
+		else 
+			$("#divAccDirecto").show();
+	});
+
+	$("#closeDiv, .fast-call-popup").click(function() {
+		$("#divAccDirecto").hide();
+	});
+
+	$("body").click(function(e) {
+		if( $("#divAccDirecto").is(":visible") && !$(e.target).is(".navbar-shortcut") && !$(e.target).parents().is(".navbar-shortcut") && !$(e.target).is("#divAccDirecto") && !$(e.target).parents().is("#divAccDirecto")) {
+			$("#divAccDirecto").hide();
+		}
+	});
+
+    $(".alert-partner").on("closed.bs.alert", function(){
+    	$(document.body).removeClass("user-trial");
+    });
+</script>
+			
+			
+			
+				
+			
+
+
+
+			
+			<div id="mainMenu" class="main-menu   toggled">
+				<!-- SIDE BAR -->
+				
+
+
+
+
+
+
+<div id="backgroundSidebar"></div>
+
+<div id="sidebarWrapper" class="sidebar-wrapper">
+	<button type="button" class="btn-transparent sidebar-toggle "></button>
+	
+	<ul id="accordionSidebar" class="menu-list menu-tree">
+		
+
+
+
+
+
+
+<!-- INICIO -->
+<li class="menu-analisis menu-header ">
+	<a href="index.html"><i class="fa fa-bar-chart"></i> Análisis</a>
+</li>
+
+<!-- FACTURACION -->
+
+	
+	
+		
+		
+		
+	
+	<div class="panel">
+		<li class="menu-header menu-facturacion ">
+			<a href="#menuFacturacion" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				<i class="fa fa-file-text"></i>				
+				Facturación
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+		</li>
+		<ul id="menuFacturacion" class="panel-collapse collapse ">
+			<!-- ventas -->
+			
+			
+				
+				
+				
+					
+					
+				
+			
+
+			<div class="panel">
+				<li class="tree-lv0">
+					<a href="#menuVentas" data-toggle="collapse" data-parent="#menuFacturacion" aria-expanded="false">
+						Ventas
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+				</li>
+				<ul id="menuVentas" class="menu-submenu panel-collapse collapse">
+					
+						<li class="tree-lv1 ">
+							<a href="facturas.html">Facturas</a>
+							
+								<a title="Crear factura" class="btn btn-icon btn-add" href="crearfacturas.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					
+					<li class="tree-lv1 ">
+						<a href="alabaranesVentas.html">Albaranes</a>
+						
+							<a title="Crear albarán" class="btn btn-icon btn-add" href="crearalbaran.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="pedidosVentas.html">Pedidos</a>
+						
+							<a title="Crear pedido" class="btn btn-icon btn-add" href="crearpedidosVentas.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="presupuestos.html">Presupuestos</a>
+						
+							<a title="Crear presupuesto" class="btn btn-icon btn-add" href="crearpresupuestos.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					
+						<li class="tree-lv1 ">
+							<a href="facturasperiodicas.html">Facturas Periódicas</a>
+							
+								<a title="Crear factura periódica" class="btn btn-icon btn-add" href="crearfacturasperiodicas.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					
+				</ul>
+			</div>
+			<!-- compras -->
+			
+				 
+				
+					
+					
+				
+
+				<div class="panel">
+					<li class="tree-lv0">
+						<a class="collapsed" href="#menuCompras" data-toggle="collapse" data-parent="#menuFacturacion" aria-expanded="false">
+							Compras
+							<i class="fa fa-angle-down" aria-hidden="true"></i>
+						</a>
+					</li>
+					<ul id="menuCompras" class="menu-submenu panel-collapse collapse ">
+						<li class="tree-lv1 ">
+							<a href="gastos.html">Gastos</a>
+							
+								<a title="Crear gasto" class="btn btn-icon btn-add" href="creargastos.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+						<li class="tree-lv1 ">
+							<a href="alabaranesVentas.html">Albaranes</a>
+						</li>
+						<li class="tree-lv1 ">
+							<a href="pedidosCompras.html">Pedidos</a>
+							
+								<a title="Crear pedido" class="btn btn-icon btn-add" href="crearpedidosCompras.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+						<li class="tree-lv1 ">
+							<a href="gastosperiodicos.html">Gastos periódicos</a>
+							
+								<a title="Crear gasto periódico" class="btn btn-icon btn-add" href="creargastosperiodicos.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					</ul>
+				</div>
+			
+		</ul>
+	</div>
+
+
+
+<!-- tesoreria -->
+
+	
+	
+		
+		
+		
+	
+
+	<div class="panel">
+		<li class="menu-header menu-tesoreria ">
+			<a class="collapsed" href="#menuTesoreria" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				<i class="fa fa-money"></i>	Tesorería		
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuTesoreria" class="menu-submenu panel-collapse collapse ">
+			<li class="tree-lv1 ">
+				<a href="cobrosypagos.html">Cobros y pagos</a>
+			</li>
+			
+			<li class="tree-lv1 ">
+				<a href="cuentasdetesoreria.html">Cuentas de tesorería</a>
+			</li>
+			
+			<li class="tree-lv1 ">
+				<a href="remesas.html">Remesas</a>
+			</li>
+		</ul>
+	</div>
+
+
+
+<!-- PROYECTOS -->
+
+	
+		
+		
+		
+	
+	
+	<div class="panel">
+		<li class="menu-header menu-proyectos active">
+			<a href="#menuProyectos" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="true">				
+				<i class="fa fa-tasks"></i>
+				Proyectos
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuProyectos" class="panel-collapse collapse in">
+			<li class="tree-lv1 ">
+				<a href="proyectos.html">Proyectos</a>
+				
+					<button type="button" title="Crear proyecto" class="btn btn-icon btn-add" onclick="location.href='crearproyectos.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 selected">
+				<a href="tareas.html">Tareas</a>
+				
+					<button title="Crear tarea" class="btn btn-icon btn-add" onclick="location.href='creartareas.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="tiempos.html">Tiempos</a>
+				
+					<button title="Registrar tiempo" class="btn btn-icon btn-add" onclick="location.href='registrartiempo.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			
+				<li class="tree-lv1 ">
+					<a id="informes" onclick="checkModifForm(event)" href="informes.html">Informes</a>
+				</li>
+			
+		</ul>
+	</div>
+
+
+
+<!-- COMERCIAL -->
+
+	
+	
+		
+		
+		
+	
+	<div class="panel">
+		<li class="menu-header menu-comercial ">
+			<a href="#menuComercial" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				Comercial
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuComercial" class="panel-collapse collapse ">
+			<li class="tree-lv1 ">
+				<a href="campanas.html">Campañas</a>
+				
+					<button title="Crear Campaña" class="btn btn-icon btn-add" onclick="location.href='crearcampanas.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="oportunidades.html">Oportunidades</a>
+				
+					<button title="Crear oportunidad" class="btn btn-icon btn-add" onclick="location.href='crearoportunidad.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="actividades.html">Actividades</a>
+				
+					<button title="Crear actividad comercial" class="btn btn-icon btn-add" onclick="location.href='crearactividades.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			
+			<li class="tree-lv1">
+				<a href="presupuestos.html">Presupuestos</a>
+				
+					<a title="Crear presupuesto" class="btn btn-icon btn-add" href="crearpresupuestos.html"><i class="fa fa-plus-circle"></i></a>
+				
+			</li>
+		</ul>
+	</div>
+
+
+	</ul>
+			
+	<ul class="menu-list favoritos-list">
+		<li class="separador"></li>
+		<li class="menu-header">Favoritos</li>
+
+		<!-- FASVORITOS GESTOR PROJCTS-->
+		
+
+		
+			<!-- LIST FAVORITOS -->
+			
+			<!-- LIST NO FAVORITOS -->
+			<ul id="menuNoFavorites" class="menu-submenu collapse">
+				<li class="separador"></li>
+				
+			</ul>
+			<li class="show-more" data-toggle="collapse" data-target="#menuNoFavorites" aria-expanded="false" style="display: none;">
+				<a href="#">
+					<span class="text-more">Ver más</span>
+					<span class="text-less">Ver menos</span>
+					<i class="fa fa-angle-down" aria-hidden="true"></i>
+				</a>
+			</li>
+		
+	</ul>
+
+	<ul class="menu-list favoritos-list">
+		<li class="separador"></li>
+	</ul>
+
+	<div class="menu-other">
+		<ul id="timetracking" class="menu-content">
+			<li class="trakingTask" style="display: none;">
+				<div class="media">
+					<div class="media-body">
+						<h4 id="trakingProject" class="media-heading"></h4>
+						<p id="trakingTask"></p>
+					</div>
+				</div>
+			</li>
+			<li class="trakingController">
+				<div class="media">
+					<div class="media-left">
+						<button id="timetracking-play" class="timetracking-play media-object btn-transparent" style="display: block;">
+							<img title="Clic para registrar tiempo" src="/saas/img/icons/icons/grey/play.svg">
+						</button>
+						<button id="timetracking-stop" class="media-object btn-transparent" style="display: none;">
+							<img title="Clic para guardar tiempo" src="/saas/img/icons/icons/red/stop.svg">
+						</button>
+					</div>
+					<div class="media-body">
+						<p id="timetracking-counter">00:00:00</p>
+					</div>
+					<div id="timetracking-discard" class="media-right" style="display: none;">
+						<button class="media-object btn-transparent">
+							<img title="Clic para guardar tiempo" src="/saas/img/icons/icons/white/delete.svg">
+						</button>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<script>
+	$(function() {
+		if( $("#menuNoFavorites").children().length < 2 ) 
+			$("#sidebarWrapper .favoritos-list .show-more").hide();
+	});
+
+	$(document).on("click", ".favoritos-list .btn-fav", function() {
+		var li = $(this).closest("li");
+		var newLi;
+		var id = $(this).data("id");
+		var esFav = $(this).closest("#menuNoFavorites").length;
+		
+		esFav = (esFav == 0) ? true : false;
+
+		if(esFav) {
+			li.clone().appendTo("#menuNoFavorites");
+			li.remove();
+			if( $("#menuNoFavorites:visible") ) 
+				$("#sidebarWrapper .favoritos-list .show-more").show();
+		}
+		else {
+			li.clone().insertBefore("#menuNoFavorites");
+			li.remove();
+			if( $("#menuNoFavorites").children().length < 2 ){
+				$("#menuNoFavorites").collapse("hide");
+				$("#sidebarWrapper .favoritos-list .show-more").hide();
+			}
+		}
+
+ 		$.ajax({
+			url: "/saas/users/set-favorite-menu",
+			data: {
+				favorite: !esFav,
+				idOptionMenu: id
+			}
+		});
+	});
+	
+	$(document).on("click", ".sidebar-toggle", function() {
+		var isActive = $(this).hasClass("active");
+		
+		$(this).toggleClass("active");
+		
+ 		$.ajax({
+			url: "/saas/pin-side-bar",
+			method: "POST",
+		});
+
+	});
+</script>
+
+				<div id="divCentral" class="page-content-wrapper">	
+				
+				
+					
+					
+					
+					
+
+					<div class="page list container-fluid">
+						
+						
+
+
+
+
+
+<div id="divtasks" class="tasks-list">		
+	
+
+
+
+
+
+
+
+<div class="page-header">
+	<div class="main-row">
+		<div class="head-col">
+			<h1>Tareas</h1>
+				
+		
+			
+				<div class="btn-group view-mode ml10 hidden-xs">
+					<button type="button" class="btn btn-icon active">
+						<img title="Vista listado" src="/saas/img/icons/icons/grey/listado.svg">
+					</button>
+					<a class="btn btn-icon" href="tareas.html?layout=kanban&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idUser=46886&amp;idEstado=1&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;orderBy=">
+						<img title="Vista kanban" src="/saas/img/icons/icons/grey/kanban.svg">
+					</a>
+				</div>
+			
+
+			
+
+<div class="filters-list">
+
+	
+	
+		
+	
+		
+		
+	<!-- SELECT PROJECT MOBILE ONLY -->
+	<div class="filter-dropdown hidden-md hidden-lg ml10">
+		<div class="dropdown">
+			<button type="button" id="filterStateActor" class="btn dropdown-toggle" data-toggle="dropdown">				
+				<i class="fa fa-tasks"></i>
+				Proyectos
+				<span class="caret"></span>
+			</button>
+			<ul id="filterProyectos" class="proyectos-list dropdown-menu sidebar-list">
+
+
+
+
+
+
+
+	<li>
+		<a id="proyectos" onclick="checkModifForm(event)" href="tareas.html?reset=true">Todas las tareas</a>
+	</li>
+	
+		<li id="idProject43253" class="li-sidebar-proyecto " data-id="43253">proyect</li>
+	
+</ul>
+		</div>
+	</div>
+	
+	<div id="select-proyecto" class="filter-btn select-tabs hidden-xs hidden-sm">
+
+
+
+
+
+
+
+	<button type="button" class="btn btn-select-tabs" data-toggle="popover" data-original-title="" title="">
+	
+	
+	
+		Seleccionar proyecto
+		
+	
+	<span class="caret"></span>
+	</button>
+
+	
+<div class="select-tabs-content">
+	<div class="select-tabs-inner">
+		
+		<ul class="nav nav-tabs select-proyecto-tabs tabs-icon">
+			<li id="tablinkActivos" class="active">
+				<a id="linkActivos" data-toggle="tab" aria-controls="activos" role="tab" href=".linkActivos">Activos</a>
+			</li>
+			<li id="tablinkInactivos">
+				<a id="linkInactivos" data-toggle="tab" aria-controls="inactivos" role="tab" href=".linkInactivos">Inactivos</a>
+			</li>
+		</ul>
+		
+		<div class="tab-content">
+			<div role="tabpanel" id="activos" class="tab-pane fade in active linkActivos">						
+											
+
+				<ul id="proyectosEnCurso">
+					
+						<li id="proyecto43253">
+							<span class="item" data-id="43253">proyect</span>
+						</li>
+					
+				</ul>
+			</div>
+			<div role="tabpanel" id="inactivos" class="tab-pane fade linkInactivos">
+				<ul id="proyectosInactivos">
+					
+				</ul>
+			</div>
+		</div>
+		
+		
+			<a href="tareas.html?idProject=0" class="btn-link" id="verTodosProyectos">Ver todos los proyectos</a>
+		
+		
+	</div>
+	<input type="hidden" id="workspacesFiltersLayout" value="layout-tasks">
+</div>
+
+<script>
+	$(function() {
+		// popover selector de proyecto
+		$(".btn-select-tabs").popover({
+			placement : 'bottom',
+			trigger : 'manual',
+			container:'body',
+			html: true,
+			content: function() {
+				$(this).data("bs.popover").tip().addClass("selectorTabs");			
+				var html = $(".select-tabs-content").html();
+				return html;
+			}
+		}).click(function(e){
+		    $(this).popover('show');
+		    e.preventDefault();
+		});
+	
+		// cerrando popover selector al hacer click fuera
+		$('body').click(function(e) {
+			var target = $(e.target);
+			if(!target.is('.selectorTabs') && !target.is('.btn-select-tabs')&& !target.parents().is('.btn-select-tabs') && !target.parents().is('.selectorTabs')) {
+				$(".selectorTabs").hide();
+			}
+		});
+	
+		$(document).on("click", ".select-tabs-inner .item", function(e) {
+			const layout = $("#workspacesFiltersLayout").val();
+			
+			var url = "tareas.html?layout=" + layout + "&idProject="; // url por defecto
+			var id = $(this).attr("data-id");
+			
+			
+			if(layout == "project") 
+				url = "/saas/projects/view.action?id="; // url view proyecto
+		
+			window.location.href = url + id;
+		});	
+	});	
+</script></div>	
+
+	<!-- ORDEN -->
+	
+		<div class="filter-dropdown hidden-xs hidden-sm">
+			<div class="dropdown">
+				<button type="button" id="filterOrderr" class="btn" data-toggle="dropdown">
+					<img class="i-icon" src="/saas/img/icons/icons/grey/order.svg">
+					Proyecto
+					
+					
+					
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a id="filterOrderByWorkspace" href="tareas.html?orderBy=-1&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idUser=46886&amp;idEstado=1&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;colorId=" title="Ordenar por proyecto">Ordenar por proyecto</a></li>
+					<li><a id="filterOrderByTime" href="tareas.html?orderBy=1&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idUser=46886&amp;idEstado=1&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;colorId=" title="Ordenar por fecha límite">Ordenar por fecha límite</a></li>
+					<li><a id="filterOrderByUser" href="tareas.html?orderBy=2&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idUser=46886&amp;idEstado=1&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;colorId=" title="Ordenar por responsable">Ordenar por responsable</a></li>
+					<li><a id="filterOrderByCreation" href="tareas.html?orderBy=3&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idUser=46886&amp;idEstado=1&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;colorId=" title="Ordenar por fecha de creación">Ordenar por fecha de creación</a></li>
+				</ul>
+			</div>
+		</div>
+	
+	
+
+	<!-- FILTRO USUARIO -->
+	<div class="filter-dropdown hidden-xs">
+		<div class="dropdown">
+			<button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+				Mis tareas
+				
+				
+				
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+				<li id="listMio">
+					<a href="tareas.html?idUser=46886&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idEstado=1&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;orderBy=&amp;colorId=">
+						Mis tareas
+					</a>
+				</li>
+				<li id="listTodos">
+					<a href="tareas.html?idUser=0&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idEstado=1&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;orderBy=&amp;colorId=">
+						Tareas de todos
+					</a>	
+				</li>
+				<li id="listUnnasigned">
+					<a href="tareas.html?idUser=-1&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idEstado=1&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;orderBy=&amp;colorId=">
+						Tareas sin asignar
+					</a>	
+				</li>
+				
+				
+			</ul>
+		</div>
+	</div>
+
+	<!-- FILTRO ESTADO -->
+	<div class="filter-dropdown">
+		<div class="dropdown">
+			<button type="button" id="filterStateActor" class="btn dropdown-toggle" data-toggle="dropdown">
+				En curso
+				
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+				<li id="filterState0">
+					<a href="tareas.html?idEstado=0&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idUser=46886&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;orderBy=&amp;colorId=">Todos</a>
+				</li>
+				
+					<li id="filterState4">
+						<a href="tareas.html?idEstado=4&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idUser=46886&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;orderBy=&amp;colorId=">Cancelada</a>
+					</li>
+				
+					<li id="filterState1">
+						<a href="tareas.html?idEstado=1&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idUser=46886&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;orderBy=&amp;colorId=">En curso</a>
+					</li>
+				
+					<li id="filterState2">
+						<a href="tareas.html?idEstado=2&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idUser=46886&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;orderBy=&amp;colorId=">Pendiente</a>
+					</li>
+				
+					<li id="filterState3">
+						<a href="tareas.html?idEstado=3&amp;page=0&amp;layout=layout-tasks&amp;startDate=&amp;endDate=&amp;filter_tag=&amp;tag_type=&amp;idUser=46886&amp;nombreCuenta=&amp;nombreTarea=&amp;idProject=&amp;orderBy=&amp;colorId=">Terminada</a>
+					</li>
+				
+			</ul>
+		</div>
+	</div>
+	
+	<!-- FILTRO TIEMPO -->
+	<div class="filter-btn hidden-xs hidden-sm">
+		<button type="button" id="filterDateRangeTareas" class="btn btn-noBtn">
+			Fecha límite
+			
+			
+			<span class="caret"></span>
+		</button>
+	</div>	
+
+	<!-- Filtro por tags -->
+	
+
+	<!-- FILTROS CLIENTE + NOMBRE -->
+	<div class="filter-popover hidden-xs">
+		<button type="button" id="tareasFilters" class="btn" data-toggle="popover" data-original-title="" title="">
+			Más filtros
+			
+		</button>
+	</div>
+	
+	<!-- FILTROS LIMPIAR -->
+	
+</div>
+
+<div id="filterTasksPopover" class="filterPopover hide">
+	<form action="list-all" method="post" autocomplete="off">
+		<input type="hidden" name="idEstado" value="1">
+		<input type="hidden" name="idUser" value="46886">
+		<input type="hidden" name="idProject" value="">
+		<input type="hidden" name="orderBy" value="">
+		<input type="hidden" name="filter_tag" value="">
+		<input type="hidden" name="tag_type" value="">
+		<input type="hidden" name="startDate" value="">
+		<input type="hidden" name="endDate" value="">
+		<input type="hidden" name="page" value="0">
+		<input type="hidden" name="colorId" id="colorIdTarea" class="entityColor" value="">
+		
+		<!-- CLIENTE -->
+		<div class="form-group">
+			<div class="autocompleter-content">
+				<input type="text" name="nombreCuenta" id="cuentaPopover" class="form-control form-control-popover" placeholder="Buscar por Cliente" value="" data-completer-context="accounts" data-completer-action="account-name.action">
+			</div>
+		</div>
+		<!-- NOMBRE -->
+		<div class="form-group">
+			<input type="text" name="nombreTarea" class="form-control form-control-popover" placeholder="Buscar por Nombre" value="">
+		</div>
+		
+		<!-- COLORES -->
+		<div class="form-group">
+			<div class="dropdown dropdown-color" data-inp="#colorIdTarea">
+				<button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+					
+						<span title="Selecciona un color" class="color color-none"></span>
+					
+										
+					
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-right">
+					
+						<li title="Sin color" class="color color-none active" data-val=""></li>
+						<li title="Todos los colores" class="color color-all " data-val="-1"></li> 
+				</ul>
+			</div>
+		</div>	
+		
+		
+		<button type="submit" class="btn btn-default btn-block">Filtrar</button>
+	</form>
+</div>
+
+<script>
+	dmslib.Ajax.actualiza('/saas/tasks/list-ajax-workspaces','filterProyectos');
+
+	
+	$(function() {
+		// POPOVER BUTTON FILTERS TASKS
+		$("#tareasFilters").popover({
+			trigger: "manual",
+			placement: "bottom",
+			html: true,
+			template: '<div class="popover filterPopover"><h3 class="popover-title"></h3><div class="popover-content"></div></div>',
+			content: function() {
+				return $('#filterTasksPopover').html();
+			}
+		}).click(function(e){
+			$(this).popover('show');
+			e.preventDefault();
+		});
+
+		//dropdown tags
+		var tags = "".split(",");
+		$("#tagDropdown [name='filter_tag']").each(function() {
+			var inp = $(this);
+
+			$.each(tags, function() {
+				if(inp.val() == parseInt(this)) 
+					inp.prop("checked", true);
+			});
+		});
+
+		$(document).on("change", "#all", function(e) {
+			if( $(this).is(":checked") ) 
+				$("#hAll").val("and");
+			else 
+				$("#hAll").val("or");
+		});
+		
+		// DATE RANGE PIKER
+		var init = false;
+		var i18n = getCalendarLabels('1');
+		var local = {
+			"format": "DD/MM/YY",
+			"separator": "/",
+			"daysOfWeek": i18n.weekdaysShort,
+			"monthNames": i18n.months,
+			"firstDay": 1,
+			"applyLabel":  billageUtilsLiteral("general.filtrar"),
+		};
+
+		$("#filterDateRangeTareas").daterangepicker({
+			"locale": local,
+			"ranges": ranges = {
+				"Hoy": [moment(), moment()],
+				"Esta semana": [moment().startOf("isoweek"), moment().endOf("isoweek")],
+				"Este mes": [moment().startOf("month"), moment().endOf("month")],
+				"Este año": [moment().startOf("year"), moment().endOf("year")],
+				//"Todos": [moment("2013").startOf("year"), moment().endOf("year")],
+				"Todos": [null, null],
+			},
+			"linkedCalendars": false,
+			"showDropdowns": true,
+			"showCustomRangeLabel": false,
+			"alwaysShowCalendars": true,
+			"buttonClasses": "btn",
+			"applyClass": "btn-primary",
+		}).on("apply.daterangepicker", function(ev, picker) {
+			var desde = "";
+			var hasta = "";
+
+			if(picker.startDate._isValid) 
+				desde = picker.startDate.format("DD/MM/YY");
+			if(picker.endDate._isValid) 
+				hasta = picker.endDate.format("DD/MM/YY");
+			
+			// aplica filtro
+			location.href = pageContext + "/tasks/list-all?page=0&layout=layout-tasks&filter_tag=&tag_type=&idUser=46886&idEstado=1&nombreCuenta=&nombreTarea=&idProject=&orderBy=&colorId=&startDate=" + desde + "&endDate=" + hasta;
+
+			$(this).datepicker("hide");
+		});
+
+		var liShowCalendar = $("<li>").addClass("visible-xs-inline").text( billageUtilsLiteral("general.seleccionarFecha") ).click(function() {
+			$(this).closest(".daterangepicker").find(".range_inputs, .calendar.left").toggle();
+		});
+		$(".daterangepicker .ranges ul").append(liShowCalendar);
+
+		// aplica fechas iniciales si viene de una b�squeda
+		var startDate = '';
+		var endDate = '';
+		
+		if("" != "") 
+			startDate = "";
+		if("" != "") 
+			endDate = "";
+	
+		if(startDate != "" && startDate == endDate) {
+			$("#filterDateRangeTareas").data("daterangepicker").setStartDate(startDate);
+			$("#filterDateRangeTareas").data("daterangepicker").setEndDate(startDate);
+		}
+		if(startDate != "" && startDate != endDate) 
+			$("#filterDateRangeTareas").data("daterangepicker").setStartDate(startDate);
+		if(endDate != "" && startDate != endDate) 
+			$("#filterDateRangeTareas").data("daterangepicker").setEndDate(endDate);
+
+	});
+</script>
+
+
+<script>
+	$(function() {
+		var layout = "layout-tasks";
+		if (layout == "")
+			layout = "layout-tasks";
+			
+		//carga filtros ajax	
+		$.ajax({
+			url: pageContext + "/tasksList/list-ajax-filter-workspaces",
+			data: {
+				"layout": layout,
+				"idProject": ""
+			}
+		}).done(function(data) {
+			$("#select-proyecto").html(data);
+		});		
+	});		
+</script>
+
+		</div>
+		
+		<div class="page-actions actions-sm">
+			
+				<button type="button" id="button-create-task" class="btn btn-primary btn-plus" onclick="location.href='creartareas.html'">
+					<span class="icon-plus"></span>
+					<span class="hidden-xs">Crear tarea</span>
+				</button>
+			
+
+			<div class="dropdown">
+				<button type="button" class="btn btn-icon btn-dropmore dropdown-toggle hidden-xs" data-toggle="dropdown"></button>
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li onclick="dmslib.Widget.verPopup('div-popup-exportar',null,'/saas/tasks/popup-export-tasks')">Exportar tareas</li>
+					<li class="divider"></li>
+					<li><a id="tipoProyecto" href="/saas/projectTypes/list">Etiquetas de proyectos</a></li>
+					<li><a id="tags" href="/saas/tags/list">Etiquetas de tareas</a></li>
+					
+						<li><a id="perfiles" href="/saas/profiles/list">Tarifas</a></li>
+					
+					<li><a id="tipoGastos" href="/saas/spendingProjectTypes/list">Tipos de gasto</a></li>
+					<li><a id="customFields" href="/saas/customFieldTasks/list">Campos personalizados de tareas</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+	<!-- cargamos listado en funcion del tipo de ordenacion -->
+	
+		
+
+
+
+
+
+
+<div id="sortable-container" class="list-workspace" unselectable="on">
+
+
+
+
+
+
+
+	
+	
+	
+
+	<!-- iteramos listados de tareas -->
+	
+		
+		
+		
+			
+			
+				
+			
+			
+			
+							
+					
+				<div class="project-container">
+				<!--  si esta en proyecto no ponemos cabecera -->
+				<div class="row-project-title">
+					<h2 class="project-title">
+						<a href="/saas/projects/view.action?id=43253">
+							proyect   
+						</a>
+						
+						<button type="button" class="btn btn-fav-project " data-id="43253"></button>
+						
+					</h2>
+	
+					
+						<button type="button" class="btn btn-primary btn-plus" aria-haspopup="true" aria-expanded="true" onclick="dmslib.Widget.verPopup('popup-xs',null,'/saas/tasksList/ver-alta?idProject=43253&amp;layout=layout-tasks');">
+							<span class="icon-plus"></span> Crear listado
+						</button>
+					
+				</div>
+			
+			
+			<div class="project-task-list-container ">
+		
+
+		
+		<div class="project-task-list" data-id="85162" data-projectid="43253" data-usuarioid="46886" data-layout="layout-tasks">
+				<div class="project-task-list-title">
+					
+					<h3 class="project-task-list-title-text" role="button" onclick="dmslib.Widget.verPopup('popup-xs',null,'/saas/tasksList/view-edit?layout=layout-tasks&amp;entity.id=85162')">
+						Primer listado		
+						
+
+
+
+
+
+										
+					</h3>
+
+					
+						
+							<div class="dropdown">
+								<button type="button" class="btn btn-more" data-toggle="dropdown"></button>
+								<ul class="dropdown-menu dropdown-menu-right menu-desplegable">
+									<li class="menu-desplegable-option" onclick="dmslib.Widget.verPopup('popup-xs',null,'/saas/tasksList/view-edit?layout=layout-tasks&amp;entity.id=85162')">
+										Modificar listado de tareas
+									</li>
+									<li class="menu-desplegable-option" onclick="marcarEliminado('tasksList',85162,'Eliminar listado','Al eliminar el listado se eliminarán también las tareas, gastos y tiempos vinculados.','layout=layout-tasks',true)">
+										Eliminar listado
+									</li>
+								</ul>
+							</div>
+						
+					
+				</div>
+
+				<!--  cargar tareas -->
+				
+				
+						<ul class="ul-project-task" data-id="85162">
+
+
+
+
+
+	
+	
+		
+
+
+
+
+
+
+<li id="li275696" class="li-project-task clearfix  time-order" data-id="275696">
+	<span class="line-color"></span>
+
+
+	
+
+	<div class="li-project-container">
+		<div class="project-task" id="div-project-task-275696">			
+			<div class="task-name">
+				<div class="project-name" onclick="dmslib.Widget.verPopup('divEditTarea',null,'/saas/tasks/view-edit?entity.id=275696&amp;layout=layout-tasks&amp;orderBy=')">sdf</div>
+			</div>
+			<div class="task-details">
+				<div class="list-tags hidden-xs" data-tags="">
+
+					
+						
+					
+					
+					
+					
+				</div>				
+				<div class="project-time hidden-xs">
+
+					
+									
+									
+									
+					<div class="fecha-fin">
+						<span class="fecha-fin-label">
+							Fecha límite
+						</span>
+						
+						<span class="data-time-trigger " data-toggle="popover" data-id="275696" data-layout="layout-tasks" data-hora="" data-minutos="" data-fecha="" data-relativasegun="" data-diasfecharelativa="" data-tipofecharelativa="" data-isreldate="false" data-fechainicioproyecto="" data-fechafinproyecto="" data-original-title="" title="">
+								
+							
+								Añadir fecha
+							
+						</span>
+					</div>
+					
+					<div class="task-progress-container">
+						
+
+
+
+
+
+									
+					</div>		
+				</div>
+
+				<div class="project-traking" data-timetracking="275696">
+					<a data-timetracking="stop" style="display:none;"><img title="Clic para guardar tiempo" src="/saas/img/icons/icons/red/stop.svg"></a>
+				</div>
+			</div>
+		
+		</div>
+	
+										
+		<div class="state-container-tasks state-container">		
+			<button class="btn-estado state-Orange state" data-task-id="275696" data-toggle="popover" type="button" data-original-title="" title="">
+				<span class="state-label">En curso</span>
+			</button>
+			
+			<div class="dropdown-estados-template" style="display:none">
+				<ul class="dropdown-estados ajax" data-layout="layout-tasks">
+					
+						<li>
+							<span class="state-edit Red " data-clase="Red" data-id="4">Cancelada</span>
+						</li>
+					
+						<li>
+							<span class="state-edit Orange active" data-clase="Orange" data-id="1">En curso</span>
+						</li>
+					
+						<li>
+							<span class="state-edit Yellow " data-clase="Yellow" data-id="2">Pendiente</span>
+						</li>
+					
+						<li>
+							<span class="state-edit Green " data-clase="Green" data-id="3">Terminada</span>
+						</li>
+											
+				</ul>
+			</div>
+		</div>		
+		
+		
+		<button type="button" class="btn-menu-usuario avatar avatar25" data-toggle="popover" data-layout="layout-tasks" data-task-id="275696" data-original-title="" title="">
+			
+			
+				<span title="Poner nombre" class="avatar-no-image">PN</span>
+																	
+		</button> 				
+
+		<div class="dropdown btn-group project-menu">
+			<button class="btn-more" type="button" data-toggle="dropdown"></button>
+			<ul class="dropdown-menu dropdown-menu-right menu-desplegable menu-desplegable-tareas">
+				<li class="menu-desplegable-option menu-color menu-option-icon color-trigger pickColor-wrap" data-original-title="" title="">
+					<span class="menu-option-text">Asignar color</span>
+					<div class="menu-icon">
+						<span class="pickColor" title="Selecciona un color"></span>
+					</div>
+				</li>
+									
+				<li class="menu-desplegable-option" onclick="dmslib.Widget.verPopup('divEditTarea',null,'/saas/tasks/view-edit?entity.id=275696&amp;layout=layout-tasks')">
+					Modificar tarea
+				</li>
+				<li class="menu-desplegable-option" onclick="dmslib.Widget.verPopup('popup-xs',null,'/saas/tasks/view-move-task?entity.id=275696')">
+					Mover a otro proyecto
+				</li>
+				<li class="menu-desplegable-option clon-task" data-id="275696">Clonar tarea</li>	
+				<li class="menu-desplegable-option task-track" onclick="dmslib.Widget.verPopup('popup-tracking', null, pageContext + '/times/popup-timetracking-start?idTarea=275696');">Iniciar registro de tiempo</li>					
+				<li class="menu-desplegable-option" onclick="marcarEliminado('tasks',275696,'¿Estás seguro de eliminar esta tarea?','Al eliminar una tarea se eliminarán también los gastos y tiempos registrados de ésta.','layout=layout-tasks',true)">
+					Eliminar tarea
+				</li>
+			</ul>
+		</div>
+	</div>
+	
+	<script>
+		var orderBy = "";
+		if (orderBy.trim() == ''){
+			initTask();
+		}
+	</script>
+</li>
+
+		
+</ul> <!--  cerrar lista tareas -->
+				
+				<script>
+					dmslib.Ajax.actualiza(pageContext+"/tasks/list-ajax-tasks-by-list?idListadoTareas=85162&layout=layout-tasks&idProject=&idUser=46886&idEstado=1&nombreCuenta=&nombreTarea=&colorId=&filter_tag=&tag_type=&startDate=&endDate=", ".project-task-list[data-id='85162'] .ul-project-task");
+				</script>
+				
+				<input type="text" name="" maxlength="256" class="task-add-quick" placeholder="Añade una nueva tarea rápida pulsando enter">
+				
+		</div>
+						
+		
+	
+
+	</div>	<!-- fin .project-task-list-container final -->
+	
+	<script>
+		$(function() {
+			$("#idListadoTareas").val(85162);
+			initListadoOrdenable('1'); // inicializaci�n ordenaci�n de tareas
+			initAddQuickTaskListado(); // a�adir tarea r�pida onkeypress
+			substringTags(); // substring de etiquetas
+		});
+	</script>
+
+
+
+
+</div></div>
+<div id="myNewTask" style="display:none;"></div>
+<input type="hidden" id="idListadoTareas" value="85162">
+<input type="hidden" id="idProject" value="">
+
+<script>
+	$(function() {
+		var bAjax = false;
+		var listadoTareas;
+		var idListadoTareas = $("#idListadoTareas").val();
+		var url = pageContext + "/tasks/list-all-new?layout=layout-tasks&orderBy=&startDate=&endDate=&filter_tag=&tag_type=&idUser=46886&idEstado=1&nombreCuenta=&nombreTarea=";
+
+		$("#sortable-container").append('<span class="cargando-ajax text-center no-hover"><img src="/saas/img/loading.gif" class="img-cargando" /></span>');
+
+		var idProject = $("#idProject").val();
+		var string_project = '';
+		
+		if (idProject != undefined && idProject.trim() != "")
+			string_project = "&idProject=" + idProject;
+
+		// carga primera vez
+		if (!bAjax){
+			bAjax = true;
+
+			$.ajax({
+				url: url + string_project,
+				success: function(result) {
+	
+					$("#sortable-container .cargando-ajax").remove();
+					$("#sortable-container").append(result);
+	
+					bAjax = false;
+					idListadoTareas = $("#idListadoTareas").val();
+					listadoTareas = $(".project-task-list[data-id='" + idListadoTareas + "']");
+					
+					
+				    setTimeout(function() {
+						// init cosas
+						initTask();
+						dropdownEstados();
+						initListadoOrdenable(''); // inicializaci�n ordenaci�n de tareas
+						initAddQuickTaskListado(); // a�adir tarea r�pida onkeypress
+						substringTags(); // substring de etiquetas
+				      }, 1000);
+	
+				}
+			});		
+		}
+
+
+		
+
+		// scroll infinito tareas
+		$(window).on("scroll", function() {						
+			var docViewTop = $(window).scrollTop();
+			var docViewBottom = docViewTop + $(window).height();
+
+			if (listadoTareas.offset() != undefined){
+				var elemTop = listadoTareas.offset().top;
+				var elemBottom = elemTop + listadoTareas.height();
+				var visible = (elemBottom <= docViewBottom) && (elemTop >= docViewTop);
+				
+				idProject = $("#idProject").val();
+				string_project = '';
+				
+				if (idProject != undefined && idProject.trim() != "")
+					string_project = "&idProject=" + idProject;
+									
+				// llamada ajax cuando el listado es visible en pantalla
+				if(visible && !bAjax) {
+					bAjax = true;
+					$("#sortable-container .cargando-ajax").remove(); // por si acaso
+					$("#sortable-container").append('<span class="cargando-ajax text-center no-hover"><img src="/saas/img/loading.gif" class="img-cargando" /></span>');
+	
+					// carga ajax más tareas
+					$.ajax({
+						url: url + string_project + "&idListadoTareas=" + idListadoTareas + "&page=1",
+						success: function(result) {
+							//console.log(result);
+							$("#sortable-container .cargando-ajax").remove();
+							
+							if (result.lastIndexOf("no-list-tasks") >= 0)
+								$("#sortable-container").html(result);
+							else if (result.trim()==''){
+								// nada
+							}
+							else{
+								$("#sortable-container").append(result);
+								bAjax = false;
+								idListadoTareas = $("#idListadoTareas").val();
+								listadoTareas = $(".project-task-list[data-id='" + idListadoTareas + "']");		
+							}
+
+						}
+					});
+				}
+			}
+		});
+			
+
+
+		
+	});
+</script>
+	
+	
+
+
+
+
+<script>
+	$(function() {
+		initTask();
+		dropdownEstados();
+		initListadoOrdenable(''); // inicializaci�n ordenaci�n de tareas
+		initAddQuickTaskListado(); // a�adir tarea r�pida onkeypress
+		substringTags(); // substring de etiquetas
+		
+		// marcar proyecto activo al cargar la p�gina
+		var selectedProject = "";
+		if(selectedProject != null && selectedProject != '') 
+			$("#idProject" + selectedProject).addClass("active");
+
+		// popover etiquetas
+		$(".tag-item").popover({
+			placement: "bottom",
+			trigger: "hover"
+		});
+		
+	});
+</script>
+</div>
+
+<script>
+	$(function() {
+		// obre el popup
+		var taskId = "";
+		if(taskId) dmslib.Widget.verPopup("divEditTarea", null, pageContext+"/tasks/view-edit?entity.id="+taskId);
+	});
+</script>
+					</div>
+
+				</div>
+				
+				
+			</div>
+	
+			<!--  contenido popover de selección de color -->
+			<div class="select-color-content">
+				
+				<span class="color-sq color-none" data-color="transparent" title="Sin color"></span>
+			</div>
+		
+		</main>
+		
+		
+
+
+
+
+
+
+
+<!-- Div para confirmar eliminar elemento -->
+<div id="dEliminarElemento" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			Atención
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+	<div class="popup-content">
+		<h4 id="divMensajePopup"></h4>
+		<div id="divMensajeImplicaciones"></div>
+    </div>
+	<div class="popup-footer">		
+		<button type="button" id="inputEliminar" class="btn btn-submit" onclick="dmslib.Validation.validate(this, 'form')">Aceptar</button>	
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+<!-- Div para subir imagen productos  -->
+<div id="dpopup_imagen_producto" class="dpopupsubirimagen popup">
+    
+        
+        
+        
+        
+        
+    
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Sube una foto para el servicio o producto.
+		
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+<form id="upload_image_product" action="/saas/products/upload-image" method="post" enctype="multipart/form-data">
+    <input id="image_product" name="id" type="hidden" value="">
+	<div class="popup-content" style="overflow:hidden">
+		<div class="upload-container">
+		    <div class="upload-img">
+		        <i class="fa fa-picture-o" aria-hidden="true"></i>
+		    </div>
+		    <div class="upload-file">
+		        <p>Sube una foto para el servicio o producto.<br><br><b>Formato:</b> jpg, png o gif.<br>	<b>Tamaño máximo:</b> 2 MB.<br><br></p>
+		        <input type="file" name="upload" id="upload">
+		    </div>
+	    </div>
+	</div>
+
+	<div class="popup-footer">		
+		<button type="submit" id="inputUploadFile" class="btn btn-submit" onclick="dmslib.Widget.escondePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>    
+</form>
+</div>
+
+<!-- Div para subir gastos  -->
+<div id="dpopup_doc-preview" class="dpopupsubirgasto popup-div popup">
+    
+        
+		
+        
+        
+		
+    
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Subir documento de gasto
+		
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+<form id="upload_image_gasto" action="/saas/spending/upload-image" method="post" enctype="multipart/form-data">
+    <input id="image_gasto" name="id" type="hidden" value="">
+	<div class="popup-content" style="overflow:hidden">
+		<div class="upload-container">
+		    <div class="upload-img">
+		        <i class="fa fa-picture-o" aria-hidden="true"></i>
+		    </div>
+		    <div class="upload-file">
+		        <p>Selecciona documento de gastos para el gasto</p>
+		        <input type="file" name="upload" id="upload">
+		    </div>
+	    </div>
+	</div>
+
+	<div class="popup-footer">		
+		<button type="submit" id="inputUploadFile" class="btn btn-submit" onclick="dmslib.Widget.escondePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>    
+</form>
+</div>
+
+<!-- Div para popup error  -->
+<div id="div-error" class="popup">
+	<div class="popup-header">
+		<div class="popup-title">
+			<span id="div-cabecera-error"></span>
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<div id="div-mensaje-error" class="popup-content"></div>
+
+	<div class="popup-footer">		
+		<button type="button" class="btn btn-submit" onclick="dmslib.Widget.removePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+<!-- Div para mover un documento o carpeta (des de docs)   -->
+<div id="destinationPopup" class="popup no-remove">
+	
+
+
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Destino
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+
+<div class="popup-content">
+	<div id="treeContainer" class="folder-tree"></div>
+	<div id="carpeta-destination-tree" class="folder-tree"></div>
+
+	<div class="fake-footer">
+		<button type="button" id="carpeta-destination-btn" class="btn btn-submit">Mover</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+
+
+<div id="divValidacionPopup" class="validacion">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Faltan campos requeridos.
+</div>
+
+<div id="divErrorPopup" class="validacion-error">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="span-texto-error-popup"></span>
+</div>
+
+
+</div>
+
+<!-- Div para ir a una carpeta (des de docs)  -->
+<div id="gotoPopup" class="popup no-remove">
+	
+
+
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Ir a
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+
+<div class="popup-content">
+	<div id="carpeta-goto-tree" class="folder-tree"></div>
+	<div id="carpeta-destination-tree" class="folder-tree"></div>
+
+	<div class="fake-footer">
+		<button type="button" id="carpeta-goto-btn" class="btn btn-submit">Confirmar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+
+
+<div id="divValidacionPopup" class="validacion">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Faltan campos requeridos.
+</div>
+
+<div id="divErrorPopup" class="validacion-error">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="span-texto-error-popup"></span>
+</div>
+
+
+</div>
+
+<!-- Div para mostrar mensajes de confirmacion  -->
+<div id="divConfirmacionAccion" class="popup popup-mensaje popup-mensaje-confirmacion">
+	<span id="divConfirmacionAccionTexto" class="popup-mensaje-texto"></span>
+</div>
+
+<!-- Div para mostrar mensajes de alerta  -->
+<div id="divAlertAccion" class="popup popup-mensaje popup-mensaje-alerta">
+    <span id="alertAccionTexto" class="popup-mensaje-texto"></span>
+</div>
+
+<!-- Div para gestionar los conceptos a albaranear -->
+<div id="divConceptosAlbaranes" class="divConceptosAlbaranes popup"></div>
+
+<!-- wigets dashboard-->
+<div id="divAddWidgetPopup" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			Seleccionar widget
+			
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<div class="popup-content">
+		<div class="controls" id="tagsControls"></div>
+		<div id="selectorAddWidget" class="container ps-container ps-active-y"></div>
+	</div>
+	
+	<div class="popup-footer">		
+		<button type="button" class="btn btn-submit" onclick="addWidgetToDashboard()">Agregar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+<!-- filtros wigets dashboard -->
+<div id="divWidgetFiltersPopup" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			<div id="divWidgetFiltersTitle"></div>
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+    <div class="divWidgetFilters">
+        <form id="formWidgetFilters" class="widget_instance_filters_form">
+            <input id="inputWidgetInstanceId" type="hidden" name="widget_instance_id" value="">
+            <div id="divWidgetFiltersArea" class="popup-content"></div>
+			<div class="popup-footer">		
+				<button id="buttonWidgetFiltersOk" type="submit" class="btn btn-submit">Filtrar</button>
+				<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+				<!-- 
+				<button id="buttonWidgetFiltersReset" type="submit" class="btn btn-primary">Limpiar</button>
+				 -->
+			</div>
+        </form>
+    </div>
+</div>
+
+<!-- Popup subir logo a plantilla-->
+<div id="dpopup_imagen_empresa" class="dpopupsubirlogo popup-div popup">
+	<div class="popup-header">
+		<div class="popup-title">
+			Subir logo
+
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<form id="upload_image_empresa" action="/saas/companies/upload-logo" method="post" enctype="multipart/form-data">
+		<input type="hidden" id="image_empresa" name="id" value="">
+
+		<div class="popup-content">
+			<div class="upload-container">
+				<div class="upload-img">
+					<i class="fa fa-picture-o fa-4x" aria-hidden="true"></i>
+				</div>
+
+				<div class="upload-file">
+					
+					<div class="form-group fakeBtn">
+						<label for="upload" class="form-label">Selecciona tu logo</label>
+						<input type="file" name="upload" id="upload">
+						<div class="input-group add-clear-span">
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-primary">
+									<i class="fa fa-folder-open" aria-hidden="true"></i>
+								</button>
+							</span>
+							<input type="text" id="labelFile" class="form-control substring" placeholder="Seleccionar" readonly="">
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+
+		<div class="popup-footer">
+			<button type="submit" id="inputUploadFile" class="btn btn-submit">Aceptar</button>
+			<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+		</div>
+	</form>
+</div>
+
+		<script>
+			// n decimales de la empresa del usuario
+			numberDecimalsInBase10 = "100";
+			decimalesEmpresa = numberDecimalsInBase10.length -1; // num real
+			numberDecimalsInBase10 = numberDecimalsInBase10*1; // string a int
+			//funcion para mostrar mensaje de confirmacion
+			var result = "";
+			//si result = 1, mostramos mensaje confirmación
+			if(result == 1 || false) {
+				dmslib.Widget.prepararAccionConfirmacion("Datos guardados correctamente.");
+			}
+
+			//setesamos valor variable mensajeConfirmacion
+			mensajeConfirmacion = "Datos guardados correctamente.";
+			ningunaLinia = "No se ha añadido ninguna línea";
+
+			if($(location).attr("href").indexOf("contract-plans") == -1 && ""=='true') {
+				document.location = pageContext+"/contract-plans?user=yosmarquebec@gmail.com&company=19546";
+			}
+
+			firstLogin = ("" == "true") ?  1 : 0;
+			activationGoal = ("" == "true") ?  1 : 0;
+
+			//miramos si hay que mostrar popup bienvenida
+			
+				if("" == "true") 
+					dmslib.Widget.verPopup("divRenovarPassword", null, pageContext+"/new-password");
+				else if("" == "true") 
+					dmslib.Widget.verPopup("divRenovarPassword", null, pageContext+"/force-new-password");
+				else if("0" == 0 && firstLogin == 1) 
+					dmslib.Widget.verPopup("divFirstLogin", null, pageContext+"/first-login");
+
+				if("" == "true") {
+					ga("send", "event", "Pro", "activation");
+					dmslib.Ajax.request(pageContext+"/activation-goal");
+				}
+			
+
+			//asociamos evento onclick a divFormulario para saber si se está editando un formulario
+			if(dmslib.DOM.dameElemento("form")) {
+				// IE o FF
+				if(document.all) 
+					dmslib.DOM.dameElemento("form").attachEvent("onclick", activaModifForm);
+				else 
+					dmslib.DOM.dameElemento("form").addEventListener("click", activaModifForm, false);
+			}
+		</script>
+
+		
+
+
+
+
+
+
+
+	<!-- google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		
+		ga('create', 'UA-7323120-25', 'billage.es');
+		
+			ga('set', 'dimension1', 'Pro');
+			ga('set', '&uid', '46886');
+		
+		ga('send', 'pageview');
+	</script>
+	
+	<!-- Google Tag Manager -->
+	<noscript>
+		<iframe src="//www.googletagmanager.com/ns.html?id=GTM-TTXBSX" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+	</noscript>
+	<script>
+		(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+		'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','GTM-TTXBSX');
+	</script>
+	
+
+
+		
+
+
+
+
+
+	
+		
+	
+			
+			<script>				
+		    window.intercomSettings = {
+		        
+		        name: "Poner nombre",
+		        
+		        email: "yosmarquebec@gmail.com",
+		        user_id: "46886",
+		        
+		        created_at: "1607574101000",
+		        signed_up_at: "1607574101000",
+		        rol: "Administrador",
+		        app_id: "sbkq18wo",
+		        company: {
+		            remote_created_at: "1607574101000",
+		            user_count: "1",
+		            plan: "Pro",
+		            activa: "true",
+		            company_id: "19546",
+		            name: "Poner razón social",
+		            periodicidad: ""
+		        }
+		    };
+			</script>
+			<script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/sbkq18wo';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>
+	
+		
+		
+	
+
+
+		<script>
+			$(function() {
+				cookieScreenSize("lg");
+	
+				$("#menuToggle, #backgroundSidebar").click(function(e) {
+					e.preventDefault();
+					$("#mainMenu").toggleClass("toggled");
+					$("#bNavPerfil").collapse("hide");
+				});
+			});
+		</script>
+		<script src="/saas/js/footer.js"></script>
+	
+<div class="daterangepicker dropdown-menu ltr show-calendar opensright"><div class="ranges"><ul><li data-range-key="Hoy">Hoy</li><li data-range-key="Esta semana">Esta semana</li><li data-range-key="Este mes">Este mes</li><li data-range-key="Este año">Este año</li><li data-range-key="Todos">Todos</li><li class="visible-xs-inline">Seleccionar fecha</li></ul><div class="range_inputs"><button class="applyBtn btn btn-primary" disabled="disabled" type="button">Filtrar</button> <button class="cancelBtn btn btn-default" type="button">Cancel</button></div></div><div class="calendar left"><div class="daterangepicker_input"><input class="input-mini form-control" type="text" name="daterangepicker_start" value=""><i class="fa fa-calendar glyphicon glyphicon-calendar"></i><div class="calendar-time" style="display: none;"><div></div><i class="fa fa-clock-o glyphicon glyphicon-time"></i></div></div><div class="calendar-table"></div></div><div class="calendar right"><div class="daterangepicker_input"><input class="input-mini form-control" type="text" name="daterangepicker_end" value=""><i class="fa fa-calendar glyphicon glyphicon-calendar"></i><div class="calendar-time" style="display: none;"><div></div><i class="fa fa-clock-o glyphicon glyphicon-time"></i></div></div><div class="calendar-table"></div></div></div>
+<script type="text/javascript" id="">!function(b,e,f,g,a,c,d){b.fbq||(a=b.fbq=function(){a.callMethod?a.callMethod.apply(a,arguments):a.queue.push(arguments)},b._fbq||(b._fbq=a),a.push=a,a.loaded=!0,a.version="2.0",a.queue=[],c=e.createElement(f),c.async=!0,c.src=g,d=e.getElementsByTagName(f)[0],d.parentNode.insertBefore(c,d))}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");fbq("init","679832448786593");fbq("track","PageView");</script>
+<noscript>
+ <img height="1" width="1" src="https://www.facebook.com/tr?id=679832448786593&amp;ev=PageView&#10;&amp;noscript=1">
+</noscript>
+<iframe id="intercom-frame" style="position: absolute !important; opacity: 0 !important; width: 1px !important; height: 1px !important; top: 0 !important; left: 0 !important; border: none !important; display: block !important; z-index: -1 !important; pointer-events: none;" aria-hidden="true" tabindex="-1" title="Intercom"></iframe><div id="intercom-container" class="intercom-namespace"><style>html.intercom-mobile-messenger-active,html.intercom-mobile-messenger-active > body,html.intercom-modal-open,#intercom-container-body{overflow:hidden !important;}html.intercom-mobile-messenger-active,html.intercom-mobile-messenger-active > body{position:static !important;}html.intercom-mobile-messenger-active > body{height:0 !important;margin:0 !important;}iframe#intercom-frame{position:absolute !important;opacity:0 !important;width:1px !important;height:1px !important;top:0 !important;left:0 !important;border:none !important;display:block !important;z-index:-1 !important;}</style><div class="intercom-app" aria-live="polite"><iframe allowfullscreen="" class="intercom-launcher-frame intercom-1q4irxg e1ur5zlj0" name="intercom-launcher-frame" title="Intercom live chat" data-intercom-frame="true"></iframe><iframe allowfullscreen="" class="intercom-launcher-badge-frame intercom-s06fua e1loc0kc0" name="intercom-launcher-badge-frame" title="Intercom live chat notificación" data-intercom-frame="true"></iframe><div id="intercom-modal-container"></div></div></div><div id="intercom-css-container"><style data-emotion="intercom-global"></style><style data-emotion="intercom"></style></div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/fullcalendar.min.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/locale-all.js"></script>
+</body>
+
+</html>

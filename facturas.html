@@ -1,0 +1,2936 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billage 20.0</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/empty.css">
+    <link rel="stylesheet" href="assets/css/evol-colorpicker.min.css">
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/fullcalendar.min.css">
+    <link rel="stylesheet" href="assets/css/fullcalendar.print.css">
+    <link rel="stylesheet" href="assets/css/jquery.tagit.css">
+    <link rel="stylesheet" href="assets/css/main.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/tagit.ui-zendesk.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.colors.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.min.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.table.css">
+</head>
+
+<body><main>
+					
+
+		<!-- Div para alertas jquery -->
+		<div id="billage-utils-alert" class="popup divAlertPopup"></div>
+
+		<script>
+			// Usuario
+			var idUsr = "46823";
+			var imgUsr = "";
+			var nameUsr = "Poner nombre";
+			var rolUsr = "1";
+			sessionStorage.setItem('session-user-id', idUsr);
+
+			// Usuario
+			var idEmpresa = "19532";
+
+			var pageContext = '/saas';
+
+			var context = '/saas';
+			queryInit(context);
+			billageUtilsInit(context);
+
+			//29-06-2018
+			//billageUtilsAvoidPasteDefault();
+			billageCombos();
+
+			billageSnippetInit();
+
+			var _alertPopup = function (h, w, data, funcOk) {
+				var t = $('#billage-utils-alert');
+				var l = $('<div/>').height(h).width(w).append(data);
+				t.empty().append(l);
+
+				console.log(data+':'+ t.attr('id'));
+				dmslib.Widget.verPopup(t.attr('id'), null, context +'/session-expired');
+			};
+
+			var _alertSessionExpiredPopup = function (data) {
+				window.location = context;
+			};
+
+			var _alertAjaxErrorPopup = function (e,jqXHR,ajaxSettings,thrownError) {
+				_alertPopup(200, 300, $('<span/>').append(data), function () {
+					window.location = context;
+				});
+			};
+
+			var interval = 31 * 60;	//1 minuto mas q el timeout de session
+			//interval = 1;			//para hacer pruebas desmarcar
+
+			var timer = billageUtilsCheckSessionExpired(function () {
+				try {
+					_alertSessionExpiredPopup();
+				} catch (e) { }
+				clearInterval(timer);
+			},
+			interval);
+
+			(function ($) {
+				$.fn.extend({
+					limiter: function (limit, elem) {
+						$(this).on("change keyup focus", function () {
+							setCount(this, elem);
+						});
+						function setCount(src, elem) {
+							var chars = src.value.length;
+
+							if (chars > limit) {
+								src.value = src.value.substr(0, limit);
+								chars = limit;
+							}
+							elem.html(limit - chars);
+						}
+
+						setCount($(this)[0], elem);
+					}
+				});
+			})(jQuery);
+		</script>
+			
+					<!-- CAPA GRIS -->
+					<div id="dgris"></div>
+			
+					<!-- MENU TOP -->
+					
+
+
+
+
+
+
+
+		<nav id="navbarTop" class="navbar navbar-fixed-top navbar-billage">
+			<!-- USER TRIAL -->
+			
+
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<a href="#" class="avatar navbar-btn collapsed" data-toggle="collapse" data-target="#bNavPerfil" aria-expanded="false">
+					
+					
+						<span title="Poner nombre" class="avatar-no-image">PN</span>
+					
+					<i class="fa fa-angle-down" aria-hidden="true"></i>
+				</a>
+				
+				<a class="navbar-recompensas-link ml5" href="/saas/partner/partner-panel">
+					Saldo <strong> 0€</strong><span class="hidden-xs">&nbsp;| 80€ por amigo</span>
+				</a>
+				
+				<button type="button" class="navbar-btn btn-transparent topBuscador" data-container="body" data-toggle="popover" data-original-title="" title=""><i class="fa fa-search"></i></button>
+
+				<a class="navbar-btn navbar-shortcut" href="index.html#onboarding"><i class="fa fa-plus"></i></a>
+
+				<a class="navbar-brand" href="index.html">
+					<img src="/saas/img/logo/billage.svg">
+				</a>
+				
+					<a id="menuToggle" class="navbar-brand toggle-btn" href="#menu-toggle"></a>
+				
+				
+				
+			</div>
+
+			<div id="bNavbar" class="collapse navbar-collapse">
+
+				<ul class="nav navbar-nav navbar-center">
+					<li>
+						<a id="accDirecto" class="navbar-shortcut">
+							<img title="Accesos directos" class="i-icon" src="/saas/img/icons/icons/white/plus.svg">
+						</a>
+					</li>
+				</ul>
+
+				<ul class="nav navbar-nav navbar-right">
+					
+						<li>
+							<button type="button" class="btn btn-search topBuscador" data-container="body" data-toggle="popover" data-original-title="" title="">
+								<img src="/saas/img/icons/icons/white/search.svg">
+							</button>
+						</li>
+						
+						<li class="navbar-recompensas">
+							<a class="navbar-recompensas-link" href="/saas/partner/partner-panel">
+								Saldo <strong>0€</strong><span class="hidden-xs hidden-sm hidden-md">&nbsp;| 80€ por amigo</span>
+							</a>
+						</li>					
+
+						<li class="separador hidden-sm"></li>
+						<li>
+							<a id="mailMenu" title="Mensajes" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+								<img title="Mensajes" src="/saas/img/icons/icons/white/mail.svg">
+								<sup class="badge"></sup>
+							</a>
+						</li>
+						<li class="separador hidden-sm"></li>
+						
+							<li class="hidden-sm">
+								<a target="_blank" href="https://help.getbillage.com">
+									<img title="Ayuda" src="/saas/img/icons/menu/ayuda.svg">
+								</a>
+							</li>
+							
+
+					
+
+					<li class="dropdown">
+						<a href="#" class="avatar dropdown-toggle toggle-ajustes" data-toggle="dropdown">
+							
+							
+								<span title="Poner nombre" class="avatar-no-image">PN</span>
+							
+							<i class="fa fa-angle-down" aria-hidden="true"></i>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-right dropdown-arrow">
+							
+
+
+
+
+
+
+
+
+
+			<li class="nav-perfil ">
+				<a href="/saas/my-profile">
+					Mi Perfil
+				</a>	
+			</li>
+			
+			
+				<li class="nav-empresa ">
+					<a onclick="dmslib.Widget.verPopup('divEditEmpresa',null,'/saas/companies/view-edit?id=19532')">
+						Datos de mi negocio
+						
+						
+					</a>
+				</li>
+				
+				
+				
+				<li class="nav-contratacion hidden-xs ">
+					<a href="/saas/companies/view-company-contract?id=19532">Mi suscripción</a>
+				</li>			
+			
+			
+			
+
+			
+			
+			
+			<li class="divider"></li>	
+			
+			
+			
+			
+				
+					<li class="nav-usuarios hidden-xs ">
+						<a href="/saas/users/list">Usuarios</a>
+					</li>
+				
+			
+			
+			<li class="nav-ajustes" onclick="dmslib.Widget.verPopup(&quot;divMenuAjustes&quot;, null, pageContext + &quot;/menu-settings&quot;);">
+				<a>Ajustes e importaciones</a>
+			</li>
+			
+			<li class="nav-mail visible-xs-block">
+				<a id="mailMenuResponsive" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+					Mensajes
+				</a>
+			</li>	
+			
+					
+				<li class="nav-integraciones">
+					<a href="/saas/integrations">Integraciones</a>
+				</li>
+				
+				<li class="nav-store">
+					<a href="/saas/store/billage-store">Billage store</a>
+				</li>
+			
+			
+			
+				<li class="nav-invita ">
+					<a href="/saas/partner/partner-panel">
+						Saldo <strong>0€</strong>
+					</a>
+				</li>
+			
+
+			<li class="divider"></li>						
+
+
+		<li class="nav-logout">
+			<a id="perfil" class="aMainMenu" href="/saas/logout">Cerrar sesión</a>
+		</li>		
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<div id="bNavPerfil" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					
+						<li class="nav-help">
+							<a target="_blank" href="https://help.getbillage.com">Ayuda</a>
+						</li>
+					
+					
+
+
+
+
+
+
+
+
+
+			<li class="nav-perfil ">
+				<a href="/saas/my-profile">
+					Mi Perfil
+				</a>	
+			</li>
+			
+			
+				<li class="nav-empresa ">
+					<a onclick="dmslib.Widget.verPopup('divEditEmpresa',null,'/saas/companies/view-edit?id=19532')">
+						Datos de mi negocio
+						
+						
+					</a>
+				</li>
+				
+				
+				
+				<li class="nav-contratacion hidden-xs ">
+					<a href="/saas/companies/view-company-contract?id=19532">Mi suscripción</a>
+				</li>			
+			
+			
+			
+
+			
+			
+			
+			<li class="divider"></li>	
+			
+			
+			
+			
+				
+					<li class="nav-usuarios hidden-xs ">
+						<a href="/saas/users/list">Usuarios</a>
+					</li>
+				
+			
+			
+			<li class="nav-ajustes" onclick="dmslib.Widget.verPopup(&quot;divMenuAjustes&quot;, null, pageContext + &quot;/menu-settings&quot;);">
+				<a>Ajustes e importaciones</a>
+			</li>
+			
+			<li class="nav-mail visible-xs-block">
+				<a id="mailMenuResponsive" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+					Mensajes
+				</a>
+			</li>	
+			
+					
+				<li class="nav-integraciones">
+					<a href="/saas/integrations">Integraciones</a>
+				</li>
+				
+				<li class="nav-store">
+					<a href="/saas/store/billage-store">Billage store</a>
+				</li>
+			
+			
+			
+				<li class="nav-invita ">
+					<a href="/saas/partner/partner-panel">
+						Saldo <strong>0€</strong>
+					</a>
+				</li>
+			
+
+			<li class="divider"></li>						
+
+
+		<li class="nav-logout">
+			<a id="perfil" class="aMainMenu" href="/saas/logout">Cerrar sesión</a>
+		</li>
+				</ul>
+			</div>
+		</nav>
+
+		<div id="divAccDirecto" class="fast-call" hidden="">
+			<div class="container">
+				<header>
+					<h1>Crear una nueva oportunidad, proyecto, factura y más</h1>
+					<button type="button" id="closeDiv" class="btn-icon btn-close"></button>
+				</header>
+
+				<section>
+					<div class="media media-comercial">
+						<div class="media-left media-top">
+							<div class="media-object">
+								<img src="/saas/img/icons/menu/vender.svg">
+							</div>
+						</div>
+						<div class="media-body">
+							<h4 class="media-heading">Comercial</h4>
+								
+								
+									
+									
+									
+								
+
+
+
+
+
+
+
+			<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearoportunidad.html'">Oportunidad</p>
+
+
+							
+
+							
+								
+									
+									
+									
+								
+
+
+
+
+
+
+
+			<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearcampanas.html';">Campaña</p>
+
+
+							
+
+							
+								
+									
+									
+									
+								
+
+
+
+
+
+
+
+			<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearactividades.html'">Actividad comercial</p>
+
+
+							
+
+							
+								
+									
+									
+									
+								
+
+
+
+
+
+
+
+
+			<p class="fast-call-caller">
+				<a href="crearpresupuestos.html">Presupuesto</a>
+			</p>
+
+							
+						</div>
+					</div>
+
+					<div class="media media-project">
+						<div class="media-left media-top">
+							<div class="media-object">
+								<img src="/saas/img/icons/menu/organizar.svg">
+							</div>
+						</div>
+						<div class="media-body">
+							<h4 class="media-heading">Proyectos</h4>
+							
+								
+									
+									
+									
+								
+
+
+
+
+
+
+
+			<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearproyectos.html'">Proyecto</p>
+
+
+							
+							
+								
+									
+									
+									
+								
+
+
+
+
+
+
+
+			<p class="fast-call-caller a fast-call-popup" onclick="location.href='creartareas.html'">Tarea de proyecto</p>
+
+
+							
+							
+							<p class="fast-call-caller a fast-call-popup timetracking-play">
+								Registro de tiempos
+							</p>
+						</div>
+					</div>
+
+					<div class="media media-biling">
+						<div class="media-left media-top">
+							<div class="media-object">
+								<img src="/saas/img/icons/menu/cobrar.svg">
+							</div>
+						</div>
+						<div class="media-body">
+							<h4 class="media-heading">Facturación</h4>
+							
+								
+									
+									
+									
+								
+
+
+
+
+
+
+
+
+			<p class="fast-call-caller">
+				<a href="crearfacturas.html">Factura de venta</a>
+			</p>
+
+							
+
+								
+								
+									
+									
+									
+								
+
+
+
+
+
+
+
+
+			<p class="fast-call-caller">
+				<a href="crearalbaran.html">Albarán de venta</a>
+			</p>
+
+							
+
+								
+								
+									
+									
+									
+								
+
+
+
+
+
+
+
+
+			<p class="fast-call-caller">
+				<a href="crearpedidosVentas.html">Pedido de venta</a>
+			</p>
+
+							
+
+							
+								
+									
+									
+									
+								
+
+
+
+
+
+
+
+
+			<p class="fast-call-caller">
+				<a href="creargastos.html">Gasto</a>
+			</p>
+
+							
+
+								
+								
+									
+									
+									
+								
+
+
+
+
+
+
+
+
+			<p class="fast-call-caller">
+				<a href="crearpedidosCompras.html">Pedido de compra</a>
+			</p>
+
+							
+						</div>
+					</div>
+
+					<div class="media">
+						<div class="media-left media-top">
+							<div class="media-object">
+								<img src="/saas/img/icons/menu/general.svg">
+							</div>
+						</div>
+						<div class="media-body">
+							<h4 class="media-heading">General</h4>
+						
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+			<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNewAccount',null,'/saas/accounts/ver-alta')">Empresa</p>
+
+
+					
+						
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+			<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNuevoContacto',null,'/saas/contacts/ver-alta')">Contacto</p>
+
+
+					
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+			<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNewDoc',null,'/saas/documents/edit-popup')">Documentos</p>
+
+
+					
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+			<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNuevoProducto',null,'/saas/products/ver-alta')">Producto</p>
+
+
+					
+						</div>
+					</div>
+				</section>
+			</div>
+		</div>
+
+
+		<div id="popover-top-search" class="hide">
+			<form action="/saas/search">
+				<div class="input-group search-input ">
+					<input type="text" name="cadena" class="form-control input-sm disable-clear" placeholder="Buscar" value="" pattern=".{4,}" autocomplete="off" oninvalid="setCustomValidity('Debes introducir al menos 4 carácteres para realizar la búsqueda')" oninput="setCustomValidity('')" required="">
+					<span class="input-group-addon">
+						<button type="submit" id="serachBtn" class="btn btn-search">
+							<img src="/saas/img/icons/icons/white/search.svg">
+						</button>
+					</span>
+				</div>
+			</form>
+		 </div>
+
+		<script>
+			$(function() {
+				
+				
+				$(document).on("click", ".toggle-ajustes", function(e) {
+					var obj = $("#sidebarAjustes");
+					
+					if (obj.is(":visible")) {
+						$(".nav-ajustes").hide();
+					}
+					else{
+						$(".nav-ajustes").show();
+					}
+				});		
+				
+				$(document).on("click", ".menu-configuracion .dropdown-submenu", function(e) {
+					var li = $(this);
+					
+					if(!li.hasClass("li-submenu")) {
+						e.stopImmediatePropagation();
+						if (li.hasClass("active")) {
+							li.parents(".menu-configuracion").find(".dropdown-menu").slideUp(350);
+							setTimeout(function() {
+								li.removeClass("active");
+							}, 400);
+						}
+						else {
+							//if
+							li.parents(".menu-configuracion").find(".dropdown-menu").slideUp(350);
+							setTimeout(function() {
+								li.parents(".menu-configuracion").find(".active").removeClass("active");
+								li.addClass("active").find(".dropdown-menu").slideDown();
+							}, 400);
+						}
+					}
+				});
+
+				// search
+				$(document).on("focus", "#inpSearch", function(e) {
+					$(this).closest(".search-input").addClass("focus");
+				}).on("blur", "#inpSearch", function(e) {
+					if( $(this).val() == "" ) 
+						$(this).closest(".search-input").removeClass("focus");
+				});
+
+				// popover buscador
+				$(".topBuscador").popover({
+					trigger: "manual",
+					placement: "bottom",
+					html: true,
+					content: function() {
+						return $('#popover-top-search').html();
+					},
+					template: '<div class="popover popover-topBuscador popover-xs"><div class="arrow arrow-dark"></div><div class="popover-content"></div></div>'
+				}).click(function(e){
+					$(this).popover('toggle');
+					$(".popover-topBuscador .form-control").focus();
+					e.preventDefault();
+				});
+
+				$('body').click(function(e) {
+					var target = $(e.target);
+					if(!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+						$(".popover-topBuscador").hide();
+					}
+				});
+
+			});
+
+			$(".navbar-shortcut").click(function() {
+				if( $("#divAccDirecto").is(":visible") ) 
+					$("#divAccDirecto").hide();
+				else 
+					$("#divAccDirecto").show();
+			});
+
+			$("#closeDiv, .fast-call-popup").click(function() {
+				$("#divAccDirecto").hide();
+			});
+
+			$("body").click(function(e) {
+				if( $("#divAccDirecto").is(":visible") && !$(e.target).is(".navbar-shortcut") && !$(e.target).parents().is(".navbar-shortcut") && !$(e.target).is("#divAccDirecto") && !$(e.target).parents().is("#divAccDirecto")) {
+					$("#divAccDirecto").hide();
+				}
+			});
+
+			$(".alert-partner").on("closed.bs.alert", function(){
+				$(document.body).removeClass("user-trial");
+			});
+		</script>
+					
+					
+						
+					
+					
+
+
+
+					
+					<div id="mainMenu" class="main-menu toggled ">
+						<!-- SIDE BAR -->
+						
+
+
+
+
+
+
+		<div id="backgroundSidebar"></div>
+
+		<div id="sidebarWrapper" class="sidebar-wrapper">
+			<button type="button" class="btn-transparent sidebar-toggle active"></button>
+			
+			<ul id="accordionSidebar" class="menu-list menu-tree">
+				
+
+
+
+
+
+
+		<!-- INICIO -->
+		<li class="menu-analisis menu-header ">
+			<a href="index.html"><i class="fa fa-bar-chart"></i> Análisis</a>
+		</li>
+
+		<!-- FACTURACION -->
+
+			
+				
+				
+				
+			
+			
+			<div class="panel">
+				<li class="menu-header menu-facturacion active">
+					<a href="#menuFacturacion" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="true">
+						<i class="fa fa-file-text"></i>	
+						Facturación
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+				</li>
+				<ul id="menuFacturacion" class="panel-collapse collapse in">
+					<!-- ventas -->
+					
+						
+						
+					
+					
+
+					<div class="panel">
+						<li class="tree-lv0">
+							<a href="#menuVentas" data-toggle="collapse" data-parent="#menuFacturacion" aria-expanded="false">
+								Ventas
+								<i class="fa fa-angle-down" aria-hidden="true"></i>
+							</a>
+						</li>
+						<ul id="menuVentas" class="menu-submenu panel-collapse collapse in">
+							
+								<li class="tree-lv1 active selected">
+									<a href="facturas.html">Facturas</a>
+									
+										<a title="Crear factura" class="btn btn-icon btn-add" href="crearfacturas.html"><i class="fa fa-plus-circle"></i></a>
+									
+								</li>
+							
+							<li class="tree-lv1 ">
+								<a href="alabaranesVentas.html">Albaranes</a>
+								
+									<a title="Crear albarán" class="btn btn-icon btn-add" href="albaranesV.html"><i class="fa fa-plus-circle"></i></a>
+								
+							</li>
+							<li class="tree-lv1 ">
+								<a href="pedidosVentas.html">Pedidos</a>
+								
+									<a title="Crear pedido" class="btn btn-icon btn-add" href="crearpedidosVentas.html"><i class="fa fa-plus-circle"></i></a>
+								
+							</li>
+							<li class="tree-lv1 ">
+								<a href="presupuestos.html">Presupuestos</a>
+								
+									<a title="Crear presupuesto" class="btn btn-icon btn-add" href="crearpresupuestos.html"><i class="fa fa-plus-circle"></i></a>
+								
+							</li>
+							
+								<li class="tree-lv1 ">
+									<a href="facturasperiodicas.html">Facturas Periódicas</a>
+									
+										<a title="Crear factura periódica" class="btn btn-icon btn-add" href="crearfacturasperiodicas.html"><i class="fa fa-plus-circle"></i></a>
+									
+								</li>
+							
+						</ul>
+					</div>
+					<!-- compras -->
+					
+						 
+						
+							
+							
+						
+
+						<div class="panel">
+							<li class="tree-lv0">
+								<a class="collapsed" href="#menuCompras" data-toggle="collapse" data-parent="#menuFacturacion" aria-expanded="false">
+									Compras
+									<i class="fa fa-angle-down" aria-hidden="true"></i>
+								</a>
+							</li>
+							<ul id="menuCompras" class="menu-submenu panel-collapse collapse ">
+								<li class="tree-lv1 ">
+									<a href="gastos.html">Gastos</a>
+									
+										<a title="Crear gasto" class="btn btn-icon btn-add" href="creargastos.html"><i class="fa fa-plus-circle"></i></a>
+									
+								</li>
+								<li class="tree-lv1 ">
+									<a href="alabaranesVentas.html">Albaranes</a>
+								</li>
+								<li class="tree-lv1 ">
+									<a href="pedidosCompras.html">Pedidos</a>
+									
+										<a title="Crear pedido" class="btn btn-icon btn-add" href="crearpedidosCompras.html"><i class="fa fa-plus-circle"></i></a>
+									
+								</li>
+								<li class="tree-lv1 ">
+									<a href="gastosperiodicos.html">Gastos periódicos</a>
+									
+										<a title="Crear gasto periódico" class="btn btn-icon btn-add" href="creargastosperiodicos.html"><i class="fa fa-plus-circle"></i></a>
+									
+								</li>
+							</ul>
+						</div>
+					
+				</ul>
+			</div>
+
+
+
+		<!-- tesoreria -->
+
+			
+			
+				
+				
+				
+			
+
+			<div class="panel">
+				<li class="menu-header menu-tesoreria ">
+					<a class="collapsed" href="#menuTesoreria" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				<i class="fa fa-money"></i>	Tesorería		
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+				</li>
+				<ul id="menuTesoreria" class="menu-submenu panel-collapse collapse ">
+					<li class="tree-lv1 ">
+						<a href="cobrosypagos.html">Cobros y pagos</a>
+					</li>
+					
+					<li class="tree-lv1 ">
+						<a href="cuentasdetesoreria.html">Cuentas de tesorería</a>
+					</li>
+					
+					<li class="tree-lv1 ">
+						<a href="remesas.html">Remesas</a>
+					</li>
+				</ul>
+			</div>
+
+
+
+		<!-- PROYECTOS -->
+
+			
+			
+				
+				
+				
+			
+			<div class="panel">
+				<li class="menu-header menu-proyectos ">
+					<a href="#menuProyectos" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">				
+					<i class="fa fa-tasks"></i>
+					Proyectos
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+				</li>
+				<ul id="menuProyectos" class="panel-collapse collapse ">
+					<li class="tree-lv1 ">
+						<a href="proyectos.html">Proyectos</a>
+						
+							<button type="button" title="Crear proyecto" class="btn btn-icon btn-add" onclick="location.href='crearproyectos.html'"><i class="fa fa-plus-circle"></i></button>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="tareas.html">Tareas</a>
+						
+							<button title="Crear tarea" class="btn btn-icon btn-add" onclick="location.href='creartareas.html'"><i class="fa fa-plus-circle"></i></button>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="tiempos.html">Tiempos</a>
+						
+							<button title="Registrar tiempo" class="btn btn-icon btn-add" onclick="location.href='registrartiempo.html'"><i class="fa fa-plus-circle"></i></button>
+						
+					</li>
+					
+						<li class="tree-lv1 ">
+							<a id="informes" onclick="checkModifForm(event)" href="informes.html">Informes</a>
+						</li>
+					
+				</ul>
+			</div>
+
+
+
+		<!-- COMERCIAL -->
+
+			
+			
+				
+				
+				
+			
+			<div class="panel">
+				<li class="menu-header menu-comercial ">
+					<a href="#menuComercial" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+						Comercial
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+				</li>
+				<ul id="menuComercial" class="panel-collapse collapse ">
+					<li class="tree-lv1 ">
+						<a href="campanas.html">Campañas</a>
+						
+							<button title="Crear Campaña" class="btn btn-icon btn-add" onclick="location.href='crearcampanas.html'"><i class="fa fa-plus-circle"></i></button>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="oportunidades.html">Oportunidades</a>
+						
+							<button title="Crear oportunidad" class="btn btn-icon btn-add" onclick="location.href='crearoportunidad.html'"><i class="fa fa-plus-circle"></i></button>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="actividades.html">Actividades</a>
+						
+							<button title="Crear actividad comercial" class="btn btn-icon btn-add" onclick="location.href='crearactividades.html'"><i class="fa fa-plus-circle"></i></button>
+						
+					</li>
+					
+					<li class="tree-lv1">
+						<a href="presupuestos.html">Presupuestos</a>
+						
+							<a title="Crear presupuesto" class="btn btn-icon btn-add" href="crearpresupuestos.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+				</ul>
+			</div>
+
+
+			</ul>
+					
+			<ul class="menu-list favoritos-list">
+				<li class="separador"></li>
+				<li class="menu-header">Favoritos</li>
+
+				<!-- FASVORITOS GESTOR PROJCTS-->
+				
+
+				
+					<!-- LIST FAVORITOS -->
+					
+						<li class=" ">
+							<button title="Añadir a favoritos" class="btn btn-fav" data-id="1"></button>
+							<a href="/saas/oportunities/new-calendar">Calendario</a>					
+							
+						</li>
+					
+						<li class=" ">
+							<button title="Añadir a favoritos" class="btn btn-fav" data-id="3"></button>
+							<a href="/saas/accounts/list">Empresas</a>					
+							
+								
+									<button type="button" class="btn btn-icon btn-add" onclick="dmslib.Widget.verPopup('divNewAccount',null,'/saas/accounts/ver-alta')"></button>
+								
+								
+							
+						</li>
+					
+						<li class=" ">
+							<button title="Añadir a favoritos" class="btn btn-fav" data-id="4"></button>
+							<a href="/saas/contacts/list">Contactos</a>					
+							
+								
+									<button type="button" class="btn btn-icon btn-add" onclick="dmslib.Widget.verPopup('divNuevoContacto',null,'/saas/contacts/ver-alta')"></button>
+								
+								
+							
+						</li>
+					
+						<li class=" ">
+							<button title="Añadir a favoritos" class="btn btn-fav" data-id="5"></button>
+							<a href="/saas/products/list">Servicios y productos</a>					
+							
+								
+									<button type="button" class="btn btn-icon btn-add" onclick="dmslib.Widget.verPopup('divNuevoProducto',null,'/saas/products/ver-alta')"></button>
+								
+								
+							
+						</li>
+					
+					<!-- LIST NO FAVORITOS -->
+					<ul id="menuNoFavorites" class="menu-submenu collapse">
+						<li class="separador"></li>
+						
+							<li class=" hidden-xs">
+								<button title="Añadir a favoritos" class="btn btn-fav" data-id="7"></button>
+								<a href="/saas/documents/list">Documentos</a>
+								
+									
+										<button type="button" class="btn btn-icon btn-add" onclick="dmslib.Widget.verPopup('divNewDoc',null,'/saas/documents/edit-popup')"></button>
+									
+									
+								
+							</li>	
+						
+							<li class=" hidden-xs">
+								<button title="Añadir a favoritos" class="btn btn-fav" data-id="8"></button>
+								<a href="/saas/contracts/list">Contratos</a>
+								
+									
+										<button type="button" class="btn btn-icon btn-add" onclick="dmslib.Widget.verPopup('divNewContract',null,'/saas/contracts/ver-alta')"></button>
+									
+									
+								
+							</li>	
+						
+					</ul>
+					<li class="show-more" data-toggle="collapse" data-target="#menuNoFavorites" aria-expanded="false">
+						<a href="#">
+							<span class="text-more">Ver más</span>
+							<span class="text-less">Ver menos</span>
+							<i class="fa fa-angle-down" aria-hidden="true"></i>
+						</a>
+					</li>
+				
+			</ul>
+
+			<ul class="menu-list favoritos-list">
+				<li class="separador"></li>
+			</ul>
+
+			<div class="menu-other">
+				<ul id="timetracking" class="menu-content">
+					<li class="trakingTask" style="display: none;">
+						<div class="media">
+							<div class="media-body">
+								<h4 id="trakingProject" class="media-heading"></h4>
+								<p id="trakingTask"></p>
+							</div>
+						</div>
+					</li>
+					<li class="trakingController">
+						<div class="media">
+							<div class="media-left">
+								<button id="timetracking-play" class="timetracking-play media-object btn-transparent" style="display: block;">
+									<img title="Clic para registrar tiempo" src="/saas/img/icons/icons/grey/play.svg">
+								</button>
+								<button id="timetracking-stop" class="media-object btn-transparent" style="display: none;">
+									<img title="Clic para guardar tiempo" src="/saas/img/icons/icons/red/stop.svg">
+								</button>
+							</div>
+							<div class="media-body">
+								<p id="timetracking-counter">00:00:00</p>
+							</div>
+							<div id="timetracking-discard" class="media-right" style="display: none;">
+								<button class="media-object btn-transparent">
+									<img title="Clic para guardar tiempo" src="/saas/img/icons/icons/white/delete.svg">
+								</button>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<script>
+			$(function() {
+				if( $("#menuNoFavorites").children().length < 2 ) 
+					$("#sidebarWrapper .favoritos-list .show-more").hide();
+			});
+
+			$(document).on("click", ".favoritos-list .btn-fav", function() {
+				var li = $(this).closest("li");
+				var newLi;
+				var id = $(this).data("id");
+				var esFav = $(this).closest("#menuNoFavorites").length;
+				
+				esFav = (esFav == 0) ? true : false;
+
+				if(esFav) {
+					li.clone().appendTo("#menuNoFavorites");
+					li.remove();
+					if( $("#menuNoFavorites:visible") ) 
+						$("#sidebarWrapper .favoritos-list .show-more").show();
+				}
+				else {
+					li.clone().insertBefore("#menuNoFavorites");
+					li.remove();
+					if( $("#menuNoFavorites").children().length < 2 ){
+						$("#menuNoFavorites").collapse("hide");
+						$("#sidebarWrapper .favoritos-list .show-more").hide();
+					}
+				}
+
+				$.ajax({
+					url: "/saas/users/set-favorite-menu",
+					data: {
+						favorite: !esFav,
+						idOptionMenu: id
+					}
+				});
+			});
+			
+			$(document).on("click", ".sidebar-toggle", function() {
+				var isActive = $(this).hasClass("active");
+				
+				$(this).toggleClass("active");
+				
+				$.ajax({
+					url: "/saas/pin-side-bar",
+					method: "POST",
+				});
+
+			});
+		</script>
+
+						<div id="divCentral" class="page-content-wrapper">	
+						
+						
+							
+							
+							
+							
+
+							<div class="page list container-fluid">
+								
+								
+
+
+
+
+
+
+
+			<div class="page-header">
+				<div class="first-line">
+					<h1>Facturas</h1>
+
+					
+						
+
+
+
+		<div class="summary">
+			<span class="value hidden-xs">
+				<strong>0,00€</strong>
+				Base
+			</span>
+			<span class="value">
+				<strong>0,00€</strong>
+				Total
+			</span>
+		</div>
+					
+				</div>
+
+				<div class="second-line">
+					
+						<div class="btn-group view-mode">
+							<button type="button" class="btn btn-icon active">
+								<img title="Listado de facturas" src="/saas/img/icons/icons/grey/facturas.svg">
+							</button>
+							<a class="btn btn-icon" href="/saas/saleBills/list-expirations">
+								<img title="Listado de vencimientos" src="/saas/img/icons/icons/grey/vencimientos.svg">
+							</a>
+						</div>
+					
+
+					
+
+		<div class="filters-list">
+			<!-- FILTROS PROPIETARIO -->
+			
+				
+				
+				
+				
+			
+
+
+
+
+
+
+
+
+
+
+
+
+			<div class="filter-dropdown hidden-xs">
+				<div id="filterUser" class="dropdown">
+					<button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+						
+							
+							
+								<span class="hidden-xs">Facturas de todos</span>
+								<span class="visible-xs-inline">De todos</span>
+							
+							
+						
+									
+						<span class="caret"></span>
+					</button>		
+					<ul class="dropdown-menu" role="menu">
+						<li id="listMio">
+							
+							
+								<a href="/saas/saleBills/search.action?entityList.filter_owner=46823">
+									<span class="hidden-xs">Mis facturas</span>
+					<span class="visible-xs-inline">Mias</span>
+								</a>
+							
+						</li>
+
+						<li id="listTodos">
+							
+							
+								<a href="/saas/saleBills/search.action?entityList.filter_owner=-1">
+									Facturas de todos
+								</a>
+								
+						</li>
+						
+						
+					</ul>
+				</div>
+			</div>
+
+
+			<!-- FILTROS TIEMPO -->
+			
+
+
+
+		<div class="filter-btn">
+			<button type="button" id="filterDateRange" class="btn">
+				Fecha
+				
+				
+				
+				
+				<span class="caret"></span>
+			</button>
+		</div>
+
+		<script>
+			// DATE RANGE PIKER
+			$(function() {
+				var initDTP = false;
+				var i18n = getCalendarLabels('1');
+				var local = {
+					"format": "DD/MM/YY",
+					"separator": "/",
+					"daysOfWeek": i18n.weekdaysShort,
+					"monthNames": i18n.months,
+					"firstDay": 1,
+					"applyLabel":  billageUtilsLiteral("general.filtrar"),
+				};
+
+				$("#filterDateRange").daterangepicker({
+					"locale": local,
+					"ranges": ranges = {
+						"Hoy": [moment(), moment()],
+						"Esta semana": [moment().startOf("isoweek"), moment().endOf("isoweek")],
+						"Este mes": [moment().startOf("month"), moment().endOf("month")],
+						"Este año": [moment().startOf("year"), moment().endOf("year")],
+						"Todos": ['', ''],
+					},
+					"linkedCalendars": false,
+					"showDropdowns": true,
+					"showCustomRangeLabel": false,
+					"alwaysShowCalendars": true,
+					"buttonClasses": "btn",
+					"applyClass": "btn-primary",
+				}).on('apply.daterangepicker', function(ev, picker) {
+					var desde = "";
+					var hasta = "";
+					var filter_time = "5"; // periodo
+
+					if(picker.startDate._isValid) 
+						desde = picker.startDate.format("DD/MM/YY");
+					if(picker.endDate._isValid) 
+						hasta = picker.endDate.format("DD/MM/YY");
+					
+					//todos
+					if(desde == "" || hasta == "") 
+						filter_time = "4";
+					
+					//hoy
+					if(desde != "" && desde != "" && desde == hasta && desde == moment().format("DD/MM/YY"))
+						filter_time = "0";		
+
+
+					var url = pageContext+"/saleBills/search.action?entityList.filter_time=" + filter_time + "&entityList.startDate="+desde+"&entityList.endDate="+hasta;
+					location.href = url;
+				});
+
+				var liShowCalendar = $("<li>").addClass("visible-xs-inline").text( billageUtilsLiteral("general.seleccionarFecha") ).click(function() {
+					$(this).closest(".daterangepicker").find(".range_inputs, .calendar.left").toggle();
+				});
+				$(".daterangepicker .ranges ul").append(liShowCalendar);
+
+				// aplica fechas iniciales si viene de una b�squeda
+				var startDate = '';
+				var endDate = '';
+				
+				if("" != "") 
+					startDate = "";
+				if("" != "") 
+					endDate = "";
+					
+				if(startDate != "" && startDate == endDate) {
+					$("#filterDateRange").data("daterangepicker").setStartDate(startDate);
+					$("#filterDateRange").data("daterangepicker").setEndDate(startDate);
+				}
+				if(startDate != "" && startDate != endDate) 
+					$("#filterDateRange").data("daterangepicker").setStartDate(startDate);
+				if(endDate != "" && startDate != endDate) 
+					$('#filterDateRange').data('daterangepicker').setEndDate(endDate);
+
+				$(".daterangepicker .calendar .form-control").removeClass("input-mini").addClass("inpFecha input-sm").next().remove();
+			});
+		</script>
+
+			<!-- FILTROS TAGS -->
+			
+
+			<!-- FILTROS CLIENTE + NUM FACTURA + PRODUCTO/SERVICIO + ESPACIO DE TRABAJO + ESTADO + TIPO + CAT. INGRESO -->
+			<div class="filter-popover">
+				<button type="button" id="facturasFilters" class="btn" data-toggle="popover" data-original-title="" title="">
+					Más filtros
+					
+				</button>
+			</div>
+
+			<!-- FILTROS LIMPIAR -->
+			
+		</div>
+
+		<div id="filterFacturasPopover" class="filterPopover hide">
+			<form action="search" method="post" autocomplete="off">
+				<!-- PROPIETARIO -->
+				<div class="form-group visible-xs-block">
+					<select name="entityList.filter_owner" id="ownerResponsive" class="form-control">
+						<option value="46823">Mis facturas</option>
+						<option value="-1" selected="">Facturas de todos</option>
+					</select>
+				</div>
+				<!-- CLIENTE -->
+				<div class="form-group">
+					<div class="autocompleter-content">
+						<input type="text" name="entityList.filter_account" id="cuentaPopover" class="form-control form-control-popover" placeholder="Buscar por Cliente" value="" data-completer-context="accounts" data-completer-action="account-name.action">
+					</div>
+				</div>
+				<!-- NUMERO -->
+				<div class="form-group">
+					<input type="text" name="entityList.filter" class="form-control form-control-popover" placeholder="Buscar por Número" value="">
+				</div>
+				<!-- PRODUCTO/SERVICIO -->
+				<div class="form-group">
+					<input type="text" name="entityList.filterProd" class="form-control form-control-popover" placeholder="Buscar por Producto o servicio" value="">
+				</div>
+				<!-- PROYECTO -->
+				<div class="form-group">
+					<input type="text" name="entityList.project" class="form-control form-control-popover" placeholder="Buscar por Proyecto" value="">
+				</div>
+				<!-- ESTADO -->
+				<div class="form-group">
+					<select name="entityList.state" id="entityList_state" class="form-control">
+						<option value="-1">Buscar por Estado</option>
+						
+							<option value="1">Cobrada</option>
+						
+							<option value="4">Impagada</option>
+						
+							<option value="2">Pendiente</option>
+						
+							<option value="5">Rectificada</option>
+						
+							<option value="3">Vencida</option>
+						
+						<option value="0">No cobrada</option>
+					</select>
+				</div>
+				<!-- TIPO -->
+				<div class="form-group">
+					<select name="entityList.type" id="entityList_type" class="form-control">
+			<option value="">Buscar por Tipo</option>
+			<option value="1">Normal</option>
+			<option value="2">Proforma</option>
+			<option value="3">Rectificativa</option>
+
+
+		</select>
+
+
+				</div>
+				<!-- CATEGORIA -->
+				<div class="form-group">
+					<select name="entityList.category" id="entityList_category" class="form-control">
+			<option value="">Buscar por Categoría de ingresos</option>
+
+
+		</select>
+
+
+				</div>
+				<!-- SERIE -->
+				<div class="form-group">
+					<select name="entityList.serie" id="entityList_serie" class="form-control">
+			<option value="">Buscar por Serie</option>
+			<option value="9752">Normal</option>
+			<option value="0">Sin serie</option>
+
+
+		</select>
+
+
+				</div>
+				<!-- COLORES -->
+				
+
+
+		<div class="form-group">
+			<div class="dropdown dropdown-color" data-inp="#entityList_color">
+				<button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+					
+					
+						<span title="Selecciona un color" class="color color-all"></span>
+										
+					
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-right">
+					
+						<li title="#D83C12" class="color " data-val="1" style="background-color:#D83C12"></li>
+					
+						<li title="#F15A24" class="color " data-val="2" style="background-color:#F15A24"></li>
+					
+						<li title="#F7931E" class="color " data-val="3" style="background-color:#F7931E"></li>
+					
+						<li title="#ED1E79" class="color " data-val="4" style="background-color:#ED1E79"></li>
+					
+						<li title="#EB7C6B" class="color " data-val="5" style="background-color:#EB7C6B"></li>
+					
+						<li title="#D9E021" class="color " data-val="6" style="background-color:#D9E021"></li>
+					
+						<li title="#36E836" class="color " data-val="7" style="background-color:#36E836"></li>
+					
+						<li title="#39B54A" class="color " data-val="8" style="background-color:#39B54A"></li>
+					
+						<li title="#1963CE" class="color " data-val="9" style="background-color:#1963CE"></li>
+					
+						<li title="#662D91" class="color " data-val="10" style="background-color:#662D91"></li>
+					
+						<li title="Sin color" class="color color-none " data-val=""></li>
+						<li title="Todos los colores" class="color color-all active" data-val="-1"></li> 
+				</ul>
+			</div>
+			<input type="hidden" name="entityList.color" id="entityList_color" class="entityColor" value="-1">
+		</div>
+				<button type="submit" class="btn btn-default btn-block">Filtrar</button>
+			</form>
+		</div>
+
+		<script>
+			$(function() {
+				// POPOVER BUTTON FILTERS FACTURAS
+				$("#facturasFilters").popover({
+					trigger: "manual",
+					placement: "bottom",
+					html: true,
+					template: '<div class="popover filterPopover"><h3 class="popover-title"></h3><div class="popover-content"></div></div>',
+					content: function() {
+						return $("#filterFacturasPopover").html();
+					}
+				}).click(function(e){
+					$(this).popover('show');
+					e.preventDefault();
+				});
+
+				//dropdown tags
+				var inboxType = "or";
+				var tags = "";
+				tags = tags.split(",");
+
+				$("#tagDropdown [name='entityList.filter_tag_type']").each(function() {
+					if(inboxType == $(this).val()) $(this).prop("checked", true);
+				});
+
+				$("#tagDropdown [name='entityList.filter_tag']").each(function() {
+					var inp = $(this);
+
+					$.each(tags, function() {
+						if(inp.val() == parseInt(this)) inp.prop("checked", true);
+					});
+				});
+
+				$(document).on("change", "#all", function(e) {
+					if( $(this).is(":checked") ) $("#hAll").val("and");
+					else $("#hAll").val("or");
+				});
+
+				// popover etiquetas
+				$(".tag").popover({
+					placement : "bottom",
+					trigger : "hover",
+				});
+			});
+		</script>
+
+					<form id="orderForm">
+						<input type="hidden" class="form-order" name="entityList.order" value="fecha">
+						<input type="hidden" class="form-orderDesc" name="entityList.orderDesc" value="true">
+					</form>
+					
+					
+						<div class="page-actions">
+							<!-- sii-integration -->
+							<button type="button" id="btn_sii_integration" class="btn btn-santander hidden-xs">
+								Enviar vía SII
+							</button>
+
+							<!-- santander  -->
+							
+
+								<button type="button" id="btn_santander" class="btn btn-santander btn-santander-multiline hidden-xs" data-toggle="tooltip">
+									Financia tus facturas
+								</button> 	
+								
+							<!-- 
+								<button type="button" id="btn_santander" class="btn btn-santander btn-santander-multiline hidden-xs">
+									<span class="santander-normal">
+										Financia tus facturas
+									</span>
+									<span class="santander-disponible">
+										Tienes *** disponibles para financiar tus facturas
+									</span>						
+								</button> 						
+							 -->										
+							
+
+							<a class="btn btn-primary btn-plus" id="id-btn-create" href="crearfacturas.html">
+								<span class="icon-plus"></span>
+								<span class="hidden-xs">Crear factura</span>
+							</a>
+							<div class="dropdown">
+								<button type="button" class="btn btn-icon btn-dropmore dropdown-toggle hidden-xs" data-toggle="dropdown"></button>
+								<ul class="dropdown-menu dropdown-menu-right">
+									<li onclick="dmslib.Widget.verPopup('exportXLS', null, '/saas/saleBills/show-popup-export-facturas')">Exportar facturas a Excel</li>
+									<li onclick="dmslib.Widget.verPopup('exportXLS', null, '/saas/saleBills/show-popup-listado-cartera')">Exportar vencimientos a Excel</li>
+									<li onclick="dmslib.Widget.verPopup('exportXLS', null, '/saas/exports/show-popup-export-flujo-caja')">Exportar flujo de caja a Excel</li>					
+									
+										<li class="tree-lv1">
+											<a href="/saas/import/invoiceConcepts/prepare">Importar facturas de venta</a>
+										</li>
+									
+									
+
+
+		<li class="divider"></li>
+		<li>
+			<a id="categorias" href="/saas/billsCategories/list">Categorías de ingresos</a>
+		</li>
+		<li>
+			<a id="series" href="/saas/series/list">Series</a>
+		</li>
+		<li>
+			<a id="inboxes" href="/saas/invoiceTag/list">Etiquetas de facturas</a>
+		</li>
+		<li>
+			<a id="customFieldBudgets" href="/saas/customFieldInvoices/list">Campos personalizados</a>
+		</li>
+								</ul>
+							</div>
+						</div>
+					
+				</div>
+			</div>
+
+			
+				
+				
+
+
+
+
+
+		<div class="helper-multi-actions">
+			<span class="helper-multi-texto" data-string="facturas.seleccionadas"></span>
+
+			<div class="dropdown">
+				<button type="button" class="btn btn-more hoverAction" data-toggle="dropdown"></button>
+				<ul class="dropdown-menu dropdown-menu-right menu-desplegable" role="menu">
+					
+					
+						<li onclick="dmslib.Widget.verPopup('popup-md', null, '/saas/exports/popup-remittance')">Generar remesa</li>	
+						<li onclick="dmslib.Widget.verPopup('exportXLS', null, '/saas/exports/popup-bulk-export-pdf-facturas')">Exportar facturas a PDF</li>	
+					
+				</ul>
+			</div>
+		</div>
+		 
+				
+				
+					
+					
+					
+				
+				<table id="tableSaleBills" class="table table-list table-sort table-multi-actions hidden-xs">
+					<thead>
+						<tr>
+							<th class="only-check">
+								<div class="checkbox">
+									<input id="tableFacturasCheckSelect" class="check-select-all" type="checkbox"><label for="tableFacturasCheckSelect"></label>
+								</div>
+							</th>
+
+							<th class="col-xs-1 col-md-1 order" data-order="codigoCompleto">Número</th>
+							<th class="col-xs-1 col-md-1 order_desc" data-order="fecha">Fecha</th>
+							<th class="col-xs-4 col-md-4 order" data-order="cuenta">Cliente</th>
+							<th class="col-md-3 hidden-sm col-category hidden-sm order" data-order="categoria">Categoría</th>
+
+							
+
+							<th class="col-xs-2 col-md-1 text-center order" data-order="estado">Estado</th>
+							<th class="col-xs-2 col-md-1 col-base order" data-order="base">Base</th>
+							<th class="col-xs-2 col-md-1  text-right order" data-order="total">Total</th>
+
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						
+							<tr class="list-element" data-context="saleBills" data-id="875302">
+								<td class="only-check ">
+									<div class="checkbox">
+										<input type="checkbox" name="entity.realizada" id="check_select_875302" class="check-select">
+										<label for="check_select_875302"></label>
+									</div>
+								</td>
+								<td>
+									
+									<a href="/saas/saleBills/../saleBills/edit.action?id=875302">1</a>
+								</td>
+								<td>07/12/20</td>
+								<td>
+									<a title="Prueba 1" href="/saas/accounts/view.action?id=1083033">
+										Prueba 1
+										
+										
+									</a>
+								</td>
+								<td class="col-category hidden-sm">
+									
+								</td>
+								
+								<td class="text-center">
+									
+										<div id="divState875302" class="d-inline-block toolExpirations" data-id="875302" title="" data-toggle="popover" data-original-title="Consultar vencimientos">
+											<a class="estado stateOrange">Vencida</a>
+										</div>
+									
+								</td>
+
+								<td class="col-base">0,00€</td>
+								<td class="text-right">
+									<span class="btn btn-link toolConceptos" data-toggle="popover" data-id="875302" title="" data-original-title="Conceptos">0,00€</span>
+								</td>
+								<td class="list-actions">									
+									
+									
+									
+
+									 
+
+									
+
+
+
+
+
+		<div class="dropdown">
+			<button type="button" class="btn btn-more hoverAction" data-toggle="dropdown"></button>
+			<ul class="dropdown-menu menu-desplegable dropdown-menu-right" role="menu">
+				
+				<li><a href="/saas/saleBills/../saleBills/edit.action?id=875302">Editar</a></li>
+				
+					<li>
+						<a onclick="dmslib.Widget.verPopup('divEnviarEmail',null,'/saas/saleBills/popup-send-invoice?id=875302&amp;entity.cuenta.id=1083033')">Enviar por email</a>
+					</li>			
+					<li class="menu-desplegable-option menu-color menu-option-icon color-trigger pickColor-wrap" data-original-title="" title="">
+						<span class="menu-option-text">Asignar color</span>
+						<div class="menu-icon">
+							<span class="pickColor" title="Selecciona un color"></span>
+						</div>
+					</li>
+					<li>
+						<a onclick="dmslib.Widget.verPopup('div-popup-exportar',null,'/saas/saleBills/popup-clon-bill?id=875302')">Clonar</a>
+					</li>
+					<li>
+						<a onclick="dmslib.Widget.verPopup('div-popup-exportar',null,'/saas/saleBills/popup-invoice-pdf?doc_type=4&amp;id=875302')">Exportar a PDF</a>
+					</li>
+					
+						<li>
+							<a onclick="dmslib.Widget.verPopup('div-generar-rectificativa',null,'/saas/saleBills/popup-rectificativa?id=875302')">Crear rectificativa</a>
+						</li>
+					
+					
+						<li>
+							<a onclick="dmslib.Widget.verPopup('popupFacturae',null,'/saas/exports/popup-invoice-facturae?id=875302')">Crear factura electrónica</a>
+						</li>
+					
+					
+
+					<!-- si no cobrada ni vencida. TODO comprobar si cuenta santander -->
+					
+								
+					
+					
+					
+						<li>
+							<a onclick="eliminarElementoListado('saleBills',875302,'Eliminar','Si aceptas también se eliminarán las facturas rectificativas, las líneas y los vencimientos asociados a esta factura.')">Eliminar</a>
+						</li>
+								
+				
+			</ul>
+		</div> 
+								</td>
+							</tr>
+						
+							<tr class="list-element" data-context="saleBills" data-id="875303">
+								<td class="only-check ">
+									<div class="checkbox">
+										<input type="checkbox" name="entity.realizada" id="check_select_875303" class="check-select">
+										<label for="check_select_875303"></label>
+									</div>
+								</td>
+								<td>
+									
+									<a href="/saas/saleBills/../saleBills/edit.action?id=875303">000112020</a>
+								</td>
+								<td>07/12/20</td>
+								<td>
+									<a title="Prueba 1" href="/saas/accounts/view.action?id=1083033">
+										Prueba 1
+										
+										
+									</a>
+								</td>
+								<td class="col-category hidden-sm">
+									
+								</td>
+								
+								<td class="text-center">
+									
+										<div id="divState875303" class="d-inline-block toolExpirations" data-id="875303" title="" data-toggle="popover" data-original-title="Consultar vencimientos">
+											<a class="estado stateOrange">Vencida</a>
+										</div>
+									
+								</td>
+
+								<td class="col-base">0,00€</td>
+								<td class="text-right">
+									<span class="btn btn-link toolConceptos" data-toggle="popover" data-id="875303" title="" data-original-title="Conceptos">0,00€</span>
+								</td>
+								<td class="list-actions">									
+									
+									
+									
+
+									 
+
+									
+
+
+
+
+
+		<div class="dropdown">
+			<button type="button" class="btn btn-more hoverAction" data-toggle="dropdown"></button>
+			<ul class="dropdown-menu menu-desplegable dropdown-menu-right" role="menu">
+				
+				<li><a href="/saas/saleBills/../saleBills/edit.action?id=875303">Editar</a></li>
+				
+					<li>
+						<a onclick="dmslib.Widget.verPopup('divEnviarEmail',null,'/saas/saleBills/popup-send-invoice?id=875303&amp;entity.cuenta.id=1083033')">Enviar por email</a>
+					</li>			
+					<li class="menu-desplegable-option menu-color menu-option-icon color-trigger pickColor-wrap" data-original-title="" title="">
+						<span class="menu-option-text">Asignar color</span>
+						<div class="menu-icon">
+							<span class="pickColor" title="Selecciona un color"></span>
+						</div>
+					</li>
+					<li>
+						<a onclick="dmslib.Widget.verPopup('div-popup-exportar',null,'/saas/saleBills/popup-clon-bill?id=875303')">Clonar</a>
+					</li>
+					<li>
+						<a onclick="dmslib.Widget.verPopup('div-popup-exportar',null,'/saas/saleBills/popup-invoice-pdf?doc_type=4&amp;id=875303')">Exportar a PDF</a>
+					</li>
+					
+						<li>
+							<a onclick="dmslib.Widget.verPopup('div-generar-rectificativa',null,'/saas/saleBills/popup-rectificativa?id=875303')">Crear rectificativa</a>
+						</li>
+					
+					
+						<li>
+							<a onclick="dmslib.Widget.verPopup('popupFacturae',null,'/saas/exports/popup-invoice-facturae?id=875303')">Crear factura electrónica</a>
+						</li>
+					
+					
+
+					<!-- si no cobrada ni vencida. TODO comprobar si cuenta santander -->
+					
+								
+					
+					
+					
+						<li>
+							<a onclick="eliminarElementoListado('saleBills',875303,'Eliminar','Si aceptas también se eliminarán las facturas rectificativas, las líneas y los vencimientos asociados a esta factura.')">Eliminar</a>
+						</li>
+								
+				
+			</ul>
+		</div> 
+								</td>
+							</tr>
+						
+					</tbody>
+				</table>
+
+				<!-- versión movil -->
+				<div class="table-list-xs visible-xs">
+					
+						<article class="list-element " data-context="saleBills" data-id="875302" data-url="/saas/saleBills/edit.action?id=875302">
+							<div class="bloque bloque-ref bloque-cut">
+								<span class="ref">1</span>
+								<span class="bloque-alias">Prueba 1</span>
+							</div>
+							<div class="bloque bloque-estado">
+								
+								
+								
+									<a class="prevent estado stateOrange toolExpirations" data-id="875302" title="" data-toggle="popover" data-original-title="Consultar vencimientos">Vencida</a>
+																
+							</div>
+							<div class="bloque bloque-importe">
+								0,00€
+								<br>
+								07/12/20
+							</div>
+							<div class="list-actions">
+
+
+
+
+
+		<div class="dropdown">
+			<button type="button" class="btn btn-more hoverAction" data-toggle="dropdown"></button>
+			<ul class="dropdown-menu menu-desplegable dropdown-menu-right" role="menu">
+				
+				<li><a href="/saas/saleBills/../saleBills/edit.action?id=875302">Editar</a></li>
+				
+					<li>
+						<a onclick="dmslib.Widget.verPopup('divEnviarEmail',null,'/saas/saleBills/popup-send-invoice?id=875302&amp;entity.cuenta.id=1083033')">Enviar por email</a>
+					</li>			
+					<li class="menu-desplegable-option menu-color menu-option-icon color-trigger pickColor-wrap" data-original-title="" title="">
+						<span class="menu-option-text">Asignar color</span>
+						<div class="menu-icon">
+							<span class="pickColor" title="Selecciona un color"></span>
+						</div>
+					</li>
+					<li>
+						<a onclick="dmslib.Widget.verPopup('div-popup-exportar',null,'/saas/saleBills/popup-clon-bill?id=875302')">Clonar</a>
+					</li>
+					<li>
+						<a onclick="dmslib.Widget.verPopup('div-popup-exportar',null,'/saas/saleBills/popup-invoice-pdf?doc_type=4&amp;id=875302')">Exportar a PDF</a>
+					</li>
+					
+						<li>
+							<a onclick="dmslib.Widget.verPopup('div-generar-rectificativa',null,'/saas/saleBills/popup-rectificativa?id=875302')">Crear rectificativa</a>
+						</li>
+					
+					
+						<li>
+							<a onclick="dmslib.Widget.verPopup('popupFacturae',null,'/saas/exports/popup-invoice-facturae?id=875302')">Crear factura electrónica</a>
+						</li>
+					
+					
+
+					<!-- si no cobrada ni vencida. TODO comprobar si cuenta santander -->
+					
+								
+					
+					
+					
+						<li>
+							<a onclick="eliminarElementoListado('saleBills',875302,'Eliminar','Si aceptas también se eliminarán las facturas rectificativas, las líneas y los vencimientos asociados a esta factura.')">Eliminar</a>
+						</li>
+								
+				
+			</ul>
+		</div></div>
+						</article>
+					
+						<article class="list-element " data-context="saleBills" data-id="875303" data-url="/saas/saleBills/edit.action?id=875303">
+							<div class="bloque bloque-ref bloque-cut">
+								<span class="ref">000112020</span>
+								<span class="bloque-alias">Prueba 1</span>
+							</div>
+							<div class="bloque bloque-estado">
+								
+								
+								
+									<a class="prevent estado stateOrange toolExpirations" data-id="875303" title="" data-toggle="popover" data-original-title="Consultar vencimientos">Vencida</a>
+																
+							</div>
+							<div class="bloque bloque-importe">
+								0,00€
+								<br>
+								07/12/20
+							</div>
+							<div class="list-actions">
+
+
+
+
+
+		<div class="dropdown">
+			<button type="button" class="btn btn-more hoverAction" data-toggle="dropdown"></button>
+			<ul class="dropdown-menu menu-desplegable dropdown-menu-right" role="menu">
+				
+				<li><a href="/saas/saleBills/../saleBills/edit.action?id=875303">Editar</a></li>
+				
+					<li>
+						<a onclick="dmslib.Widget.verPopup('divEnviarEmail',null,'/saas/saleBills/popup-send-invoice?id=875303&amp;entity.cuenta.id=1083033')">Enviar por email</a>
+					</li>			
+					<li class="menu-desplegable-option menu-color menu-option-icon color-trigger pickColor-wrap" data-original-title="" title="">
+						<span class="menu-option-text">Asignar color</span>
+						<div class="menu-icon">
+							<span class="pickColor" title="Selecciona un color"></span>
+						</div>
+					</li>
+					<li>
+						<a onclick="dmslib.Widget.verPopup('div-popup-exportar',null,'/saas/saleBills/popup-clon-bill?id=875303')">Clonar</a>
+					</li>
+					<li>
+						<a onclick="dmslib.Widget.verPopup('div-popup-exportar',null,'/saas/saleBills/popup-invoice-pdf?doc_type=4&amp;id=875303')">Exportar a PDF</a>
+					</li>
+					
+						<li>
+							<a onclick="dmslib.Widget.verPopup('div-generar-rectificativa',null,'/saas/saleBills/popup-rectificativa?id=875303')">Crear rectificativa</a>
+						</li>
+					
+					
+						<li>
+							<a onclick="dmslib.Widget.verPopup('popupFacturae',null,'/saas/exports/popup-invoice-facturae?id=875303')">Crear factura electrónica</a>
+						</li>
+					
+					
+
+					<!-- si no cobrada ni vencida. TODO comprobar si cuenta santander -->
+					
+								
+					
+					
+					
+						<li>
+							<a onclick="eliminarElementoListado('saleBills',875303,'Eliminar','Si aceptas también se eliminarán las facturas rectificativas, las líneas y los vencimientos asociados a esta factura.')">Eliminar</a>
+						</li>
+								
+				
+			</ul>
+		</div></div>
+						</article>
+					
+				</div>
+
+				
+
+		<div class="paginador">
+			<div class="page-block page-block-resultados">
+				<strong>2</strong> <span>resultados</span>
+			</div>
+
+			<div class="page-block page-block-elementos">
+				Mostrar
+				<select name="entityList.maxResults" id="entityList_maxResults" class="paginador-select" onchange="document.location='search?entityList.maxResults=' + this.options[this.selectedIndex].value">
+			<option value="25" selected="selected">25</option>
+			<option value="50">50</option>
+			<option value="100">100</option>
+			<option value="500">500</option>
+
+
+		</select>
+
+
+				<span class="hidden-xs">elementos<span class="hidden-xs"> por página</span></span>
+			</div>
+
+			<div class="page-block page-block-paginas">
+				<span>Página</span> <strong>1</strong> de <strong>1</strong>
+			</div>
+
+			<div class="page-block page-block-flechas">
+				
+
+		<div class="list-navi">
+			
+			
+		</div>
+			</div>
+		</div>	 
+			
+			
+
+
+		<script>
+			// enviar
+			$(document).on("click", ".btn-enviar-popup", function(e){
+				var id = $(this).attr("data-id");
+				var cuenta = $(this).attr("data-cuenta");
+				
+				dmslib.Widget.verPopup('divEnviarEmail', null, pageContext + '/saleBills/popup-send-invoice?id=' + id + '&entity.cuenta.id=' + cuenta);
+			});
+
+			$(".toolConceptos").popover({		
+				placement: "bottom",
+				html: true, 
+				trigger: "manual",
+				content: function() {	
+					var id = $(this).attr("data-id");
+					var ret = $(this).attr("data-retencion");
+					var bRetencion = false;
+					if (ret != undefined && ret == "true")
+						bRetencion = true;
+								
+					var html = getRowsConceptos(id, "sales/invoices", bRetencion);
+					return html;
+				},
+				template: '<div class="popover popover-conceptos"><div class="arrow arrow-white"></div><div class="popover-content"></div></div>'
+			}).click(function(e){
+				$(this).popover('show');
+				e.preventDefault();
+			});
+
+			//carga labels calendarios
+			var i18n = getCalendarLabels('1');
+			var idInvoice;
+			var expirationsIds = [];
+
+			$(".toolExpirations").popover({		
+				placement: "bottom",
+				trigger: "manual",
+				html: true, 
+				content: function() {	
+					var id =  $(this).attr("data-id");
+					idInvoice = id;			
+					
+					var html = "";
+					html ="<table id='tableExpiraciones_" + id + "' class='table table-lst'>";
+					html +="	<thead>";
+					html +="		<tr>";
+					html +="			<th class='text-center'>" + billageUtilsLiteral('general.fecha') + "</th>";
+					html +="			<th class='text-right'>" + billageUtilsLiteral('general.importe') + "</th>";
+					html +="			<th class='text-center'>" + billageUtilsLiteral('general.estado') + "</th>";
+					html +="			<th>&nbsp;</th>";
+					html +="		</tr>";
+					html +="	</thead>";
+					html +="	<tbody>";			
+
+					$.ajax({
+						url: pageContext+"/rest-services/sales/invoices/expirations/" + id,
+						dataType: "json",
+						async: false,
+						success: function(json){	            	
+							if(json.length == 0) html +="<tr><td colspan='5' class='empty'>" + billageUtilsLiteral("linias.ninguna") + "</td></tr>";
+							else {
+								$.each(json, function(i, field) {
+									html += json[i].html;
+									expirationsIds.push(json[i].idExpiration);
+								});
+							}        	   			
+						}
+					});
+
+					html +="	</tbody>";
+					html +="</table>";
+					
+					return html;
+				},
+				template: '<div class="popover popover-expiraciones"><div class="arrow arrow-white"></div><div class="popover-content"></div></div>'
+			}).click(function(e){
+				$(this).popover('show');
+				for(i=0;i<=expirationsIds.length;i++){
+					var id = expirationsIds.pop();
+					setCalendar(id);
+				}
+				e.preventDefault();
+			}); 
+
+			
+			//creamos calendario para cada vencimiento
+			function setCalendar(id) {
+				var datepicker = new Pikaday({
+					field: document.getElementById("fechaCobro_" + id),
+					firstDay: 1,
+					format: "DD/MM/YY",
+					i18n: i18n,
+					onSelect: function() {
+						$("#fechaCobro_"+id).val( this.getMoment().format("DD/MM/YY") );
+					}
+				});
+			}
+
+
+			//	santander finance
+
+			$(function() {
+						
+				// santander get disponible
+				function santanderFinanceAvailable(isAvailable, creditAmount) {
+					//console.log('isAvailable [' + isAvailable + '] credit amount [' + creditAmount + ']');
+					var amount = parseInt(creditAmount);
+					
+					if(isAvailable && creditAmount > 0){
+
+						var titulo = 'Tienes *** disponibles para financiar tus facturas';
+						titulo = titulo.replace("***", amount.toLocaleString() + "€");
+						
+						//$("#btn_santander .santander-disponible span").html(amount.toLocaleString() + "&euro;");
+						//$("#btn_santander").css("max-width", "230px");
+						
+						//$("#btn_santander .santander-normal").hide();
+						//$("#btn_santander .santander-disponible").show();
+						
+						$("#btn_santander").attr("title", titulo);
+
+						$("[data-toggle='tooltip']").tooltip(); 
+						
+					}
+				}
+				santanderFinanceManagement.isSantanderFinanceAvailable(santanderFinanceAvailable);
+				// fin santander disponible
+
+				var landingState = getURLParameter("state");
+				// console.log("landing state: " + landingState + ' url: ' + window.location.search);
+
+				if (landingState !== undefined) {
+					//state=pre-step-landing#e16b029d-2f72-476b-bd63-ba452cbaad4f&SOS-JWT-TOKEN
+
+					var arr = landingState.split('@');
+					//console.log(arr);
+					// we have to open a modal if we are in a step of landing
+					if (arr[0] === 'pre-step-landing') {
+
+						// // //	mostrem un nou popup de loading i en el popup es recalcula la redirecció
+						// if (window.opener != null) {
+						// 	const loc = window.location;
+						// 	//console.log(loc);
+						// 	window.opener.location = loc;
+						// 	window.close();
+						// } else {
+							dmslib.Widget.verPopup("popupSantanderFinance", null,
+									WebappProperties.path + '/saleBills/santander-finance-prestep-landing' + window.location.search);
+						// }
+
+					} else if (arr[0] === 'authorize-products-landing') {
+
+						// if (window.opener != null) {
+						// 	window.opener.location = window.location;
+						// 	window.close();
+						// } else {
+							//	Aquí hem de mostrar un nou popup (continuació)
+							dmslib.Widget.verPopup("popupSantanderFinance", null,
+									WebappProperties.path + '/saleBills/santander-finance-authorize-landing' + window.location.search);
+						// }
+
+					} else if (arr[0] === 'hiring-products-landing') {
+
+						// santanderFinanceManagement.refreshOperations();
+
+						// if (window.opener != null) {
+						// 	window.opener.location = window.location;
+						// 	window.close();
+						// } else {
+						// 	window.location = WebappProperties.path + '/saleBills/list';
+						// }
+
+						// dmslib.Widget.verPopup("popupSantanderFinance", null,
+						// 		'/saas/saleBills/santander-finance-hired-product' + window.location.search);
+					}
+				}
+				
+				
+				$('#btn_santander').click(function() {
+					//	get all parameters
+					var checks = document.getElementsByTagName("input");
+					var variables = [];
+					for (var x = 0; x < checks.length; x++) {
+						var actual = checks[x];
+						if (actual.className == "check-select") {
+							if (actual.checked) {
+								variables.push(actual.id.substring(13));
+							}
+						}
+					}
+								
+					dmslib.Widget.removePopup();
+					dmslib.Widget.verPopup('popupSantanderFinance', null, pageContext + '/saleBills/santander-finance?invoiceIds=' + variables.join());
+				});
+				
+				// si viene de un redirect
+				var redirectParam = getURLParameter("redirect");
+				if (redirectParam !== undefined){
+					dmslib.Widget.verPopup('popupSantanderSteps', null, pageContext + '/saleBills/santander-steps');
+				}
+			});
+
+			//	fin santander finance
+
+			//	sii integration
+			$('#btn_sii_integration').click(function() {
+				//	get all parameters
+				var checks = document.getElementsByTagName("input");
+				var variables = [];
+				for (var x = 0; x < checks.length; x++) {
+					var actual = checks[x];
+					if (actual.className == "check-select") {
+						if (actual.checked) {
+							variables.push(actual.id.substring(13));
+						}
+					}
+				}
+
+				dmslib.Widget.removePopup();
+				dmslib.Widget.verPopup('popupSiiIntegration', null, pageContext + '/saleBills/sii-integration?siiIntegrationItemIds=' + variables.join());
+			});
+
+
+			function prepareCalendar(idFactura) {
+				console.log("prepareCalendar");
+				var datepicker = new Pikaday({
+					field: document.getElementById('sii_fecha_' + idFactura),
+					firstDay: 1,
+					format: "DD/MM/YY",
+					i18n: i18n,
+					onSelect: function() {
+						document.getElementById('sii_fecha_' + idFactura).value = this.getMoment().format('DD/MM/YY');
+					}
+				});
+			}
+			//	sii integration
+
+		</script>
+							</div>
+
+						</div>
+						
+						
+					</div>
+			
+					<!--  contenido popover de selección de color -->
+					<div class="select-color-content">
+						
+							<span class="color-sq" style="background:#D83C12" data-color="#D83C12" title="#D83C12"></span>
+						
+							<span class="color-sq" style="background:#F15A24" data-color="#F15A24" title="#F15A24"></span>
+						
+							<span class="color-sq" style="background:#F7931E" data-color="#F7931E" title="#F7931E"></span>
+						
+							<span class="color-sq" style="background:#ED1E79" data-color="#ED1E79" title="#ED1E79"></span>
+						
+							<span class="color-sq" style="background:#EB7C6B" data-color="#EB7C6B" title="#EB7C6B"></span>
+						
+							<span class="color-sq" style="background:#D9E021" data-color="#D9E021" title="#D9E021"></span>
+						
+							<span class="color-sq" style="background:#36E836" data-color="#36E836" title="#36E836"></span>
+						
+							<span class="color-sq" style="background:#39B54A" data-color="#39B54A" title="#39B54A"></span>
+						
+							<span class="color-sq" style="background:#1963CE" data-color="#1963CE" title="#1963CE"></span>
+						
+							<span class="color-sq" style="background:#662D91" data-color="#662D91" title="#662D91"></span>
+						
+						<span class="color-sq color-none" data-color="transparent" title="Sin color"></span>
+					</div>
+				
+				</main>
+				
+				
+
+
+
+
+
+
+
+		<!-- Div para confirmar eliminar elemento -->
+		<div id="dEliminarElemento" class="popup no-remove">
+			<div class="popup-header">
+				<div class="popup-title">
+					Atención
+					<button type="button" class="btn-transparent popup-btn-close">
+						<img src="/saas/img/icons/icons/grey/close.svg">
+					</button>
+				</div>
+			</div>
+			<div class="popup-content">
+				<div class="text-center"><strong id="divMensajePopup"></strong></div>
+				<img class="pull-left" src="/saas/img/trash.png">
+				<div id="divMensajeImplicaciones" class="text-center"></div>
+			</div>
+			<div class="popup-footer">		
+				<button type="button" id="inputEliminar" class="btn btn-submit" onclick="dmslib.Validation.validate(this, 'form')">Aceptar</button>	
+				<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+			</div>
+		</div>
+
+
+
+		<!-- Div para subir imagen productos  -->
+		<div id="dpopup_imagen_producto" class="dpopupsubirimagen popup">
+			
+				
+				
+				
+				
+				
+			
+
+
+
+
+		<div class="popup-header">
+			<div class="popup-title">
+				Sube una foto para el servicio o producto.
+				
+				<button type="button" class="btn-transparent popup-btn-close">
+					<img src="/saas/img/icons/icons/grey/close.svg">
+				</button>
+			</div>
+		</div>
+
+
+		<form id="upload_image_product" action="/saas/products/upload-image" method="post" enctype="multipart/form-data">
+			<input id="image_product" name="id" type="hidden" value="">
+			<div class="popup-content" style="overflow:hidden">
+				<div class="upload-container">
+					<div class="upload-img">
+						<i class="fa fa-picture-o" aria-hidden="true"></i>
+					</div>
+					<div class="upload-file">
+						<p>Sube una foto para el servicio o producto.<br><br><b>Formato:</b> jpg, png o gif.<br>	<b>Tamaño máximo:</b> 2 MB.<br><br></p>
+						<input type="file" name="upload" id="upload">
+					</div>
+				</div>
+			</div>
+
+			<div class="popup-footer">		
+				<button type="submit" id="inputUploadFile" class="btn btn-submit" onclick="dmslib.Widget.escondePopup()">Aceptar</button>
+				<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+			</div>    
+		</form>
+		</div>
+
+		<!-- Div para subir gastos  -->
+		<div id="dpopup_doc-preview" class="dpopupsubirgasto popup-div popup">
+			
+				
+				
+				
+				
+				
+			
+
+
+
+
+		<div class="popup-header">
+			<div class="popup-title">
+				Subir documento de gasto
+				
+				<button type="button" class="btn-transparent popup-btn-close">
+					<img src="/saas/img/icons/icons/grey/close.svg">
+				</button>
+			</div>
+		</div>
+
+
+		<form id="upload_image_gasto" action="/saas/spending/upload-image" method="post" enctype="multipart/form-data">
+			<input id="image_gasto" name="id" type="hidden" value="">
+			<div class="popup-content" style="overflow:hidden">
+				<div class="upload-container">
+					<div class="upload-img">
+						<i class="fa fa-picture-o" aria-hidden="true"></i>
+					</div>
+					<div class="upload-file">
+						<p>Selecciona documento de gastos para el gasto</p>
+						<input type="file" name="upload" id="upload">
+					</div>
+				</div>
+			</div>
+
+			<div class="popup-footer">		
+				<button type="submit" id="inputUploadFile" class="btn btn-submit" onclick="dmslib.Widget.escondePopup()">Aceptar</button>
+				<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+			</div>    
+		</form>
+		</div>
+
+		<!-- Div para popup error  -->
+		<div id="div-error" class="popup">
+			<div class="popup-header">
+				<div class="popup-title">
+					<span id="div-cabecera-error"></span>
+					<button type="button" class="btn-transparent popup-btn-close">
+						<img src="/saas/img/icons/icons/grey/close.svg">
+					</button>
+				</div>
+			</div>
+
+			<div id="div-mensaje-error" class="popup-content"></div>
+
+			<div class="popup-footer">		
+				<button type="button" class="btn btn-submit" onclick="dmslib.Widget.removePopup()">Aceptar</button>
+				<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+			</div>
+		</div>
+
+		<!-- Div para mover un documento o carpeta (des de docs)   -->
+		<div id="destinationPopup" class="popup no-remove">
+			
+
+
+
+
+
+
+		<div class="popup-header">
+			<div class="popup-title">
+				Destino
+				<button type="button" class="btn-transparent popup-btn-close">
+					<img src="/saas/img/icons/icons/grey/close.svg">
+				</button>
+			</div>
+		</div>
+
+
+
+		<div class="popup-content">
+			<div id="treeContainer" class="folder-tree"></div>
+			<div id="carpeta-destination-tree" class="folder-tree"></div>
+
+			<div class="fake-footer">
+				<button type="button" id="carpeta-destination-btn" class="btn btn-submit">Mover</button>
+				<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+			</div>
+		</div>
+
+
+
+
+		<div id="divValidacionPopup" class="validacion">
+			<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Faltan campos requeridos.
+		</div>
+
+		<div id="divErrorPopup" class="validacion-error">
+			<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="span-texto-error-popup"></span>
+		</div>
+
+
+		</div>
+
+		<!-- Div para ir a una carpeta (des de docs)  -->
+		<div id="gotoPopup" class="popup no-remove">
+			
+
+
+
+
+
+
+		<div class="popup-header">
+			<div class="popup-title">
+				Ir a
+				<button type="button" class="btn-transparent popup-btn-close">
+					<img src="/saas/img/icons/icons/grey/close.svg">
+				</button>
+			</div>
+		</div>
+
+
+
+		<div class="popup-content">
+			<div id="carpeta-goto-tree" class="folder-tree"></div>
+			<div id="carpeta-destination-tree" class="folder-tree"></div>
+
+			<div class="fake-footer">
+				<button type="button" id="carpeta-goto-btn" class="btn btn-submit">Confirmar</button>
+				<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+			</div>
+		</div>
+
+
+
+
+		<div id="divValidacionPopup" class="validacion">
+			<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Faltan campos requeridos.
+		</div>
+
+		<div id="divErrorPopup" class="validacion-error">
+			<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="span-texto-error-popup"></span>
+		</div>
+
+
+		</div>
+
+		<!-- Div para mostrar mensajes de confirmacion  -->
+		<div id="divConfirmacionAccion" class="popup popup-mensaje popup-mensaje-confirmacion">
+			<span id="divConfirmacionAccionTexto" class="popup-mensaje-texto"></span>
+		</div>
+
+		<!-- Div para mostrar mensajes de alerta  -->
+		<div id="divAlertAccion" class="popup popup-mensaje popup-mensaje-alerta">
+			<span id="alertAccionTexto" class="popup-mensaje-texto"></span>
+		</div>
+
+		<!-- Div para gestionar los conceptos a albaranear -->
+		<div id="divConceptosAlbaranes" class="divConceptosAlbaranes popup"></div>
+
+		<!-- wigets dashboard-->
+		<div id="divAddWidgetPopup" class="popup no-remove">
+			<div class="popup-header">
+				<div class="popup-title">
+					Seleccionar widget
+					
+					<button type="button" class="btn-transparent popup-btn-close">
+						<img src="/saas/img/icons/icons/grey/close.svg">
+					</button>
+				</div>
+			</div>
+
+			<div class="popup-content">
+				<div class="controls" id="tagsControls"></div>
+				<div id="selectorAddWidget" class="container ps-container ps-active-y"></div>
+			</div>
+			
+			<div class="popup-footer">		
+				<button type="button" class="btn btn-submit" onclick="addWidgetToDashboard()">Agregar</button>
+				<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+			</div>
+		</div>
+
+
+		<!-- filtros wigets dashboard -->
+		<div id="divWidgetFiltersPopup" class="popup no-remove">
+			<div class="popup-header">
+				<div class="popup-title">
+					<div id="divWidgetFiltersTitle"></div>
+					<button type="button" class="btn-transparent popup-btn-close">
+						<img src="/saas/img/icons/icons/grey/close.svg">
+					</button>
+				</div>
+			</div>
+
+			<div class="divWidgetFilters">
+				<form id="formWidgetFilters" class="widget_instance_filters_form">
+					<input id="inputWidgetInstanceId" type="hidden" name="widget_instance_id" value="">
+					<div id="divWidgetFiltersArea" class="popup-content"></div>
+					<div class="popup-footer">		
+						<button id="buttonWidgetFiltersOk" type="submit" class="btn btn-submit">Filtrar</button>
+						<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+						<!-- 
+						<button id="buttonWidgetFiltersReset" type="submit" class="btn btn-primary">Limpiar</button>
+						 -->
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- Popup subir logo a plantilla-->
+		<div id="dpopup_imagen_empresa" class="dpopupsubirlogo popup-div popup">
+			<div class="popup-header">
+				<div class="popup-title">
+					Subir logo
+
+					<button type="button" class="btn-transparent popup-btn-close">
+						<img src="/saas/img/icons/icons/grey/close.svg">
+					</button>
+				</div>
+			</div>
+
+			<form id="upload_image_empresa" action="/saas/companies/upload-logo" method="post" enctype="multipart/form-data">
+				<input type="hidden" id="image_empresa" name="id" value="">
+
+				<div class="popup-content">
+					<div class="upload-container">
+						<div class="upload-img">
+							<i class="fa fa-picture-o fa-4x" aria-hidden="true"></i>
+						</div>
+
+						<div class="upload-file">
+							
+							<div class="form-group fakeBtn">
+								<label for="upload" class="form-label">Selecciona tu logo</label>
+								<input type="file" name="upload" id="upload">
+								<div class="input-group add-clear-span">
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-primary">
+											<i class="fa fa-folder-open" aria-hidden="true"></i>
+										</button>
+									</span>
+									<input type="text" id="labelFile" class="form-control substring" placeholder="Seleccionar" readonly="">
+								</div>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+
+				<div class="popup-footer">
+					<button type="submit" id="inputUploadFile" class="btn btn-submit">Aceptar</button>
+					<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+				</div>
+			</form>
+		</div>
+
+				<script>
+					// n decimales de la empresa del usuario
+					numberDecimalsInBase10 = "100";
+					decimalesEmpresa = numberDecimalsInBase10.length -1; // num real
+					numberDecimalsInBase10 = numberDecimalsInBase10*1; // string a int
+					//funcion para mostrar mensaje de confirmacion
+					var result = "";
+					//si result = 1, mostramos mensaje confirmación
+					if(result == 1 || false) {
+						dmslib.Widget.prepararAccionConfirmacion("Datos guardados correctamente.");
+					}
+
+					//setesamos valor variable mensajeConfirmacion
+					mensajeConfirmacion = "Datos guardados correctamente.";
+					ningunaLinia = "No se ha añadido ninguna línea";
+
+					if($(location).attr("href").indexOf("contract-plans") == -1 && ""=='true') {
+						document.location = pageContext+"/contract-plans?user=producciones.ara2020@gmail.com&company=19532";
+					}
+
+					firstLogin = ("false" == "true") ?  1 : 0;
+					activationGoal = ("" == "true") ?  1 : 0;
+
+					//miramos si hay que mostrar popup bienvenida
+					
+						if("" == "true") 
+							dmslib.Widget.verPopup("divRenovarPassword", null, pageContext+"/new-password");
+						else if("" == "true") 
+							dmslib.Widget.verPopup("divRenovarPassword", null, pageContext+"/force-new-password");
+						else if("0" == 0 && firstLogin == 1) 
+							dmslib.Widget.verPopup("divFirstLogin", null, pageContext+"/first-login");
+
+						if("" == "true") {
+							ga("send", "event", "Gratis", "activation");
+							dmslib.Ajax.request(pageContext+"/activation-goal");
+						}
+					
+
+					//asociamos evento onclick a divFormulario para saber si se está editando un formulario
+					if(dmslib.DOM.dameElemento("form")) {
+						// IE o FF
+						if(document.all) 
+							dmslib.DOM.dameElemento("form").attachEvent("onclick", activaModifForm);
+						else 
+							dmslib.DOM.dameElemento("form").addEventListener("click", activaModifForm, false);
+					}
+				</script>
+
+				
+
+
+
+
+
+
+
+			<!-- google Analytics -->
+			<script>
+				(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+				})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+				
+				ga('create', 'UA-7323120-25', 'billage.es');
+				
+					ga('set', 'dimension1', 'Gratis');
+					ga('set', '&uid', '46823');
+				
+				ga('send', 'pageview');
+			</script>
+			
+			<!-- Google Tag Manager -->
+			<noscript>
+				<iframe src="//www.googletagmanager.com/ns.html?id=GTM-TTXBSX" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+			</noscript>
+			<script>
+				(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+				new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+				j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+				'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+				})(window,document,'script','dataLayer','GTM-TTXBSX');
+			</script>
+			
+
+
+				
+
+
+
+
+
+			
+				
+			
+					
+					<script>				
+					window.intercomSettings = {
+						
+						name: "Poner nombre",
+						
+						email: "producciones.ara2020@gmail.com",
+						user_id: "46823",
+						
+						created_at: "1607380962000",
+						signed_up_at: "1607380962000",
+						rol: "Administrador",
+						app_id: "sbkq18wo",
+						company: {
+							remote_created_at: "1607380962000",
+							user_count: "1",
+							plan: "Gratis",
+							activa: "true",
+							company_id: "19532",
+							name: "Poner razón social",
+							periodicidad: "12"
+						}
+					};
+					</script>
+					<script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/sbkq18wo';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>
+			
+				
+				
+			
+
+
+				<script>
+					$(function() {
+						cookieScreenSize("md");
+			
+						$("#menuToggle, #backgroundSidebar").click(function(e) {
+							e.preventDefault();
+							$("#mainMenu").toggleClass("toggled");
+							$("#bNavPerfil").collapse("hide");
+						});
+					});
+				</script>
+				<script src="/saas/js/footer.js"></script>
+			
+		<div class="daterangepicker dropdown-menu ltr show-calendar opensright"><div class="ranges"><ul><li data-range-key="Hoy">Hoy</li><li data-range-key="Esta semana">Esta semana</li><li data-range-key="Este mes">Este mes</li><li data-range-key="Este año">Este año</li><li data-range-key="Todos">Todos</li><li class="visible-xs-inline">Seleccionar fecha</li></ul><div class="range_inputs"><button class="applyBtn btn btn-primary" disabled="disabled" type="button">Filtrar</button> <button class="cancelBtn btn btn-default" type="button">Cancel</button></div></div><div class="calendar left"><div class="daterangepicker_input"><input class="form-control inpFecha input-sm" type="text" name="daterangepicker_start" value=""><div class="calendar-time" style="display: none;"><div></div><i class="fa fa-clock-o glyphicon glyphicon-time"></i></div></div><div class="calendar-table"></div></div><div class="calendar right"><div class="daterangepicker_input"><input class="form-control inpFecha input-sm" type="text" name="daterangepicker_end" value=""><div class="calendar-time" style="display: none;"><div></div><i class="fa fa-clock-o glyphicon glyphicon-time"></i></div></div><div class="calendar-table"></div></div></div>
+		<iframe id="intercom-frame" style="position: absolute !important; opacity: 0 !important; width: 1px !important; height: 1px !important; top: 0 !important; left: 0 !important; border: none !important; display: block !important; z-index: -1 !important; pointer-events: none;" aria-hidden="true" tabindex="-1" title="Intercom"></iframe><script type="text/javascript" id="">!function(b,e,f,g,a,c,d){b.fbq||(a=b.fbq=function(){a.callMethod?a.callMethod.apply(a,arguments):a.queue.push(arguments)},b._fbq||(b._fbq=a),a.push=a,a.loaded=!0,a.version="2.0",a.queue=[],c=e.createElement(f),c.async=!0,c.src=g,d=e.getElementsByTagName(f)[0],d.parentNode.insertBefore(c,d))}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");fbq("init","679832448786593");fbq("track","PageView");</script>
+		<noscript>
+		 <img height="1" width="1" src="https://www.facebook.com/tr?id=679832448786593&amp;ev=PageView&#10;&#9;&#9;&amp;noscript=1">
+		</noscript>
+		<div id="intercom-container" class="intercom-namespace"><style>html.intercom-mobile-messenger-active,html.intercom-mobile-messenger-active > body,html.intercom-modal-open,#intercom-container-body{overflow:hidden !important;}html.intercom-mobile-messenger-active,html.intercom-mobile-messenger-active > body{position:static !important;}html.intercom-mobile-messenger-active > body{height:0 !important;margin:0 !important;}iframe#intercom-frame{position:absolute !important;opacity:0 !important;width:1px !important;height:1px !important;top:0 !important;left:0 !important;border:none !important;display:block !important;z-index:-1 !important;}</style><div class="intercom-app" aria-live="polite"><iframe allowfullscreen="" class="intercom-launcher-frame intercom-1q4irxg e1ur5zlj0" name="intercom-launcher-frame" title="Intercom live chat" data-intercom-frame="true"></iframe><iframe allowfullscreen="" class="intercom-launcher-badge-frame intercom-s06fua e1loc0kc0" name="intercom-launcher-badge-frame" title="Intercom live chat notificación" data-intercom-frame="true"></iframe><div id="intercom-modal-container"></div></div></div><div id="intercom-css-container"><style data-emotion="intercom-global"></style><style data-emotion="intercom"></style></div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/fullcalendar.min.js"></script>
+    <script src="assets/js/locale-all.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/fullcalendar.min.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/locale-all.js"></script>
+</body>
+
+</html>

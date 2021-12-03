@@ -1,0 +1,4678 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billage 20.0</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/empty.css">
+    <link rel="stylesheet" href="assets/css/evol-colorpicker.min.css">
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/fullcalendar.min.css">
+    <link rel="stylesheet" href="assets/css/fullcalendar.print.css">
+    <link rel="stylesheet" href="assets/css/jquery.tagit.css">
+    <link rel="stylesheet" href="assets/css/main.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/tagit.ui-zendesk.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.colors.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.min.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.table.css">
+</head>
+
+<body><main>
+			
+
+<!-- Div para alertas jquery -->
+<div id="billage-utils-alert" class="popup divAlertPopup"></div>
+
+<script>
+	// Usuario
+	var idUsr = "46886";
+	var imgUsr = "";
+	var nameUsr = "Poner nombre";
+	var rolUsr = "1";
+	sessionStorage.setItem('session-user-id', idUsr);
+
+	// Usuario
+	var idEmpresa = "19546";
+
+	var pageContext = '/saas';
+
+	var context = '/saas';
+	queryInit(context);
+	billageUtilsInit(context);
+
+	//29-06-2018
+	//billageUtilsAvoidPasteDefault();
+	billageCombos();
+
+	billageSnippetInit();
+
+	var _alertPopup = function (h, w, data, funcOk) {
+		var t = $('#billage-utils-alert');
+		var l = $('<div/>').height(h).width(w).append(data);
+		t.empty().append(l);
+
+		console.log(data+':'+ t.attr('id'));
+		dmslib.Widget.verPopup(t.attr('id'), null, context +'/session-expired');
+	};
+
+	var _alertSessionExpiredPopup = function (data) {
+		window.location = context;
+	};
+
+	var _alertAjaxErrorPopup = function (e,jqXHR,ajaxSettings,thrownError) {
+		_alertPopup(200, 300, $('<span/>').append(data), function () {
+			window.location = context;
+		});
+	};
+
+	var interval = 31 * 60;	//1 minuto mas q el timeout de session
+	//interval = 1;			//para hacer pruebas desmarcar
+
+	var timer = billageUtilsCheckSessionExpired(function () {
+		try {
+			_alertSessionExpiredPopup();
+		} catch (e) { }
+		clearInterval(timer);
+	},
+	interval);
+
+	(function ($) {
+		$.fn.extend({
+			limiter: function (limit, elem) {
+				$(this).on("change keyup focus", function () {
+					setCount(this, elem);
+				});
+				function setCount(src, elem) {
+					var chars = src.value.length;
+
+					if (chars > limit) {
+						src.value = src.value.substr(0, limit);
+						chars = limit;
+					}
+					elem.html(limit - chars);
+				}
+
+				setCount($(this)[0], elem);
+			}
+		});
+	})(jQuery);
+</script>
+	
+			<!-- CAPA GRIS -->
+			<div id="dgris"></div>
+	
+			<!-- MENU TOP -->
+			
+
+
+
+
+
+
+
+<nav id="navbarTop" class="navbar navbar-fixed-top navbar-billage">
+	<!-- USER TRIAL -->
+	
+
+	<!-- Brand and toggle get grouped for better mobile display -->
+	<div class="navbar-header">
+		<a href="#" class="avatar navbar-btn collapsed" data-toggle="collapse" data-target="#bNavPerfil" aria-expanded="false">
+			
+			
+				<span title="Poner nombre" class="avatar-no-image">PN</span>
+			
+			<i class="fa fa-angle-down" aria-hidden="true"></i>
+		</a>
+		
+		<a class="navbar-recompensas-link ml5" href="/saas/partner/partner-panel">
+			Saldo <strong> €</strong><span class="hidden-xs">&nbsp;| 80€ por amigo</span>
+		</a>
+		
+		<button type="button" class="navbar-btn btn-transparent topBuscador" data-container="body" data-toggle="popover" data-original-title="" title=""><i class="fa fa-search"></i></button>
+
+		<a class="navbar-btn navbar-shortcut" href="index.html#onboarding"><i class="fa fa-plus"></i></a>
+
+		<a class="navbar-brand" href="index.html">
+			<img src="/saas/img/logo/billage.svg">
+		</a>
+		
+			<a id="menuToggle" class="navbar-brand toggle-btn" href="#menu-toggle"></a>
+		
+		
+		
+	</div>
+
+	<div id="bNavbar" class="collapse navbar-collapse">
+
+		<ul class="nav navbar-nav navbar-center">
+			<li>
+				<a id="accDirecto" class="navbar-shortcut">
+					<img title="Accesos directos" class="i-icon" src="/saas/img/icons/icons/white/plus.svg">
+				</a>
+			</li>
+		</ul>
+
+		<ul class="nav navbar-nav navbar-right">
+			
+ 				<li>
+					<button type="button" class="btn btn-search topBuscador" data-container="body" data-toggle="popover" data-original-title="" title="">
+						<img src="/saas/img/icons/icons/white/search.svg">
+					</button>
+				</li>
+				
+				<li class="navbar-recompensas">
+					<a class="navbar-recompensas-link" href="/saas/partner/partner-panel">
+						Saldo <strong>€</strong><span class="hidden-xs hidden-sm hidden-md">&nbsp;| 80€ por amigo</span>
+					</a>
+				</li>					
+
+				<li class="separador hidden-sm"></li>
+			 	<li>
+					<a id="mailMenu" title="Mensajes" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+						<img title="Mensajes" src="/saas/img/icons/icons/white/mail.svg">
+						<sup class="badge"></sup>
+					</a>
+				</li>
+				<li class="separador hidden-sm"></li>
+				
+					<li class="hidden-sm">
+						<a target="_blank" href="https://help.getbillage.com">
+							<img title="Ayuda" src="/saas/img/icons/menu/ayuda.svg">
+						</a>
+					</li>
+					
+
+			
+
+			<li class="dropdown">
+				<a href="#" class="avatar dropdown-toggle toggle-ajustes" data-toggle="dropdown">
+					
+					
+						<span title="Poner nombre" class="avatar-no-image">PN</span>
+					
+					<i class="fa fa-angle-down" aria-hidden="true"></i>
+				</a>
+				<ul class="dropdown-menu dropdown-menu-right dropdown-arrow">
+					
+
+
+
+
+
+
+
+
+
+	<li class="nav-perfil ">
+		<a href="/saas/my-profile">
+			Mi Perfil
+		</a>	
+	</li>
+	
+	
+		<li class="nav-empresa ">
+			<a onclick="dmslib.Widget.verPopup('divEditEmpresa',null,'/saas/companies/view-edit?id=19546')">
+				Datos de mi negocio
+				
+				
+			</a>
+		</li>
+		
+		
+		
+		<li class="nav-contratacion hidden-xs ">
+			<a href="/saas/companies/view-company-contract?id=19546">Mi suscripción</a>
+		</li>			
+	
+	
+	
+
+	
+	
+	
+	<li class="divider"></li>	
+	
+	
+	
+	
+		
+			<li class="nav-usuarios hidden-xs ">
+				<a href="/saas/users/list">Usuarios</a>
+			</li>
+		
+	
+	
+	<li class="nav-ajustes" onclick="dmslib.Widget.verPopup(&quot;divMenuAjustes&quot;, null, pageContext + &quot;/menu-settings&quot;);">
+		<a>Ajustes e importaciones</a>
+	</li>
+	
+ 	<li class="nav-mail visible-xs-block">
+		<a id="mailMenuResponsive" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+			Mensajes
+		</a>
+	</li>	
+	
+			
+		<li class="nav-integraciones">
+			<a href="/saas/integrations">Integraciones</a>
+		</li>
+		
+		<li class="nav-store">
+			<a href="/saas/store/billage-store">Billage store</a>
+		</li>
+	
+	
+	
+		<li class="nav-invita ">
+			<a href="/saas/partner/partner-panel">
+				Saldo <strong>€</strong>
+			</a>
+		</li>
+	
+
+	<li class="divider"></li>						
+
+
+<li class="nav-logout">
+	<a id="perfil" class="aMainMenu" href="/saas/logout">Cerrar sesión</a>
+</li>		
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<div id="bNavPerfil" class="collapse navbar-collapse" aria-expanded="false">
+		<ul class="nav navbar-nav">
+			
+				<li class="nav-help">
+					<a target="_blank" href="https://help.getbillage.com">Ayuda</a>
+				</li>
+			
+			
+
+
+
+
+
+
+
+
+
+	<li class="nav-perfil ">
+		<a href="/saas/my-profile">
+			Mi Perfil
+		</a>	
+	</li>
+	
+	
+		<li class="nav-empresa ">
+			<a onclick="dmslib.Widget.verPopup('divEditEmpresa',null,'/saas/companies/view-edit?id=19546')">
+				Datos de mi negocio
+				
+				
+			</a>
+		</li>
+		
+		
+		
+		<li class="nav-contratacion hidden-xs ">
+			<a href="/saas/companies/view-company-contract?id=19546">Mi suscripción</a>
+		</li>			
+	
+	
+	
+
+	
+	
+	
+	<li class="divider"></li>	
+	
+	
+	
+	
+		
+			<li class="nav-usuarios hidden-xs ">
+				<a href="/saas/users/list">Usuarios</a>
+			</li>
+		
+	
+	
+	<li class="nav-ajustes" onclick="dmslib.Widget.verPopup(&quot;divMenuAjustes&quot;, null, pageContext + &quot;/menu-settings&quot;);">
+		<a>Ajustes e importaciones</a>
+	</li>
+	
+ 	<li class="nav-mail visible-xs-block">
+		<a id="mailMenuResponsive" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+			Mensajes
+		</a>
+	</li>	
+	
+			
+		<li class="nav-integraciones">
+			<a href="/saas/integrations">Integraciones</a>
+		</li>
+		
+		<li class="nav-store">
+			<a href="/saas/store/billage-store">Billage store</a>
+		</li>
+	
+	
+	
+		<li class="nav-invita ">
+			<a href="/saas/partner/partner-panel">
+				Saldo <strong>€</strong>
+			</a>
+		</li>
+	
+
+	<li class="divider"></li>						
+
+
+<li class="nav-logout">
+	<a id="perfil" class="aMainMenu" href="/saas/logout">Cerrar sesión</a>
+</li>
+		</ul>
+	</div>
+</nav>
+
+<div id="divAccDirecto" class="fast-call" hidden="">
+	<div class="container">
+		<header>
+			<h1>Crear una nueva oportunidad, proyecto, factura y más</h1>
+			<button type="button" id="closeDiv" class="btn-icon btn-close"></button>
+		</header>
+
+		<section>
+			<div class="media media-comercial">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/vender.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Comercial</h4>
+			       		
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearoportunidad.html'">Oportunidad</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearcampanas.html';">Campaña</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearactividades.html'">Actividad comercial</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpresupuestos.html">Presupuesto</a>
+	</p>
+
+					
+				</div>
+			</div>
+
+			<div class="media media-project">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/organizar.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Proyectos</h4>
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearproyectos.html'">Proyecto</p>
+
+
+					
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='creartareas.html'">Tarea de proyecto</p>
+
+
+					
+					
+					<p class="fast-call-caller a fast-call-popup timetracking-play">
+						Registro de tiempos
+					</p>
+				</div>
+			</div>
+
+			<div class="media media-biling">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/cobrar.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Facturación</h4>
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearfacturas.html">Factura de venta</a>
+	</p>
+
+					
+
+						
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearalbaran.html">Albarán de venta</a>
+	</p>
+
+					
+
+						
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpedidosVentas.html">Pedido de venta</a>
+	</p>
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="creargastos.html">Gasto</a>
+	</p>
+
+					
+
+					    
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpedidosCompras.html">Pedido de compra</a>
+	</p>
+
+					
+				</div>
+			</div>
+
+			<div class="media">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/general.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">General</h4>
+				
+				
+					
+					
+					
+				
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNewAccount',null,'/saas/accounts/ver-alta')">Empresa</p>
+
+
+			
+	       		
+				
+					
+					
+					
+				
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNuevoContacto',null,'/saas/contacts/ver-alta')">Contacto</p>
+
+
+			
+			
+		        
+		            
+		            
+		        	
+		        
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNewDoc',null,'/saas/documents/edit-popup')">Documentos</p>
+
+
+			
+			
+		        
+		            
+		            
+		            
+		        
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNuevoProducto',null,'/saas/products/ver-alta')">Producto</p>
+
+
+			
+				</div>
+			</div>
+		</section>
+	</div>
+</div>
+
+
+<div id="popover-top-search" class="hide">
+	<form action="/saas/search">
+		<div class="input-group search-input ">
+			<input type="text" name="cadena" class="form-control input-sm disable-clear" placeholder="Buscar" value="" pattern=".{4,}" autocomplete="off" oninvalid="setCustomValidity('Debes introducir al menos 4 carácteres para realizar la búsqueda')" oninput="setCustomValidity('')" required="">
+			<span class="input-group-addon">
+				<button type="submit" id="serachBtn" class="btn btn-search">
+					<img src="/saas/img/icons/icons/white/search.svg">
+				</button>
+			</span>
+		</div>
+	</form>
+ </div>
+
+<script>
+	$(function() {
+		
+		
+		$(document).on("click", ".toggle-ajustes", function(e) {
+			var obj = $("#sidebarAjustes");
+			
+			if (obj.is(":visible")) {
+				$(".nav-ajustes").hide();
+			}
+			else{
+				$(".nav-ajustes").show();
+			}
+		});		
+		
+		$(document).on("click", ".menu-configuracion .dropdown-submenu", function(e) {
+			var li = $(this);
+			
+			if(!li.hasClass("li-submenu")) {
+				e.stopImmediatePropagation();
+				if (li.hasClass("active")) {
+					li.parents(".menu-configuracion").find(".dropdown-menu").slideUp(350);
+					setTimeout(function() {
+						li.removeClass("active");
+					}, 400);
+				}
+				else {
+					//if
+					li.parents(".menu-configuracion").find(".dropdown-menu").slideUp(350);
+					setTimeout(function() {
+						li.parents(".menu-configuracion").find(".active").removeClass("active");
+						li.addClass("active").find(".dropdown-menu").slideDown();
+					}, 400);
+				}
+			}
+		});
+
+		// search
+		$(document).on("focus", "#inpSearch", function(e) {
+			$(this).closest(".search-input").addClass("focus");
+		}).on("blur", "#inpSearch", function(e) {
+			if( $(this).val() == "" ) 
+				$(this).closest(".search-input").removeClass("focus");
+		});
+
+		// popover buscador
+		$(".topBuscador").popover({
+			trigger: "manual",
+			placement: "bottom",
+			html: true,
+			content: function() {
+				return $('#popover-top-search').html();
+			},
+			template: '<div class="popover popover-topBuscador popover-xs"><div class="arrow arrow-dark"></div><div class="popover-content"></div></div>'
+		}).click(function(e){
+		    $(this).popover('toggle');
+		    $(".popover-topBuscador .form-control").focus();
+		    e.preventDefault();
+		});
+
+		$('body').click(function(e) {
+			var target = $(e.target);
+			if(!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+				$(".popover-topBuscador").hide();
+			}
+		});
+
+	});
+
+	$(".navbar-shortcut").click(function() {
+		if( $("#divAccDirecto").is(":visible") ) 
+			$("#divAccDirecto").hide();
+		else 
+			$("#divAccDirecto").show();
+	});
+
+	$("#closeDiv, .fast-call-popup").click(function() {
+		$("#divAccDirecto").hide();
+	});
+
+	$("body").click(function(e) {
+		if( $("#divAccDirecto").is(":visible") && !$(e.target).is(".navbar-shortcut") && !$(e.target).parents().is(".navbar-shortcut") && !$(e.target).is("#divAccDirecto") && !$(e.target).parents().is("#divAccDirecto")) {
+			$("#divAccDirecto").hide();
+		}
+	});
+
+    $(".alert-partner").on("closed.bs.alert", function(){
+    	$(document.body).removeClass("user-trial");
+    });
+</script>
+			
+			
+			
+				
+			
+
+
+
+			
+			<div id="mainMenu" class="main-menu   toggled">
+				<!-- SIDE BAR -->
+				
+
+
+
+
+
+
+<div id="backgroundSidebar"></div>
+
+<div id="sidebarWrapper" class="sidebar-wrapper">
+	<button type="button" class="btn-transparent sidebar-toggle "></button>
+	
+	<ul id="accordionSidebar" class="menu-list menu-tree">
+		
+
+
+
+
+
+
+<!-- INICIO -->
+<li class="menu-analisis menu-header active">
+	<a href="index.html"><i class="fa fa-bar-chart"></i> Análisis</a>
+</li>
+
+<!-- FACTURACION -->
+
+	
+	
+		
+		
+		
+	
+	<div class="panel">
+		<li class="menu-header menu-facturacion ">
+			<a href="#menuFacturacion" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				<i class="fa fa-file-text"></i>				
+				Facturación
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+		</li>
+		<ul id="menuFacturacion" class="panel-collapse collapse ">
+			<!-- ventas -->
+			
+			
+				
+				
+				
+					
+					
+				
+			
+
+			<div class="panel">
+				<li class="tree-lv0">
+					<a href="#menuVentas" data-toggle="collapse" data-parent="#menuFacturacion" aria-expanded="false">
+						Ventas
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+				</li>
+				<ul id="menuVentas" class="menu-submenu panel-collapse collapse">
+					
+						<li class="tree-lv1 ">
+							<a href="facturas.html">Facturas</a>
+							
+								<a title="Crear factura" class="btn btn-icon btn-add" href="crearfacturas.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					
+					<li class="tree-lv1 ">
+						<a href="alabaranesVentas.html">Albaranes</a>
+						
+							<a title="Crear albarán" class="btn btn-icon btn-add" href="crearalbaran.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="pedidosVentas.html">Pedidos</a>
+						
+							<a title="Crear pedido" class="btn btn-icon btn-add" href="crearpedidosVentas.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="presupuestos.html">Presupuestos</a>
+						
+							<a title="Crear presupuesto" class="btn btn-icon btn-add" href="crearpresupuestos.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					
+						<li class="tree-lv1 ">
+							<a href="facturasperiodicas.html">Facturas Periódicas</a>
+							
+								<a title="Crear factura periódica" class="btn btn-icon btn-add" href="crearfacturasperiodicas.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					
+				</ul>
+			</div>
+			<!-- compras -->
+			
+				 
+				
+					
+					
+				
+
+				<div class="panel">
+					<li class="tree-lv0">
+						<a class="collapsed" href="#menuCompras" data-toggle="collapse" data-parent="#menuFacturacion" aria-expanded="false">
+							Compras
+							<i class="fa fa-angle-down" aria-hidden="true"></i>
+						</a>
+					</li>
+					<ul id="menuCompras" class="menu-submenu panel-collapse collapse ">
+						<li class="tree-lv1 ">
+							<a href="gastos.html">Gastos</a>
+							
+								<a title="Crear gasto" class="btn btn-icon btn-add" href="creargastos.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+						<li class="tree-lv1 ">
+							<a href="alabaranesVentas.html">Albaranes</a>
+						</li>
+						<li class="tree-lv1 ">
+							<a href="pedidosCompras.html">Pedidos</a>
+							
+								<a title="Crear pedido" class="btn btn-icon btn-add" href="crearpedidosCompras.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+						<li class="tree-lv1 ">
+							<a href="gastosperiodicos.html">Gastos periódicos</a>
+							
+								<a title="Crear gasto periódico" class="btn btn-icon btn-add" href="creargastosperiodicos.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					</ul>
+				</div>
+			
+		</ul>
+	</div>
+
+
+
+<!-- tesoreria -->
+
+	
+	
+		
+		
+		
+	
+
+	<div class="panel">
+		<li class="menu-header menu-tesoreria ">
+			<a class="collapsed" href="#menuTesoreria" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				<i class="fa fa-money"></i>	Tesorería		
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuTesoreria" class="menu-submenu panel-collapse collapse ">
+			<li class="tree-lv1 ">
+				<a href="cobrosypagos.html">Cobros y pagos</a>
+			</li>
+			
+			<li class="tree-lv1 ">
+				<a href="cuentasdetesoreria.html">Cuentas de tesorería</a>
+			</li>
+			
+			<li class="tree-lv1 ">
+				<a href="remesas.html">Remesas</a>
+			</li>
+		</ul>
+	</div>
+
+
+
+<!-- PROYECTOS -->
+
+	
+	
+		
+		
+		
+	
+	<div class="panel">
+		<li class="menu-header menu-proyectos ">
+			<a href="#menuProyectos" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">				
+				<i class="fa fa-tasks"></i>
+				Proyectos
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuProyectos" class="panel-collapse collapse ">
+			<li class="tree-lv1 ">
+				<a href="proyectos.html">Proyectos</a>
+				
+					<button type="button" title="Crear proyecto" class="btn btn-icon btn-add" onclick="location.href='crearproyectos.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="tareas.html">Tareas</a>
+				
+					<button title="Crear tarea" class="btn btn-icon btn-add" onclick="location.href='creartareas.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="tiempos.html">Tiempos</a>
+				
+					<button title="Registrar tiempo" class="btn btn-icon btn-add" onclick="location.href='registrartiempo.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			
+				<li class="tree-lv1 ">
+					<a id="informes" onclick="checkModifForm(event)" href="informes.html">Informes</a>
+				</li>
+			
+		</ul>
+	</div>
+
+
+
+<!-- COMERCIAL -->
+
+	
+		
+		
+		
+	
+	
+	<div class="panel">
+		<li class="menu-header menu-comercial active">
+			<a href="#menuComercial" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="true">
+				Comercial
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuComercial" class="panel-collapse collapse in">
+			<li class="tree-lv1 ">
+				<a href="campanas.html">Campañas</a>
+				
+					<button title="Crear Campaña" class="btn btn-icon btn-add" onclick="location.href='crearcampanas.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="oportunidades.html">Oportunidades</a>
+				
+					<button title="Crear oportunidad" class="btn btn-icon btn-add" onclick="location.href='crearoportunidad.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="actividades.html">Actividades</a>
+				
+					<button title="Crear actividad comercial" class="btn btn-icon btn-add" onclick="location.href='crearactividades.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			
+			<li class="tree-lv1">
+				<a href="presupuestos.html">Presupuestos</a>
+				
+					<a title="Crear presupuesto" class="btn btn-icon btn-add" href="crearpresupuestos.html"><i class="fa fa-plus-circle"></i></a>
+				
+			</li>
+		</ul>
+	</div>
+
+
+	</ul>
+			
+	<ul class="menu-list favoritos-list">
+		<li class="separador"></li>
+		<li class="menu-header">Favoritos</li>
+
+		<!-- FASVORITOS GESTOR PROJCTS-->
+		
+
+		
+			<!-- LIST FAVORITOS -->
+			
+			<!-- LIST NO FAVORITOS -->
+			<ul id="menuNoFavorites" class="menu-submenu collapse">
+				<li class="separador"></li>
+				
+			</ul>
+			<li class="show-more" data-toggle="collapse" data-target="#menuNoFavorites" aria-expanded="false" style="display: none;">
+				<a href="#">
+					<span class="text-more">Ver más</span>
+					<span class="text-less">Ver menos</span>
+					<i class="fa fa-angle-down" aria-hidden="true"></i>
+				</a>
+			</li>
+		
+	</ul>
+
+	<ul class="menu-list favoritos-list">
+		<li class="separador"></li>
+	</ul>
+
+	<div class="menu-other">
+		<ul id="timetracking" class="menu-content">
+			<li class="trakingTask" style="display: none;">
+				<div class="media">
+					<div class="media-body">
+						<h4 id="trakingProject" class="media-heading"></h4>
+						<p id="trakingTask"></p>
+					</div>
+				</div>
+			</li>
+			<li class="trakingController">
+				<div class="media">
+					<div class="media-left">
+						<button id="timetracking-play" class="timetracking-play media-object btn-transparent" style="display: block;">
+							<img title="Clic para registrar tiempo" src="/saas/img/icons/icons/grey/play.svg">
+						</button>
+						<button id="timetracking-stop" class="media-object btn-transparent" style="display: none;">
+							<img title="Clic para guardar tiempo" src="/saas/img/icons/icons/red/stop.svg">
+						</button>
+					</div>
+					<div class="media-body">
+						<p id="timetracking-counter">00:00:00</p>
+					</div>
+					<div id="timetracking-discard" class="media-right" style="display: none;">
+						<button class="media-object btn-transparent">
+							<img title="Clic para guardar tiempo" src="/saas/img/icons/icons/white/delete.svg">
+						</button>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<script>
+	$(function() {
+		if( $("#menuNoFavorites").children().length < 2 ) 
+			$("#sidebarWrapper .favoritos-list .show-more").hide();
+	});
+
+	$(document).on("click", ".favoritos-list .btn-fav", function() {
+		var li = $(this).closest("li");
+		var newLi;
+		var id = $(this).data("id");
+		var esFav = $(this).closest("#menuNoFavorites").length;
+		
+		esFav = (esFav == 0) ? true : false;
+
+		if(esFav) {
+			li.clone().appendTo("#menuNoFavorites");
+			li.remove();
+			if( $("#menuNoFavorites:visible") ) 
+				$("#sidebarWrapper .favoritos-list .show-more").show();
+		}
+		else {
+			li.clone().insertBefore("#menuNoFavorites");
+			li.remove();
+			if( $("#menuNoFavorites").children().length < 2 ){
+				$("#menuNoFavorites").collapse("hide");
+				$("#sidebarWrapper .favoritos-list .show-more").hide();
+			}
+		}
+
+ 		$.ajax({
+			url: "/saas/users/set-favorite-menu",
+			data: {
+				favorite: !esFav,
+				idOptionMenu: id
+			}
+		});
+	});
+	
+	$(document).on("click", ".sidebar-toggle", function() {
+		var isActive = $(this).hasClass("active");
+		
+		$(this).toggleClass("active");
+		
+ 		$.ajax({
+			url: "/saas/pin-side-bar",
+			method: "POST",
+		});
+
+	});
+</script>
+
+				<div id="divCentral" class="page-content-wrapper">	
+				
+				
+					
+					
+					
+					
+
+					<div class="page list container-fluid">
+						
+						
+
+
+
+
+
+
+<div class="landings">
+
+	<div class="page-header">
+		<div class="main-row">
+			<div class="head-col">
+				
+
+
+
+
+
+
+<div class="form-group combo-advanced selector-paneles">
+	<!--<div class="filter-dropdown hidden-xs hidden-sm">
+			<div class="dropdown">
+				<button type="button" id="filterOrderr" class="btn-pnel" data-toggle="dropdown">
+					
+					Panel de comercial
+					
+					
+					
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a id="" href="index.html"  class="btn-pnel2" title="">Panel de facturación</a></li>
+					<li><a id="" href="paneldetesoreria.html"  class="btn-pnel2"  title="">Panel de tesorería</a></li>
+					<li><a id="" href="paneldeproyectos.html"  class="btn-pnel2" title="">Panel de proyectos</a></li>
+					
+				</ul>
+			</div>
+	</div>--> 
+	
+	<select class="btn-pnel" >	
+	<option value="1" class="btn-pnel2"  onclick=" fact()">Panel de facturación</option>
+	<option value="2" class="btn-pnel2"  onclick=" teso()">Panel de tesorería</option>
+	<option value="3" class="btn-pnel2"  onclick=" proy()">Panel de proyectos</option>
+	<option value="4" class="btn-pnel2"  selected onclick=" come()">Panel de comercial</option>	
+	</select>
+	<script>
+		function fact()
+		{ window.location.href = "index.html";}
+		function teso()
+		{ window.location.href = "paneldetesoreria.html";}
+		function proy()
+		{ window.location.href = "paneldeproyectos.html";}		
+	//jQuery(document).ready(function($) {
+		//$('.fake-select').fakeSelect();$('.fake-select').fakeSelect({
+			//btnSize :'btn-sm',
+			//btnStyle:'btn-danger'
+		//});
+		//alert("Hello! I am an alert box!!");
+	//});
+	</script>
+	<!-- <div class="btn-group">
+		<button type="button" class="btn fake-select">
+			<span class="item-texto">			
+				Panel personalizado
+			</span>	
+			<span class="item-texto active">			
+				Panel de comercial
+			</span>	
+			<span class="item-texto">			
+				Panel de proyectos
+			</span>
+			
+				<span class="item-texto">			
+					Panel de tesorería
+				</span>
+										
+			<span class="item-texto">			
+				Panel de facturación
+			</span>
+		</button>
+		
+		<ul class="dropdown-menu">		
+			<li>
+				<a href="/saas/dashboard/normal">
+					Panel personalizado
+				</a>
+			</li>
+			<li>
+				<a href="/saas/oportunities/index">
+					Panel de comercial
+				</a>
+			</li>
+			<li>
+				<a href="/saas/projects/index">
+					Panel de proyectos
+				</a>
+			</li>
+			
+			
+				
+					<li>
+						<a href="/saas/saleBills/treasury-index">
+							Panel de tesorería
+						</a>
+					</li>
+				
+				
+				<li>
+					<a href="/saas/saleBills/index">
+						Panel de facturación
+					</a>
+				</li>
+			
+		</ul>					
+	</div>	--> 	
+</div>
+
+
+<script>	
+	$('.fake-select').on('click', function (event) {
+	    $(this).parent().toggleClass('open');
+	});
+	
+	// detecta click fuera para cerrar desplegable
+	$(document).on('click', function (e) {
+	    if (!$('.combo-advanced').is(e.target) 
+	        && $('.combo-advanced').has(e.target).length === 0 
+	        && $('.open').has(e.target).length === 0) {
+	    	
+	    	// cierra
+	        $('.combo-advanced .btn-group').removeClass('open');
+	    }
+	});	
+	
+	// panel por defecto
+	$(document).on('change', '#defaultPanel', function (e) {
+		var panel = "";
+		
+		if ($("#defaultPanel").is(":checked"))
+			panel = $("#defaultPanel").val();
+
+		$.ajax({
+			url: pageContext+"/users/set-start-panel",
+			data: {
+				"entity.id": "46886",
+				"panel": panel
+			},
+		});
+	});	
+</script>
+			</div>
+			<div class="default-panel hidden-xs hidden-sm">
+				<span>Panel por defecto</span>
+				
+				<label class="switch switch-mini">
+					<input id="defaultPanel" type="checkbox" value="crm">
+					<div class="slider round"></div>
+				</label>
+			</div>			
+		</div>
+	</div>
+
+	<ul class="nav nav-tabs nav-billage">
+		<li class="active">
+			<a href="#comercialInfo" data-toggle="tab">Información</a>
+		</li>
+		<li>
+			<a href="#comercialActividad" data-toggle="tab">Actividad reciente</a>
+		</li>
+	</ul>
+	
+	<div class="tab-content">
+		<div id="comercialInfo" class="tab-pane fade in active">
+			
+
+
+
+
+
+<script type="text/javascript" src="/saas/dashboard/lib/datatables/DataTables-1.10.16/js/jquery.dataTables.min.js"></script>
+
+
+	<div class="page-header">
+		<div class="first-line">
+			<div class="filters-list">
+				<!-- filtro año -->
+				<div class="filter-dropdown">
+					<div class="dropdown">
+						<button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+							2020
+							
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu dropdown-years" role="menu">
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=2020&amp;filterPeriod=&amp;filterCampana=">
+										2020
+									</a> 
+								</li>
+							
+						</ul>
+					</div>
+				</div>
+
+				<!--  filtro periodo -->
+				<div class="filter-dropdown">
+					<div class="dropdown">
+						<button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+							Todo el año
+							
+							
+							
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu" role="menu">
+							<li>
+								<a href="/saas/oportunities/index?filterYear=&amp;filterCampana=&amp;filterUsuarioStr=" class="active">
+									Todo el año
+								</a>
+							</li>
+							<li class="no-hover dropdown-title">Trimestral</li>
+							<li>
+								<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=t0&amp;filterCampana=&amp;filterUsuarioStr=">
+									Todos los trimestres
+								</a>
+							</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=t1&amp;filterCampana=&amp;filterUsuarioStr=">
+										Trimestre 1
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=t2&amp;filterCampana=&amp;filterUsuarioStr=">
+										Trimestre 2
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=t3&amp;filterCampana=&amp;filterUsuarioStr=">
+										Trimestre 3
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=t4&amp;filterCampana=&amp;filterUsuarioStr=">
+										Trimestre 4
+									</a>
+								</li>
+							
+							<li class="no-hover dropdown-title">Mensual</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=1&amp;filterCampana=&amp;filterUsuarioStr=">
+										Enero
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=2&amp;filterCampana=&amp;filterUsuarioStr=">
+										Febrero
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=3&amp;filterCampana=&amp;filterUsuarioStr=">
+										Marzo
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=4&amp;filterCampana=&amp;filterUsuarioStr=">
+										Abril
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=5&amp;filterCampana=&amp;filterUsuarioStr=">
+										Mayo
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=6&amp;filterCampana=&amp;filterUsuarioStr=">
+										Junio
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=7&amp;filterCampana=&amp;filterUsuarioStr=">
+										Julio
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=8&amp;filterCampana=&amp;filterUsuarioStr=">
+										Agosto
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=9&amp;filterCampana=&amp;filterUsuarioStr=">
+										Septiembre
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=10&amp;filterCampana=&amp;filterUsuarioStr=">
+										Octubre
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=11&amp;filterCampana=&amp;filterUsuarioStr=">
+										Noviembre
+									</a>
+								</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=12&amp;filterCampana=&amp;filterUsuarioStr=">
+										Diciembre
+									</a>
+								</li>
+							
+						</ul>
+					</div>
+				</div>	
+
+				<!-- filtro campañas -->
+				<div class="filter-dropdown">
+					<div class="dropdown">
+						<button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+							Todas las campañas
+							
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu dropdown-campanas" role="menu">
+							<li>
+								<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=&amp;filterUsuarioStr=&amp;filterCampana=" class="active">
+									Todas las campañas
+								</a> 						
+							</li>
+							
+								<li>
+									<a href="/saas/oportunities/index?filterYear=&amp;filterPeriod=&amp;filterUsuarioStr=&amp;filterCampana=5795">
+										dfghj
+									</a> 
+								</li>
+							
+						</ul>
+					</div>
+				</div>
+				
+				<!-- FILTRO USUARIO -->
+				
+					<div class="filter-dropdown">
+						<div id="usuarioDropdown" class="dropdown">
+							<button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+								Todos los usuarios
+								
+								<span class="caret"></span>
+							</button>
+							<div class="dropdown-menu">
+								<form action="index" method="post" autocomplete="off">
+									<input type="hidden" name="filterYear" value="" id="filterYear">
+									<input type="hidden" name="filterPeriod" value="" id="filterPeriod">
+									<input type="hidden" name="filterCampana" value="" id="filterCampana">
+									
+									
+									<ul class="dropdown-menu">
+										
+											<li>
+												<div class="checkbox">
+													<input type="checkbox" name="filterUsuarioStr" id="filterUser0" value="46886">
+													<label for="filterUser0">Poner nombre</label>
+												</div>
+											</li>
+										
+									</ul>
+									
+									<div class="dropdown-footer">
+										<button type="submit" id="filterUsuarioSearch" class="btn btn-secondary">Aplicar</button>
+									</div>	
+								</form>
+							</div>		
+						</div>
+					</div>
+				
+			</div>
+		</div>
+	</div>
+
+
+<div class="info-blocks">
+
+	<div class="row row-resumenes">
+		<div class="col-md-6 col-lg-4">
+			<div class="caja" style="height: 116px;">
+			
+				<h2>Oportunidades ganadas</h2>
+				
+				
+				
+					<span class="main-amount color-green">0</span>
+					
+					<div class="box-total box-total-comercial">
+						Con un valor de
+						<span class="ntotal">0,00€</span>
+					</div>	
+				
+
+			</div>
+		</div>
+
+		<div class="col-md-6 col-lg-4">
+			<div class="caja" style="height: 116px;">
+				<h2>Oportunidades perdidas</h2>
+				
+				
+				
+					<span class="main-amount color-red">0</span>
+					
+					<div class="box-total box-total-comercial">
+						Con un valor de
+						<span class="ntotal">0,00€</span>
+					</div>
+								
+						
+			</div>
+		</div>
+
+		<div class="col-md-6 col-lg-4">
+			<div class="caja" style="height: 116px;">
+				<h2>Oportunidades vivas</h2>
+				
+				
+				
+					<span class="main-amount color-billage">1</span>
+	
+					<div class="box-total box-total-comercial">
+						Con un valor de
+						<span class="ntotal">0,00€</span>
+					</div>	
+								
+
+			</div>
+		</div>						
+	</div>
+	
+	<!-- Gráfico oportunidades -->
+	<div class="caja" style="">
+		
+		
+			<div id="oportunidadesChart" style="min-width: 310px; height: 400px; margin: 0px auto; overflow: hidden;" data-highcharts-chart="0"><div id="highcharts-nl4fpx5-0" style="position: relative; overflow: hidden; width: 1172px; height: 400px; text-align: left; line-height: normal; z-index: 0; user-select: none; font-family: Source Sans Pro; font-size: 16px; left: 0px; top: 0.966675px;" dir="ltr" class="highcharts-container "><svg version="1.1" class="highcharts-root" style="font-family:Source Sans Pro;font-size:16px;" xmlns="http://www.w3.org/2000/svg" width="1172" height="400" viewBox="0 0 1172 400"><desc>Created with Highcharts 8.2.2</desc><defs><clipPath id="highcharts-nl4fpx5-1-"><rect x="0" y="0" width="1122" height="292" fill="none"></rect></clipPath></defs><rect fill="#ffffff" class="highcharts-background" x="0" y="0" width="1172" height="400" rx="0" ry="0"></rect><rect fill="none" class="highcharts-plot-background" x="40" y="70" width="1122" height="292"></rect><g class="highcharts-grid highcharts-xaxis-grid" data-z-index="1"><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 413.5 70 L 413.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 787.5 70 L 787.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 1161.5 70 L 1161.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 39.5 70 L 39.5 362" opacity="1"></path></g><g class="highcharts-grid highcharts-yaxis-grid" data-z-index="1"><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 362.5 L 1162 362.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 304.5 L 1162 304.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 245.5 L 1162 245.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 187.5 L 1162 187.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 128.5 L 1162 128.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 69.5 L 1162 69.5" opacity="1"></path></g><rect fill="none" class="highcharts-plot-border" data-z-index="1" x="40" y="70" width="1122" height="292"></rect><g class="highcharts-axis highcharts-xaxis" data-z-index="2"><path fill="none" class="highcharts-axis-line" stroke="#ccd6eb" stroke-width="1" data-z-index="7" d="M 40 362.5 L 1162 362.5"></path></g><g class="highcharts-axis highcharts-yaxis" data-z-index="2"><path fill="none" class="highcharts-axis-line" data-z-index="7" d="M 40 70 L 40 362"></path></g><g class="highcharts-series-group" data-z-index="3"><g class="highcharts-series highcharts-series-0 highcharts-column-series highcharts-color-NaN highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(40,70) scale(1 1)" clip-path="url(#highcharts-nl4fpx5-1-)"><rect x="96.5" y="292.5" width="180" height="0" fill="#03C85F" stroke="#ffffff" stroke-width="1" opacity="1" class="highcharts-point highcharts-color-NaN"></rect><rect x="470.5" y="292.5" width="180" height="0" fill="#FF6D62" stroke="#ffffff" stroke-width="1" opacity="1" class="highcharts-point highcharts-color-NaN"></rect><rect x="844.5" y="58.5" width="180" height="234" fill="#2C64FF" stroke="#ffffff" stroke-width="1" opacity="1" class="highcharts-point highcharts-color-NaN"></rect></g><g class="highcharts-markers highcharts-series-0 highcharts-column-series highcharts-color-NaN" data-z-index="0.1" opacity="1" transform="translate(40,70) scale(1 1)" clip-path="none"></g></g><text x="0" text-anchor="start" class="highcharts-title" data-z-index="4" style="color:#494a4a;font-size:18px;font-size:18px;font-weight:700;margin-bottom:20px;fill:#494a4a;" y="19"><tspan>Oportunidades</tspan></text><text x="586" text-anchor="middle" class="highcharts-subtitle" data-z-index="4" style="color:#666666;fill:#666666;" y="45"></text><text x="10" text-anchor="start" class="highcharts-caption" data-z-index="4" style="color:#666666;fill:#666666;" y="400"></text><g class="highcharts-axis-labels highcharts-xaxis-labels" data-z-index="7"><text x="227" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">Ganadas</text><text x="601" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">Perdidas</text><text x="975" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">Vivas</text></g><g class="highcharts-axis-labels highcharts-yaxis-labels" data-z-index="7"><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="366" opacity="1">0</text><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="308" opacity="1">0,25</text><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="249" opacity="1">0,5</text><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="191" opacity="1">0,75</text><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="132" opacity="1">1</text><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="74" opacity="1">1,25</text></g><text x="1162" class="highcharts-credits" text-anchor="end" data-z-index="8" style="cursor:pointer;color:#999999;font-size:9px;fill:#999999;" y="395">Highcharts.com</text></svg></div></div>
+					
+	</div>
+
+
+	<!-- Gráfico actividades -->
+	<div class="caja caja-actividades" style="">
+
+
+
+
+
+
+
+
+<div id="actividadesChart" style="min-width: 310px; height: 400px; margin: 0px auto; overflow: hidden;" data-highcharts-chart="3"><div id="highcharts-nl4fpx5-14" style="position: relative; overflow: hidden; width: 1172px; height: 400px; text-align: left; line-height: normal; z-index: 0; user-select: none; font-family: Source Sans Pro; font-size: 16px; left: 0px; top: 0.81665px;" dir="ltr" class="highcharts-container "><svg version="1.1" class="highcharts-root" style="font-family:Source Sans Pro;font-size:16px;" xmlns="http://www.w3.org/2000/svg" width="1172" height="400" viewBox="0 0 1172 400"><desc>Created with Highcharts 8.2.2</desc><defs><clipPath id="highcharts-nl4fpx5-15-"><rect x="0" y="0" width="1122" height="262" fill="none"></rect></clipPath></defs><rect fill="#ffffff" class="highcharts-background" x="0" y="0" width="1172" height="400" rx="0" ry="0"></rect><rect fill="none" class="highcharts-plot-background" x="40" y="100" width="1122" height="262"></rect><g class="highcharts-grid highcharts-xaxis-grid" data-z-index="1"><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 133.5 100 L 133.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 226.5 100 L 226.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 320.5 100 L 320.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 413.5 100 L 413.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 507.5 100 L 507.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 600.5 100 L 600.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 694.5 100 L 694.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 787.5 100 L 787.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 881.5 100 L 881.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 974.5 100 L 974.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 1068.5 100 L 1068.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 1161.5 100 L 1161.5 362" opacity="1"></path><path fill="none" data-z-index="1" class="highcharts-grid-line" d="M 39.5 100 L 39.5 362" opacity="1"></path></g><g class="highcharts-grid highcharts-yaxis-grid" data-z-index="1"><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 362.5 L 1162 362.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 310.5 L 1162 310.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 257.5 L 1162 257.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 205.5 L 1162 205.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 152.5 L 1162 152.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" data-z-index="1" class="highcharts-grid-line" d="M 40 99.5 L 1162 99.5" opacity="1"></path></g><rect fill="none" class="highcharts-plot-border" data-z-index="1" x="40" y="100" width="1122" height="262"></rect><g class="highcharts-axis highcharts-xaxis" data-z-index="2"><path fill="none" class="highcharts-axis-line" stroke="#ccd6eb" stroke-width="1" data-z-index="7" d="M 40 362.5 L 1162 362.5"></path></g><g class="highcharts-axis highcharts-yaxis" data-z-index="2"><path fill="none" class="highcharts-axis-line" data-z-index="7" d="M 40 100 L 40 362"></path></g><g class="highcharts-series-group" data-z-index="3"><g class="highcharts-series highcharts-series-0 highcharts-line-series" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)" clip-path="url(#highcharts-nl4fpx5-15-)"><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" class="highcharts-graph" data-z-index="1" stroke="#C8D898" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" visibility="visible" data-z-index="2" class="highcharts-tracker-line" stroke-linecap="round" stroke-linejoin="round" stroke="rgba(192,192,192,0.0001)" stroke-width="24"></path></g><g class="highcharts-markers highcharts-series-0 highcharts-line-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)"><path fill="#C8D898" d="M 46 266 A 4 4 0 1 1 46.00399999933334 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C8D898" d="M 140 266 A 4 4 0 1 1 140.00399999933333 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C8D898" d="M 233 266 A 4 4 0 1 1 233.00399999933333 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C8D898" d="M 327 266 A 4 4 0 1 1 327.00399999933336 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C8D898" d="M 420 266 A 4 4 0 1 1 420.00399999933336 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C8D898" d="M 514 266 A 4 4 0 1 1 514.0039999993334 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C8D898" d="M 607 266 A 4 4 0 1 1 607.0039999993334 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C8D898" d="M 701 266 A 4 4 0 1 1 701.0039999993334 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C8D898" d="M 794 266 A 4 4 0 1 1 794.0039999993334 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C8D898" d="M 888 266 A 4 4 0 1 1 888.0039999993334 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C8D898" d="M 981 266 A 4 4 0 1 1 981.0039999993334 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C8D898" d="M 1075 266 A 4 4 0 1 1 1075.0039999993332 265.9999980000002 Z" stroke="#C8D898" stroke-width="4" opacity="1" class="highcharts-point"></path></g><g class="highcharts-series highcharts-series-1 highcharts-line-series" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)" clip-path="url(#highcharts-nl4fpx5-15-)"><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" class="highcharts-graph" data-z-index="1" stroke="#4AAAE5" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" visibility="visible" data-z-index="2" class="highcharts-tracker-line" stroke-linecap="round" stroke-linejoin="round" stroke="rgba(192,192,192,0.0001)" stroke-width="24"></path></g><g class="highcharts-markers highcharts-series-1 highcharts-line-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)"><path fill="#4AAAE5" d="M 46 266 A 4 4 0 1 1 46.00399999933334 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AAAE5" d="M 140 266 A 4 4 0 1 1 140.00399999933333 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AAAE5" d="M 233 266 A 4 4 0 1 1 233.00399999933333 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AAAE5" d="M 327 266 A 4 4 0 1 1 327.00399999933336 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AAAE5" d="M 420 266 A 4 4 0 1 1 420.00399999933336 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AAAE5" d="M 514 266 A 4 4 0 1 1 514.0039999993334 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AAAE5" d="M 607 266 A 4 4 0 1 1 607.0039999993334 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AAAE5" d="M 701 266 A 4 4 0 1 1 701.0039999993334 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AAAE5" d="M 794 266 A 4 4 0 1 1 794.0039999993334 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AAAE5" d="M 888 266 A 4 4 0 1 1 888.0039999993334 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AAAE5" d="M 981 266 A 4 4 0 1 1 981.0039999993334 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AAAE5" d="M 1075 266 A 4 4 0 1 1 1075.0039999993332 265.9999980000002 Z" stroke="#4AAAE5" stroke-width="4" opacity="1" class="highcharts-point"></path></g><g class="highcharts-series highcharts-series-2 highcharts-line-series" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)" clip-path="url(#highcharts-nl4fpx5-15-)"><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" class="highcharts-graph" data-z-index="1" stroke="#4960D8" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" visibility="visible" data-z-index="2" class="highcharts-tracker-line" stroke-linecap="round" stroke-linejoin="round" stroke="rgba(192,192,192,0.0001)" stroke-width="24"></path></g><g class="highcharts-markers highcharts-series-2 highcharts-line-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)"><path fill="#4960D8" d="M 46 266 A 4 4 0 1 1 46.00399999933334 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4960D8" d="M 140 266 A 4 4 0 1 1 140.00399999933333 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4960D8" d="M 233 266 A 4 4 0 1 1 233.00399999933333 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4960D8" d="M 327 266 A 4 4 0 1 1 327.00399999933336 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4960D8" d="M 420 266 A 4 4 0 1 1 420.00399999933336 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4960D8" d="M 514 266 A 4 4 0 1 1 514.0039999993334 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4960D8" d="M 607 266 A 4 4 0 1 1 607.0039999993334 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4960D8" d="M 701 266 A 4 4 0 1 1 701.0039999993334 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4960D8" d="M 794 266 A 4 4 0 1 1 794.0039999993334 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4960D8" d="M 888 266 A 4 4 0 1 1 888.0039999993334 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4960D8" d="M 981 266 A 4 4 0 1 1 981.0039999993334 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4960D8" d="M 1075 266 A 4 4 0 1 1 1075.0039999993332 265.9999980000002 Z" stroke="#4960D8" stroke-width="4" opacity="1" class="highcharts-point"></path></g><g class="highcharts-series highcharts-series-3 highcharts-line-series" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)" clip-path="url(#highcharts-nl4fpx5-15-)"><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" class="highcharts-graph" data-z-index="1" stroke="#D5E54A" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" visibility="visible" data-z-index="2" class="highcharts-tracker-line" stroke-linecap="round" stroke-linejoin="round" stroke="rgba(192,192,192,0.0001)" stroke-width="24"></path></g><g class="highcharts-markers highcharts-series-3 highcharts-line-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)"><path fill="#D5E54A" d="M 46 266 A 4 4 0 1 1 46.00399999933334 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#D5E54A" d="M 140 266 A 4 4 0 1 1 140.00399999933333 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#D5E54A" d="M 233 266 A 4 4 0 1 1 233.00399999933333 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#D5E54A" d="M 327 266 A 4 4 0 1 1 327.00399999933336 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#D5E54A" d="M 420 266 A 4 4 0 1 1 420.00399999933336 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#D5E54A" d="M 514 266 A 4 4 0 1 1 514.0039999993334 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#D5E54A" d="M 607 266 A 4 4 0 1 1 607.0039999993334 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#D5E54A" d="M 701 266 A 4 4 0 1 1 701.0039999993334 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#D5E54A" d="M 794 266 A 4 4 0 1 1 794.0039999993334 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#D5E54A" d="M 888 266 A 4 4 0 1 1 888.0039999993334 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#D5E54A" d="M 981 266 A 4 4 0 1 1 981.0039999993334 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#D5E54A" d="M 1075 266 A 4 4 0 1 1 1075.0039999993332 265.9999980000002 Z" stroke="#D5E54A" stroke-width="4" opacity="1" class="highcharts-point"></path></g><g class="highcharts-series highcharts-series-4 highcharts-line-series" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)" clip-path="url(#highcharts-nl4fpx5-15-)"><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" class="highcharts-graph" data-z-index="1" stroke="#EDBC53" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" visibility="visible" data-z-index="2" class="highcharts-tracker-line" stroke-linecap="round" stroke-linejoin="round" stroke="rgba(192,192,192,0.0001)" stroke-width="24"></path></g><g class="highcharts-markers highcharts-series-4 highcharts-line-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)"><path fill="#EDBC53" d="M 46 266 A 4 4 0 1 1 46.00399999933334 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#EDBC53" d="M 140 266 A 4 4 0 1 1 140.00399999933333 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#EDBC53" d="M 233 266 A 4 4 0 1 1 233.00399999933333 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#EDBC53" d="M 327 266 A 4 4 0 1 1 327.00399999933336 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#EDBC53" d="M 420 266 A 4 4 0 1 1 420.00399999933336 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#EDBC53" d="M 514 266 A 4 4 0 1 1 514.0039999993334 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#EDBC53" d="M 607 266 A 4 4 0 1 1 607.0039999993334 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#EDBC53" d="M 701 266 A 4 4 0 1 1 701.0039999993334 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#EDBC53" d="M 794 266 A 4 4 0 1 1 794.0039999993334 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#EDBC53" d="M 888 266 A 4 4 0 1 1 888.0039999993334 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#EDBC53" d="M 981 266 A 4 4 0 1 1 981.0039999993334 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#EDBC53" d="M 1075 266 A 4 4 0 1 1 1075.0039999993332 265.9999980000002 Z" stroke="#EDBC53" stroke-width="4" opacity="1" class="highcharts-point"></path></g><g class="highcharts-series highcharts-series-5 highcharts-line-series" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)" clip-path="url(#highcharts-nl4fpx5-15-)"><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 52.400000000000006" class="highcharts-graph" data-z-index="1" stroke="#4AE59E" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 52.400000000000006" visibility="visible" data-z-index="2" class="highcharts-tracker-line" stroke-linecap="round" stroke-linejoin="round" stroke="rgba(192,192,192,0.0001)" stroke-width="24"></path></g><g class="highcharts-markers highcharts-series-5 highcharts-line-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)"><path fill="#4AE59E" d="M 46 266 A 4 4 0 1 1 46.00399999933334 265.9999980000002 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE59E" d="M 140 266 A 4 4 0 1 1 140.00399999933333 265.9999980000002 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE59E" d="M 233 266 A 4 4 0 1 1 233.00399999933333 265.9999980000002 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE59E" d="M 327 266 A 4 4 0 1 1 327.00399999933336 265.9999980000002 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE59E" d="M 420 266 A 4 4 0 1 1 420.00399999933336 265.9999980000002 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE59E" d="M 514 266 A 4 4 0 1 1 514.0039999993334 265.9999980000002 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE59E" d="M 607 266 A 4 4 0 1 1 607.0039999993334 265.9999980000002 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE59E" d="M 701 266 A 4 4 0 1 1 701.0039999993334 265.9999980000002 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE59E" d="M 794 266 A 4 4 0 1 1 794.0039999993334 265.9999980000002 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE59E" d="M 888 266 A 4 4 0 1 1 888.0039999993334 265.9999980000002 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE59E" d="M 981 266 A 4 4 0 1 1 981.0039999993334 265.9999980000002 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE59E" d="M 1075 56 A 4 4 0 1 1 1075.0039999993332 55.99999800000017 Z" stroke="#4AE59E" stroke-width="4" opacity="1" class="highcharts-point"></path></g><g class="highcharts-series highcharts-series-6 highcharts-line-series" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)" clip-path="url(#highcharts-nl4fpx5-15-)"><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" class="highcharts-graph" data-z-index="1" stroke="#329E6D" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" visibility="visible" data-z-index="2" class="highcharts-tracker-line" stroke-linecap="round" stroke-linejoin="round" stroke="rgba(192,192,192,0.0001)" stroke-width="24"></path></g><g class="highcharts-markers highcharts-series-6 highcharts-line-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)"><path fill="#329E6D" d="M 46 266 A 4 4 0 1 1 46.00399999933334 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#329E6D" d="M 140 266 A 4 4 0 1 1 140.00399999933333 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#329E6D" d="M 233 266 A 4 4 0 1 1 233.00399999933333 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#329E6D" d="M 327 266 A 4 4 0 1 1 327.00399999933336 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#329E6D" d="M 420 266 A 4 4 0 1 1 420.00399999933336 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#329E6D" d="M 514 266 A 4 4 0 1 1 514.0039999993334 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#329E6D" d="M 607 266 A 4 4 0 1 1 607.0039999993334 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#329E6D" d="M 701 266 A 4 4 0 1 1 701.0039999993334 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#329E6D" d="M 794 266 A 4 4 0 1 1 794.0039999993334 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#329E6D" d="M 888 266 A 4 4 0 1 1 888.0039999993334 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#329E6D" d="M 981 266 A 4 4 0 1 1 981.0039999993334 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#329E6D" d="M 1075 266 A 4 4 0 1 1 1075.0039999993332 265.9999980000002 Z" stroke="#329E6D" stroke-width="4" opacity="1" class="highcharts-point"></path></g><g class="highcharts-series highcharts-series-7 highcharts-line-series" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)" clip-path="url(#highcharts-nl4fpx5-15-)"><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" class="highcharts-graph" data-z-index="1" stroke="#E58B4A" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" visibility="visible" data-z-index="2" class="highcharts-tracker-line" stroke-linecap="round" stroke-linejoin="round" stroke="rgba(192,192,192,0.0001)" stroke-width="24"></path></g><g class="highcharts-markers highcharts-series-7 highcharts-line-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)"><path fill="#E58B4A" d="M 46 266 A 4 4 0 1 1 46.00399999933334 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#E58B4A" d="M 140 266 A 4 4 0 1 1 140.00399999933333 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#E58B4A" d="M 233 266 A 4 4 0 1 1 233.00399999933333 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#E58B4A" d="M 327 266 A 4 4 0 1 1 327.00399999933336 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#E58B4A" d="M 420 266 A 4 4 0 1 1 420.00399999933336 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#E58B4A" d="M 514 266 A 4 4 0 1 1 514.0039999993334 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#E58B4A" d="M 607 266 A 4 4 0 1 1 607.0039999993334 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#E58B4A" d="M 701 266 A 4 4 0 1 1 701.0039999993334 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#E58B4A" d="M 794 266 A 4 4 0 1 1 794.0039999993334 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#E58B4A" d="M 888 266 A 4 4 0 1 1 888.0039999993334 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#E58B4A" d="M 981 266 A 4 4 0 1 1 981.0039999993334 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#E58B4A" d="M 1075 266 A 4 4 0 1 1 1075.0039999993332 265.9999980000002 Z" stroke="#E58B4A" stroke-width="4" opacity="1" class="highcharts-point"></path></g><g class="highcharts-series highcharts-series-8 highcharts-line-series" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)" clip-path="url(#highcharts-nl4fpx5-15-)"><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" class="highcharts-graph" data-z-index="1" stroke="#C791EC" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" visibility="visible" data-z-index="2" class="highcharts-tracker-line" stroke-linecap="round" stroke-linejoin="round" stroke="rgba(192,192,192,0.0001)" stroke-width="24"></path></g><g class="highcharts-markers highcharts-series-8 highcharts-line-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)"><path fill="#C791EC" d="M 46 266 A 4 4 0 1 1 46.00399999933334 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C791EC" d="M 140 266 A 4 4 0 1 1 140.00399999933333 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C791EC" d="M 233 266 A 4 4 0 1 1 233.00399999933333 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C791EC" d="M 327 266 A 4 4 0 1 1 327.00399999933336 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C791EC" d="M 420 266 A 4 4 0 1 1 420.00399999933336 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C791EC" d="M 514 266 A 4 4 0 1 1 514.0039999993334 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C791EC" d="M 607 266 A 4 4 0 1 1 607.0039999993334 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C791EC" d="M 701 266 A 4 4 0 1 1 701.0039999993334 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C791EC" d="M 794 266 A 4 4 0 1 1 794.0039999993334 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C791EC" d="M 888 266 A 4 4 0 1 1 888.0039999993334 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C791EC" d="M 981 266 A 4 4 0 1 1 981.0039999993334 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#C791EC" d="M 1075 266 A 4 4 0 1 1 1075.0039999993332 265.9999980000002 Z" stroke="#C791EC" stroke-width="4" opacity="1" class="highcharts-point"></path></g><g class="highcharts-series highcharts-series-9 highcharts-line-series" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)" clip-path="url(#highcharts-nl4fpx5-15-)"><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" class="highcharts-graph" data-z-index="1" stroke="#4AE5DF" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path><path fill="none" d="M 46.75 262 L 140.25 262 L 233.75 262 L 327.25 262 L 420.75 262 L 514.25 262 L 607.75 262 L 701.25 262 L 794.75 262 L 888.25 262 L 981.75 262 L 1075.25 262" visibility="visible" data-z-index="2" class="highcharts-tracker-line" stroke-linecap="round" stroke-linejoin="round" stroke="rgba(192,192,192,0.0001)" stroke-width="24"></path></g><g class="highcharts-markers highcharts-series-9 highcharts-line-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(40,100) scale(1 1)"><path fill="#4AE5DF" d="M 46 266 A 4 4 0 1 1 46.00399999933334 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE5DF" d="M 140 266 A 4 4 0 1 1 140.00399999933333 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE5DF" d="M 233 266 A 4 4 0 1 1 233.00399999933333 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE5DF" d="M 327 266 A 4 4 0 1 1 327.00399999933336 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE5DF" d="M 420 266 A 4 4 0 1 1 420.00399999933336 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE5DF" d="M 514 266 A 4 4 0 1 1 514.0039999993334 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE5DF" d="M 607 266 A 4 4 0 1 1 607.0039999993334 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE5DF" d="M 701 266 A 4 4 0 1 1 701.0039999993334 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE5DF" d="M 794 266 A 4 4 0 1 1 794.0039999993334 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE5DF" d="M 888 266 A 4 4 0 1 1 888.0039999993334 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE5DF" d="M 981 266 A 4 4 0 1 1 981.0039999993334 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path><path fill="#4AE5DF" d="M 1075 266 A 4 4 0 1 1 1075.0039999993332 265.9999980000002 Z" stroke="#4AE5DF" stroke-width="4" opacity="1" class="highcharts-point"></path></g></g><text x="0" text-anchor="start" class="highcharts-title" data-z-index="4" style="color:#494a4a;font-size:18px;font-size:18px;font-weight:700;fill:#494a4a;" y="19"><tspan>Actividades</tspan></text><text x="586" text-anchor="middle" class="highcharts-subtitle" data-z-index="4" style="color:#666666;fill:#666666;" y="45"></text><text x="10" text-anchor="start" class="highcharts-caption" data-z-index="4" style="color:#666666;fill:#666666;" y="400"></text><g class="highcharts-legend" data-z-index="7" transform="translate(504,-2)"><rect fill="none" class="highcharts-legend-box" rx="0" ry="0" x="0" y="0" width="658" height="75" visibility="visible"></rect><g data-z-index="1"><g><g class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-0" data-z-index="1" transform="translate(8,3)"><path fill="none" d="M 0 12 L 16 12" class="highcharts-graph" stroke="#C8D898" stroke-width="4"></path><path fill="#C8D898" d="M 8 16 A 4 4 0 1 1 8.003999999333336 15.999998000000167 Z" class="highcharts-point" stroke="#C8D898" stroke-width="4" opacity="1"></path></g><g class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-1" data-z-index="1" transform="translate(211,3)"><path fill="none" d="M 0 12 L 16 12" class="highcharts-graph" stroke="#4AAAE5" stroke-width="4"></path><path fill="#4AAAE5" d="M 8 16 A 4 4 0 1 1 8.003999999333336 15.999998000000167 Z" class="highcharts-point" stroke="#4AAAE5" stroke-width="4" opacity="1"></path></g><g class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-2" data-z-index="1" transform="translate(414,3)"><path fill="none" d="M 0 12 L 16 12" class="highcharts-graph" stroke="#4960D8" stroke-width="4"></path><path fill="#4960D8" d="M 8 16 A 4 4 0 1 1 8.003999999333336 15.999998000000167 Z" class="highcharts-point" stroke="#4960D8" stroke-width="4" opacity="1"></path></g><g class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-3" data-z-index="1" transform="translate(8,19)"><path fill="none" d="M 0 12 L 16 12" class="highcharts-graph" stroke="#D5E54A" stroke-width="4"></path><path fill="#D5E54A" d="M 8 16 A 4 4 0 1 1 8.003999999333336 15.999998000000167 Z" class="highcharts-point" stroke="#D5E54A" stroke-width="4" opacity="1"></path></g><g class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-4" data-z-index="1" transform="translate(211,19)"><path fill="none" d="M 0 12 L 16 12" class="highcharts-graph" stroke="#EDBC53" stroke-width="4"></path><path fill="#EDBC53" d="M 8 16 A 4 4 0 1 1 8.003999999333336 15.999998000000167 Z" class="highcharts-point" stroke="#EDBC53" stroke-width="4" opacity="1"></path></g><g class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-5" data-z-index="1" transform="translate(414,19)"><path fill="none" d="M 0 12 L 16 12" class="highcharts-graph" stroke="#4AE59E" stroke-width="4"></path><path fill="#4AE59E" d="M 8 16 A 4 4 0 1 1 8.003999999333336 15.999998000000167 Z" class="highcharts-point" stroke="#4AE59E" stroke-width="4" opacity="1"></path></g><g class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-6" data-z-index="1" transform="translate(8,35)"><path fill="none" d="M 0 12 L 16 12" class="highcharts-graph" stroke="#329E6D" stroke-width="4"></path><path fill="#329E6D" d="M 8 16 A 4 4 0 1 1 8.003999999333336 15.999998000000167 Z" class="highcharts-point" stroke="#329E6D" stroke-width="4" opacity="1"></path></g><g class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-7" data-z-index="1" transform="translate(211,35)"><path fill="none" d="M 0 12 L 16 12" class="highcharts-graph" stroke="#E58B4A" stroke-width="4"></path><path fill="#E58B4A" d="M 8 16 A 4 4 0 1 1 8.003999999333336 15.999998000000167 Z" class="highcharts-point" stroke="#E58B4A" stroke-width="4" opacity="1"></path></g><g class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-8" data-z-index="1" transform="translate(414,35)"><path fill="none" d="M 0 12 L 16 12" class="highcharts-graph" stroke="#C791EC" stroke-width="4"></path><path fill="#C791EC" d="M 8 16 A 4 4 0 1 1 8.003999999333336 15.999998000000167 Z" class="highcharts-point" stroke="#C791EC" stroke-width="4" opacity="1"></path></g><g class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-9" data-z-index="1" transform="translate(8,51)"><path fill="none" d="M 0 12 L 16 12" class="highcharts-graph" stroke="#4AE5DF" stroke-width="4"></path><path fill="#4AE5DF" d="M 8 16 A 4 4 0 1 1 8.003999999333336 15.999998000000167 Z" class="highcharts-point" stroke="#4AE5DF" stroke-width="4" opacity="1"></path></g></g></g></g><g class="highcharts-axis-labels highcharts-xaxis-labels" data-z-index="7"><text x="86.75" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">1</text><text x="180.25" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">2</text><text x="273.75" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">3</text><text x="367.25" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">4</text><text x="460.75" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">5</text><text x="554.25" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">6</text><text x="647.75" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">7</text><text x="741.25" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">8</text><text x="834.75" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">9</text><text x="928.25" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">10</text><text x="1021.75" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">11</text><text x="1115.25" style="color:#666666;cursor:default;font-size:12px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="382" opacity="1">12</text></g><g class="highcharts-axis-labels highcharts-yaxis-labels" data-z-index="7"><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="366" opacity="1">0</text><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="314" opacity="1">0,25</text><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="261" opacity="1">0,5</text><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="209" opacity="1">0,75</text><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="156" opacity="1">1</text><text x="25" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="104" opacity="1">1,25</text></g><text x="1162" class="highcharts-credits" text-anchor="end" data-z-index="8" style="cursor:pointer;color:#999999;font-size:9px;fill:#999999;" y="395">Highcharts.com</text></svg><div class="highcharts-legend" style="position: absolute; left: 504px; top: -2px; opacity: 1;"><div style="position: absolute; left: 0px; top: 0px; opacity: 1;"><div style="position: absolute; left: 0px; top: 0px; opacity: 1;"><div class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-0" style="position: absolute; left: 8px; top: 3px; opacity: 1;"><span style="position: absolute; font-family: Source Sans Pro; font-size: 13px; white-space: nowrap; color: rgb(51, 51, 51); cursor: pointer; font-weight: normal; text-overflow: ellipsis; overflow: hidden; margin-left: 0px; margin-top: 0px; left: 21px; top: 3px; fill: rgb(51, 51, 51);" data-z-index="2">Comentario</span></div><div class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-1" style="position: absolute; left: 211px; top: 3px; opacity: 1;"><span style="position: absolute; font-family: Source Sans Pro; font-size: 13px; white-space: nowrap; color: rgb(51, 51, 51); cursor: pointer; font-weight: normal; text-overflow: ellipsis; overflow: hidden; margin-left: 0px; margin-top: 0px; left: 21px; top: 3px; fill: rgb(51, 51, 51);" data-z-index="2">Demostración presencial</span></div><div class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-2" style="position: absolute; left: 414px; top: 3px; opacity: 1;"><span style="position: absolute; font-family: Source Sans Pro; font-size: 13px; white-space: nowrap; color: rgb(51, 51, 51); cursor: pointer; font-weight: normal; text-overflow: ellipsis; overflow: hidden; margin-left: 0px; margin-top: 0px; left: 21px; top: 3px; fill: rgb(51, 51, 51);" data-z-index="2">Demostración remota</span></div><div class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-3" style="position: absolute; left: 8px; top: 19px; opacity: 1;"><span style="position: absolute; font-family: Source Sans Pro; font-size: 13px; white-space: nowrap; color: rgb(51, 51, 51); cursor: pointer; font-weight: normal; text-overflow: ellipsis; overflow: hidden; margin-left: 0px; margin-top: 0px; left: 21px; top: 3px; fill: rgb(51, 51, 51);" data-z-index="2">Enviar información por e-mail</span></div><div class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-4" style="position: absolute; left: 211px; top: 19px; opacity: 1;"><span style="position: absolute; font-family: Source Sans Pro; font-size: 13px; white-space: nowrap; color: rgb(51, 51, 51); cursor: pointer; font-weight: normal; text-overflow: ellipsis; overflow: hidden; margin-left: 0px; margin-top: 0px; left: 21px; top: 3px; fill: rgb(51, 51, 51);" data-z-index="2">Enviar oferta</span></div><div class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-5" style="position: absolute; left: 414px; top: 19px; opacity: 1;"><span style="position: absolute; font-family: Source Sans Pro; font-size: 13px; white-space: nowrap; color: rgb(51, 51, 51); cursor: pointer; font-weight: normal; text-overflow: ellipsis; overflow: hidden; margin-left: 0px; margin-top: 0px; left: 21px; top: 3px; fill: rgb(51, 51, 51);" data-z-index="2">Llamada</span></div><div class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-6" style="position: absolute; left: 8px; top: 35px; opacity: 1;"><span style="position: absolute; font-family: Source Sans Pro; font-size: 13px; white-space: nowrap; color: rgb(51, 51, 51); cursor: pointer; font-weight: normal; text-overflow: ellipsis; overflow: hidden; margin-left: 0px; margin-top: 0px; left: 21px; top: 3px; fill: rgb(51, 51, 51);" data-z-index="2">Llamada sin interés</span></div><div class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-7" style="position: absolute; left: 211px; top: 35px; opacity: 1;"><span style="position: absolute; font-family: Source Sans Pro; font-size: 13px; white-space: nowrap; color: rgb(51, 51, 51); cursor: pointer; font-weight: normal; text-overflow: ellipsis; overflow: hidden; margin-left: 0px; margin-top: 0px; left: 21px; top: 3px; fill: rgb(51, 51, 51);" data-z-index="2">Otra</span></div><div class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-8" style="position: absolute; left: 414px; top: 35px; opacity: 1;"><span style="position: absolute; font-family: Source Sans Pro; font-size: 13px; white-space: nowrap; color: rgb(51, 51, 51); cursor: pointer; font-weight: normal; text-overflow: ellipsis; overflow: hidden; margin-left: 0px; margin-top: 0px; left: 21px; top: 3px; fill: rgb(51, 51, 51);" data-z-index="2">Reunión</span></div><div class="highcharts-legend-item highcharts-line-series highcharts-color-undefined highcharts-series-9" style="position: absolute; left: 8px; top: 51px; opacity: 1;"><span style="position: absolute; font-family: Source Sans Pro; font-size: 13px; white-space: nowrap; color: rgb(51, 51, 51); cursor: pointer; font-weight: normal; text-overflow: ellipsis; overflow: hidden; margin-left: 0px; margin-top: 0px; left: 21px; top: 3px; fill: rgb(51, 51, 51);" data-z-index="2">Visita</span></div></div></div></div></div></div>
+
+
+
+<script>
+	Highcharts.setOptions({
+	    lang: {
+	        decimalPoint: ',',
+	        thousandsSep: '.'
+	    }
+	});
+
+
+	// CHARTS
+	var colors = [];
+	
+	
+		
+	Highcharts.setOptions({
+		colors: colors
+	});
+			
+
+	// actividades
+	
+		var actividades_series = [];
+		var list_categories = [];
+				
+			
+			var nombre = 'Comentario'; // tipo de actividad
+			var color = '#C8D898';
+			var data = [];
+			
+				
+				var label = '1'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '2'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '3'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '4'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '5'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '6'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '7'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '8'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '9'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '10'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '11'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '12'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+			
+			
+			actividades_series.push({
+		        name: nombre,
+		        color: color,
+	            lineWidth: 4,
+		        marker: {
+		            symbol: 'circle',  
+		            lineWidth: 4,
+		            radius: 4,
+		            lineColor: color,
+		            fillColor: color			        
+		        },        
+		        data: data
+		    });
+	
+			
+			var nombre = 'Demostraci&oacute;n presencial'; // tipo de actividad
+			var color = '#4AAAE5';
+			var data = [];
+			
+				
+				var label = '1'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '2'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '3'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '4'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '5'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '6'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '7'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '8'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '9'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '10'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '11'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '12'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+			
+			
+			actividades_series.push({
+		        name: nombre,
+		        color: color,
+	            lineWidth: 4,
+		        marker: {
+		            symbol: 'circle',  
+		            lineWidth: 4,
+		            radius: 4,
+		            lineColor: color,
+		            fillColor: color			        
+		        },        
+		        data: data
+		    });
+	
+			
+			var nombre = 'Demostraci&oacute;n remota'; // tipo de actividad
+			var color = '#4960D8';
+			var data = [];
+			
+				
+				var label = '1'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '2'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '3'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '4'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '5'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '6'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '7'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '8'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '9'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '10'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '11'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '12'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+			
+			
+			actividades_series.push({
+		        name: nombre,
+		        color: color,
+	            lineWidth: 4,
+		        marker: {
+		            symbol: 'circle',  
+		            lineWidth: 4,
+		            radius: 4,
+		            lineColor: color,
+		            fillColor: color			        
+		        },        
+		        data: data
+		    });
+	
+			
+			var nombre = 'Enviar informaci&oacute;n por e-mail'; // tipo de actividad
+			var color = '#D5E54A';
+			var data = [];
+			
+				
+				var label = '1'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '2'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '3'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '4'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '5'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '6'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '7'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '8'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '9'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '10'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '11'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '12'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+			
+			
+			actividades_series.push({
+		        name: nombre,
+		        color: color,
+	            lineWidth: 4,
+		        marker: {
+		            symbol: 'circle',  
+		            lineWidth: 4,
+		            radius: 4,
+		            lineColor: color,
+		            fillColor: color			        
+		        },        
+		        data: data
+		    });
+	
+			
+			var nombre = 'Enviar oferta'; // tipo de actividad
+			var color = '#EDBC53';
+			var data = [];
+			
+				
+				var label = '1'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '2'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '3'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '4'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '5'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '6'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '7'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '8'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '9'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '10'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '11'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '12'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+			
+			
+			actividades_series.push({
+		        name: nombre,
+		        color: color,
+	            lineWidth: 4,
+		        marker: {
+		            symbol: 'circle',  
+		            lineWidth: 4,
+		            radius: 4,
+		            lineColor: color,
+		            fillColor: color			        
+		        },        
+		        data: data
+		    });
+	
+			
+			var nombre = 'Llamada'; // tipo de actividad
+			var color = '#4AE59E';
+			var data = [];
+			
+				
+				var label = '1'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '2'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '3'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '4'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '5'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '6'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '7'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '8'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '9'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '10'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '11'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '12'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '1';
+					data.push(total*1);
+				}
+			
+			
+			
+			actividades_series.push({
+		        name: nombre,
+		        color: color,
+	            lineWidth: 4,
+		        marker: {
+		            symbol: 'circle',  
+		            lineWidth: 4,
+		            radius: 4,
+		            lineColor: color,
+		            fillColor: color			        
+		        },        
+		        data: data
+		    });
+	
+			
+			var nombre = 'Llamada sin inter&eacute;s'; // tipo de actividad
+			var color = '#329E6D';
+			var data = [];
+			
+				
+				var label = '1'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '2'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '3'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '4'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '5'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '6'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '7'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '8'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '9'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '10'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '11'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '12'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+			
+			
+			actividades_series.push({
+		        name: nombre,
+		        color: color,
+	            lineWidth: 4,
+		        marker: {
+		            symbol: 'circle',  
+		            lineWidth: 4,
+		            radius: 4,
+		            lineColor: color,
+		            fillColor: color			        
+		        },        
+		        data: data
+		    });
+	
+			
+			var nombre = 'Otra'; // tipo de actividad
+			var color = '#E58B4A';
+			var data = [];
+			
+				
+				var label = '1'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '2'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '3'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '4'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '5'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '6'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '7'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '8'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '9'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '10'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '11'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '12'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+			
+			
+			actividades_series.push({
+		        name: nombre,
+		        color: color,
+	            lineWidth: 4,
+		        marker: {
+		            symbol: 'circle',  
+		            lineWidth: 4,
+		            radius: 4,
+		            lineColor: color,
+		            fillColor: color			        
+		        },        
+		        data: data
+		    });
+	
+			
+			var nombre = 'Reuni&oacute;n'; // tipo de actividad
+			var color = '#C791EC';
+			var data = [];
+			
+				
+				var label = '1'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '2'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '3'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '4'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '5'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '6'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '7'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '8'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '9'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '10'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '11'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '12'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+			
+			
+			actividades_series.push({
+		        name: nombre,
+		        color: color,
+	            lineWidth: 4,
+		        marker: {
+		            symbol: 'circle',  
+		            lineWidth: 4,
+		            radius: 4,
+		            lineColor: color,
+		            fillColor: color			        
+		        },        
+		        data: data
+		    });
+	
+			
+			var nombre = 'Visita'; // tipo de actividad
+			var color = '#4AE5DF';
+			var data = [];
+			
+				
+				var label = '1'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '2'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '3'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '4'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '5'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '6'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '7'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '8'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '9'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '10'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '11'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+				
+				var label = '12'; // etiqueta del periodo ("Ene", "21")
+				if (!list_categories.includes(label) && label.trim() != '')
+					list_categories.push(label);
+			
+				if (label.trim() != ''){
+					var total = '0';
+					data.push(total*1);
+				}
+			
+			
+			
+			actividades_series.push({
+		        name: nombre,
+		        color: color,
+	            lineWidth: 4,
+		        marker: {
+		            symbol: 'circle',  
+		            lineWidth: 4,
+		            radius: 4,
+		            lineColor: color,
+		            fillColor: color			        
+		        },        
+		        data: data
+		    });
+	
+		
+	
+
+		Highcharts.chart('actividadesChart', {
+		    chart: {
+		        style: {
+		            fontFamily: 'Source Sans Pro',
+		            fontSize:'16px'
+		        },
+		        marginLeft: 40,
+		        spacingTop: 5,
+		        marginTop: 100,
+
+		    },
+		    xAxis: {
+		        categories: list_categories,
+	            labels: {
+	                style: {
+	                    fontSize:'12px'
+	                }
+	            }
+		    },
+		    yAxis: {
+		        title: {
+		            text: null,
+		        },
+		    },				    
+		    title: {
+				text: 'Actividades',		
+		        align: 'left',
+		        style: {'font-size': '18px', 'font-weight' : 700, 'color': '#494a4a'},
+		    	x: -10
+		    	
+		    },	
+		    tooltip: {
+		        headerFormat: '',
+		        pointFormat: '<span class="tt-tooltip text-center"><span class="htt-title">{series.name}</span><br> <span class="htt-main">{point.y}</span></span>',
+		        useHTML: true,
+		        borderColor: '#DEDEDE',
+		        backgroundColor: "rgba(255,255,255,1)",
+		        padding: 0
+		    },			    
+		    legend: {
+		        align: 'right',
+		        verticalAlign: 'top',
+		        itemStyle: { fontSize: '13px', fontWeight: 'normal'},
+		        width:650,
+		        y:-45,
+		        useHTML:true
+		    },
+		    series: actividades_series,
+		});
+	
+
+</script></div>	
+
+	<!-- Listado Usuarios -->
+	<div class="caja" style="">
+		
+		
+			<div id="listUsuarios_wrapper" class="dataTables_wrapper no-footer"><table id="listUsuarios" class="table table-list table-nosort dataTable no-footer" role="grid" style="width: 1175px;">
+				<thead>
+					<tr role="row"><th class="col-index hidden-xs hidden-sm index sorting_disabled" aria-label="Puesto" rowspan="1" colspan="1" style="width: 0px;">Puesto</th><th class="col-xs-3 col-sm-6 col-md-5 sorting" aria-label="Usuario: Activar para ordenar la columna de manera ascendente" tabindex="0" aria-controls="listUsuarios" rowspan="1" colspan="1" style="width: 473px;">Usuario</th><th class="col-xs-3 col-sm-2 col-md-2 sorting" aria-label="
+							Oportunidades
+							Op.
+						: Activar para ordenar la columna de manera ascendente" tabindex="0" aria-controls="listUsuarios" rowspan="1" colspan="1" style="width: 180px;">
+							<span class="hidden-xs hidden-sm">Oportunidades</span>
+							<span class="hidden-md hidden-lg">Op.</span>
+						</th><th class="col-xs-3 col-sm-2 col-md-1 sorting_desc" aria-label="Valor: Activar para ordenar la columna de manera ascendente" tabindex="0" aria-controls="listUsuarios" rowspan="1" colspan="1" style="width: 82px;" aria-sort="descending">Valor</th><th class="col-xs-3 col-sm-2 col-md-2 sorting" aria-label="
+							Actividades
+							Ac.
+						: Activar para ordenar la columna de manera ascendente" tabindex="0" aria-controls="listUsuarios" rowspan="1" colspan="1" style="width: 180px;">
+							<span class="hidden-xs hidden-sm">Actividades</span>
+							<span class="hidden-md hidden-lg">Ac.</span>
+						</th><th class="hidden-xs hidden-sm col-md-2 sorting" aria-label="Km recorridos: Activar para ordenar la columna de manera ascendente" tabindex="0" aria-controls="listUsuarios" rowspan="1" colspan="1" style="width: 180px;">Km recorridos</th></tr>
+				</thead>
+				<tbody>
+					
+						
+					
+				<tr role="row" class="odd">
+							<td class="col-index hidden-xs hidden-sm index">1</td>
+							<td>				
+								<span class="usuario-popover-trigger" data-toggle="popover" data-id="46886" data-nombre="Poner nombre" data-rol="Administrador" data-original-title="" title="">
+									<span class="avatar avatar30">
+										
+										
+											<span title="Poner nombre" class="avatar-no-image">PN</span>
+										
+									</span>
+									<span class="hidden-xs">Poner nombre</span>
+
+									
+									
+									<div class="usuario-actividades-lista">
+										<ul class="caja-listado">
+											
+												
+												
+												 
+													<li>
+														<!-- session.colors[#a.count].color -->
+														<span class="state-o" style="background:#4AE59E"></span> Llamada: 1
+													</li>
+												
+												
+											
+										</ul>
+										<input type="hidden" class="tactividades" value="1">
+									</div>
+								 </span>
+							</td>
+							<td>1</td>
+							<td class="sorting_1">0,00€</td>
+							<td>1</td>
+							<td class="hidden-xs hidden-sm">0</td>						
+						</tr></tbody>
+			</table></div>
+					
+	</div>	
+	
+	<!-- Listado prevision de cierre oportunidades por usuario y mes -->
+	<div class="caja" style="">
+		<h2>Previsión de cierre de oportunidades por usuario y mes</h2>
+		
+		<p class="help-block">La previsión de ventas mensual se calcula a partir de la probabilidad de la fase, el presupuesto informado de cada oportunidad y su fecha prevista de cierre</p>
+		
+		
+		
+			<div id="listUsuariosOportunidadesFechaCierre_wrapper" class="dataTables_wrapper no-footer"><table id="listUsuariosOportunidadesFechaCierre" class="table table-list table-nosort dataTable no-footer" role="grid">
+				<thead>
+					<tr role="row"><th class="sorting_asc" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 72px;" aria-sort="ascending" aria-label="Usuario: Activar para ordenar la columna de manera descendente">Usuario</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 57px;" aria-label="Enero: Activar para ordenar la columna de manera ascendente">Enero</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 72px;" aria-label="Febrero: Activar para ordenar la columna de manera ascendente">Febrero</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 59px;" aria-label="Marzo: Activar para ordenar la columna de manera ascendente">Marzo</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 49px;" aria-label="Abril: Activar para ordenar la columna de manera ascendente">Abril</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 53px;" aria-label="Mayo: Activar para ordenar la columna de manera ascendente">Mayo</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 56px;" aria-label="Junio: Activar para ordenar la columna de manera ascendente">Junio</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 51px;" aria-label="Julio: Activar para ordenar la columna de manera ascendente">Julio</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 64px;" aria-label="Agosto: Activar para ordenar la columna de manera ascendente">Agosto</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 102px;" aria-label="Septiembre: Activar para ordenar la columna de manera ascendente">Septiembre</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 75px;" aria-label="Octubre: Activar para ordenar la columna de manera ascendente">Octubre</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 97px;" aria-label="Noviembre: Activar para ordenar la columna de manera ascendente">Noviembre</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 91px;" aria-label="Diciembre: Activar para ordenar la columna de manera ascendente">Diciembre</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesFechaCierre" rowspan="1" colspan="1" style="width: 50px;" aria-label="Total: Activar para ordenar la columna de manera ascendente">Total</th></tr>
+				</thead>
+				<tbody>
+					
+				<tr class="odd"><td colspan="14" class="dataTables_empty" valign="top">Ningún dato disponible en esta tabla</td></tr></tbody>
+			</table></div>
+					
+	</div>	
+	
+	<!-- Listado ganancia oportunidades ganadas por usuario y mes -->
+	<div class="caja" style="">
+		<h2>Importe de las oportunidades ganadas por usuario y mes</h2>
+		
+		
+		
+			<div id="listUsuariosOportunidadesGanadas_wrapper" class="dataTables_wrapper no-footer"><table id="listUsuariosOportunidadesGanadas" class="table table-list table-nosort dataTable no-footer" role="grid">
+				<thead>
+					<tr role="row"><th class="sorting_asc" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 72px;" aria-sort="ascending" aria-label="Usuario: Activar para ordenar la columna de manera descendente">Usuario</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 57px;" aria-label="Enero: Activar para ordenar la columna de manera ascendente">Enero</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 72px;" aria-label="Febrero: Activar para ordenar la columna de manera ascendente">Febrero</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 59px;" aria-label="Marzo: Activar para ordenar la columna de manera ascendente">Marzo</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 49px;" aria-label="Abril: Activar para ordenar la columna de manera ascendente">Abril</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 53px;" aria-label="Mayo: Activar para ordenar la columna de manera ascendente">Mayo</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 56px;" aria-label="Junio: Activar para ordenar la columna de manera ascendente">Junio</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 51px;" aria-label="Julio: Activar para ordenar la columna de manera ascendente">Julio</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 64px;" aria-label="Agosto: Activar para ordenar la columna de manera ascendente">Agosto</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 102px;" aria-label="Septiembre: Activar para ordenar la columna de manera ascendente">Septiembre</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 75px;" aria-label="Octubre: Activar para ordenar la columna de manera ascendente">Octubre</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 97px;" aria-label="Noviembre: Activar para ordenar la columna de manera ascendente">Noviembre</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 91px;" aria-label="Diciembre: Activar para ordenar la columna de manera ascendente">Diciembre</th><th class="sorting" tabindex="0" aria-controls="listUsuariosOportunidadesGanadas" rowspan="1" colspan="1" style="width: 50px;" aria-label="Total: Activar para ordenar la columna de manera ascendente">Total</th></tr>
+				</thead>
+				<tbody>
+					
+				<tr class="odd"><td colspan="14" class="dataTables_empty" valign="top">Ningún dato disponible en esta tabla</td></tr></tbody>
+			</table></div>
+					
+	</div>	
+	
+	<!-- KPI -->
+	<div class="row">
+		<div class="col-sm-6 col-md-3">
+			<div class="caja" style="height: 136px;">
+				<h2 class="kpi-titulo" style="height: 40px;">Tiempo medio para ganar oportunidad</h2>
+				
+				
+					<span class="kpi-main">0 días</span>
+				
+			</div>
+		</div>
+		<div class="col-sm-6 col-md-3">
+			<div class="caja" style="height: 136px;">
+				<h2 class="kpi-titulo" style="height: 40px;">Media de actividades por oportunidad</h2>
+				
+				
+					<div class="kpi-main kpi-main-label"><span class="kpi-main-number">0</span> <span class="kpi-main-text">actividades</span></div>
+				
+			</div>
+		</div>
+		<div class="col-sm-6 col-md-3">
+			<div class="caja" style="height: 136px;">
+				<h2 class="kpi-titulo" style="height: 40px;">Presupuesto medio de cada oportunidad</h2>
+				
+				
+					<span class="kpi-main">0,00€</span>
+				
+			</div>
+		</div>
+		<div class="col-sm-6 col-md-3">
+			<div class="caja" style="height: 136px;">
+				<h2 class="kpi-titulo" style="height: 40px;">Porcentaje oportunidades ganadas</h2>
+				
+				
+					<span class="kpi-main">0%</span>
+				
+			</div>
+		</div>						
+	</div>
+
+	<div class="row">
+		<!-- Gráfico Campañas -->
+			
+		
+		<div class="col-md-6">
+			<div class="caja" style="height: 225px;">
+				<h2>Campañas</h2>
+
+				
+				
+				
+					<div class="row">
+						<div class="col-sm-4 col-md-12 col-lg-4">
+							<div id="campanasChart" style="height: 170px; margin: 0px auto; overflow: hidden;" data-highcharts-chart="1"><div id="highcharts-nl4fpx5-5" style="position: relative; overflow: hidden; width: 165px; height: 170px; text-align: left; line-height: normal; z-index: 0; user-select: none; font-family: Source Sans Pro; left: 0px; top: 0.883301px;" dir="ltr" class="highcharts-container "><svg version="1.1" class="highcharts-root" style="font-family:Source Sans Pro;font-size:12px;" xmlns="http://www.w3.org/2000/svg" width="165" height="170" viewBox="0 0 165 170"><desc>Created with Highcharts 8.2.2</desc><defs><clipPath id="highcharts-nl4fpx5-7-"><rect x="0" y="0" width="165" height="170" fill="none"></rect></clipPath></defs><rect fill="#ffffff" class="highcharts-background" x="0" y="0" width="165" height="170" rx="0" ry="0"></rect><rect fill="none" class="highcharts-plot-background" x="0" y="0" width="165" height="170"></rect><rect fill="none" class="highcharts-plot-border" data-z-index="1" x="0" y="0" width="165" height="170"></rect><g class="highcharts-series-group" data-z-index="3"><g class="highcharts-series highcharts-series-0 highcharts-pie-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(0,0) scale(1 1)"><path fill="none" d="M 82.4852336927321 12.500001503750568 A 72.5 72.5 0 1 1 82.39929895448981 12.500069935899703 M 82.42950926814287 34.25004895512979 A 50.75 50.75 0 1 0 82.48966358491246 34.2500010526254" transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round" class="highcharts-point highcharts-color-0"></path></g><g class="highcharts-markers highcharts-series-0 highcharts-pie-series" data-z-index="0.1" opacity="1" transform="translate(0,0) scale(1 1)"></g></g><text x="83" text-anchor="middle" class="highcharts-subtitle" data-z-index="4" style="color:#666666;fill:#666666;" y="14"></text><text x="10" text-anchor="start" class="highcharts-caption" data-z-index="4" style="color:#666666;fill:#666666;" y="182"></text><g class="highcharts-legend" data-z-index="7"><rect fill="none" class="highcharts-legend-box" rx="0" ry="0" x="0" y="0" width="8" height="8" visibility="hidden"></rect><g data-z-index="1"><g></g></g></g><text x="155" class="highcharts-credits" text-anchor="end" data-z-index="8" style="cursor:pointer;color:#999999;font-size:9px;fill:#999999;" y="165">Highcharts.com</text></svg><span style="position: absolute; font-family: Source Sans Pro; font-size: 18px; white-space: nowrap; margin-left: 0px; margin-top: 0px; left: 52px; top: 39px; color: rgb(51, 51, 51);" class="highcharts-title" data-z-index="4"><span class="tt-label">Campañas</span><br><span class="tt-total">0,00€</span></span></div></div>
+						</div>
+						<div class="col-sm-8 col-md-12 col-lg-8">
+						
+							
+							
+							
+							
+							<ul class="caja-listado">
+								
+									
+									
+									
+									
+										<li>
+											<span class="state-o" style="background:"></span> 
+											
+											
+												Sin campañaa asignada:
+											
+											 
+											
+											1
+										</li>
+									
+										
+								
+								
+							</ul>
+						</div>							
+					</div>
+								
+			</div>
+		</div>
+		
+		
+
+		<!-- Gráfico fuentes -->
+		<div class="col-md-6">
+			<div class="caja" style="height: 225px;">
+				<h2>Fuentes</h2>
+				
+				
+				
+				
+					<div class="row">
+						<div class="col-sm-4 col-md-12 col-lg-4">
+							<div id="fuentesChart" style="height: 170px; margin: 0px auto; overflow: hidden;" data-highcharts-chart="2"><div id="highcharts-nl4fpx5-8" style="position: relative; overflow: hidden; width: 165px; height: 170px; text-align: left; line-height: normal; z-index: 0; user-select: none; font-family: Source Sans Pro; left: 0.666687px; top: 0.883301px;" dir="ltr" class="highcharts-container "><svg version="1.1" class="highcharts-root" style="font-family:Source Sans Pro;font-size:12px;" xmlns="http://www.w3.org/2000/svg" width="165" height="170" viewBox="0 0 165 170"><desc>Created with Highcharts 8.2.2</desc><defs><clipPath id="highcharts-nl4fpx5-10-"><rect x="0" y="0" width="165" height="170" fill="none"></rect></clipPath></defs><rect fill="#ffffff" class="highcharts-background" x="0" y="0" width="165" height="170" rx="0" ry="0"></rect><rect fill="none" class="highcharts-plot-background" x="0" y="0" width="165" height="170"></rect><rect fill="none" class="highcharts-plot-border" data-z-index="1" x="0" y="0" width="165" height="170"></rect><g class="highcharts-series-group" data-z-index="3"><g class="highcharts-series highcharts-series-0 highcharts-pie-series highcharts-tracker" data-z-index="0.1" opacity="1" transform="translate(0,0) scale(1 1)"><path fill="none" d="M 82.4852336927321 12.500001503750568 A 72.5 72.5 0 1 1 82.39929895448981 12.500069935899703 M 82.42950926814287 34.25004895512979 A 50.75 50.75 0 1 0 82.48966358491246 34.2500010526254" transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round" class="highcharts-point highcharts-color-0"></path></g><g class="highcharts-markers highcharts-series-0 highcharts-pie-series" data-z-index="0.1" opacity="1" transform="translate(0,0) scale(1 1)"></g></g><text x="83" text-anchor="middle" class="highcharts-subtitle" data-z-index="4" style="color:#666666;fill:#666666;" y="14"></text><text x="10" text-anchor="start" class="highcharts-caption" data-z-index="4" style="color:#666666;fill:#666666;" y="182"></text><g class="highcharts-legend" data-z-index="7"><rect fill="none" class="highcharts-legend-box" rx="0" ry="0" x="0" y="0" width="8" height="8" visibility="hidden"></rect><g data-z-index="1"><g></g></g></g><text x="155" class="highcharts-credits" text-anchor="end" data-z-index="8" style="cursor:pointer;color:#999999;font-size:9px;fill:#999999;" y="165">Highcharts.com</text></svg><span style="position: absolute; font-family: Source Sans Pro; font-size: 18px; white-space: nowrap; margin-left: 0px; margin-top: 0px; left: 60px; top: 39px; color: rgb(51, 51, 51);" class="highcharts-title" data-z-index="4"><span class="tt-label">Fuentes</span><br><span class="tt-total">1</span></span></div></div>
+						</div>
+						<div class="col-sm-8 col-md-12 col-lg-8">
+						
+							
+							
+							
+							<ul class="caja-listado">
+																	
+									
+									
+										<li>
+											<span class="state-o" style="background:"></span> 
+											
+											
+												Sin fuente asignada:
+											
+											 
+											
+											1
+										</li>
+									
+										
+								
+																
+							
+							</ul>
+
+														
+						</div>							
+					</div>	
+					
+			</div>
+		</div>	
+				
+	</div>			
+</div>
+
+<input type="hidden" id="monedaDefecto" value="€">
+<input type="hidden" id="campanasImporteTotal" value="0,00">
+
+<div class="usuario-actividades-content popover-template">
+	<h2>Nombre usuario</h2>
+	<h3>Sin rol definido</h3>
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="usuario-actividades-chart" style="height:170px;"></div>
+		</div>
+		<div class="col-sm-6 usuario-actividades-lista"></div>
+	</div>
+
+</div>
+<script>
+	// mostrar / ocultar listado de "otros"
+	$(document).on("click", ".otros-contenido", function(){
+		var objUl = $(this).parents(".otros").find("ul");
+		objUl.toggle();
+		
+		$(this).parents(".caja").css("height","auto");
+	
+	});
+	
+	// deshabilitar dropdown-header en filtros
+	$(document).on("click", ".dropdown-header", function(e){
+		e.preventDefault();
+		e.stopPropagation();
+	});	
+	
+	
+	// popover en usuarios resumen	
+	
+	
+	
+		var usuario_data = [];
+		var otrasActividadesTotal = 0;
+		
+			
+			
+			var nombre = "Llamada";
+			var color = "#4AE59E";
+			//var color = "";
+			var total = "1";
+
+			
+				var jObj = {
+						nombre : nombre, 
+						y : total*1,
+						color : color
+				};
+				usuario_data.push(jObj)
+			
+			
+
+		
+		
+		
+		
+		
+		localStorage.setItem('actividades-usuario-' + 46886, JSON.stringify(usuario_data));
+		
+	
+
+
+ 
+	$(".usuario-popover-trigger").popover({
+		placement : 'top',
+		trigger : 'manual',
+		html: true,
+		template: '<div class="popover popover-usuario-actividades"><div class="arrow"></div><div class="popover-content"></div></div>',
+		content: function() {
+			var dataId = $(this).attr("data-id");
+			var dataNombre = $(this).attr("data-nombre");
+			var dataRol = $(this).attr("data-rol");
+			
+			$(".popover-usuario-actividades").remove(); // fix para evitar errores
+			
+			$(this).data("bs.popover").tip().attr("data-id", dataId);
+			
+			var lista = $(this).find(".usuario-actividades-lista").html();		
+			var content = $(".usuario-actividades-content.popover-template");
+			
+			content.find("h2").html(dataNombre);
+			content.find("h3").html(dataRol);
+			content.find(".usuario-actividades-lista").html(lista);
+			
+			return content.html();
+		}
+	}).click(function(e){
+		e.preventDefault();
+	    $(this).popover('show');
+	    
+	    var total_actividades = $(this).find(".tactividades").val();
+	    var dataId = $(this).attr("data-id");
+	    $(".usuario-actividades-chart").empty();
+	    
+	    var usuario_data = JSON.parse(localStorage.getItem('actividades-usuario-' + dataId));
+	    var chart_data = getChartData(usuario_data, total_actividades);
+	
+	   	var chart = new Highcharts.Chart(chart_data); 
+	});
+
+
+	function getChartData(usuario_data, total_actividades){
+	    return{
+	        chart: {
+	        	renderTo:$(".popover.in .usuario-actividades-chart")[0],
+	        	type: 'pie',
+	            style: {
+	                fontFamily: 'Source Sans Pro',
+	            },
+	        },
+	        marginLeft: 0,
+	        marginRight: 0,
+	        spacingTop: 0,
+	        spacingBottom: 0,  
+		    title: {
+		        text: '<span class="tt-label">Actividades</span><br><span class="tt-total">' + total_actividades + '</span>',
+		        verticalAlign: 'middle',
+		        y:-7,
+		        useHTML: true
+		    },
+		    tooltip: {
+		        headerFormat: '',
+		        pointFormat: '<span class="tt-tooltip"><span class="tt-label">{point.nombre}</span><br> <span class="state-o" style="background:{point.color}"></span> <span class="tt-total">{point.y}</span></span>',
+		        useHTML: true,
+		        borderColor: '#DEDEDE',
+		        backgroundColor: "rgba(255,255,255,1)",
+		        padding: 0
+		    },
+		    series : [{
+		        size: '100%',
+		        innerSize: '70%',
+		        data: usuario_data,
+	            dataLabels: {
+	                enabled: false
+	            }
+		    }]
+		}; 
+	}
+	
+	// cerrando popover selector al hacer click fuera
+	$('body').click(function(e) {
+		var target = $(e.target);
+		if(!target.is('.popover-contactos-cuenta') && !target.parents().is('.popover-contactos-cuenta') && !target.is('.cc-anadir-texto') && !target.parents().is('.cc-anadir-texto')) {
+			$(".popover-contactos-cuenta").hide();
+		}
+	});
+
+
+</script>
+
+
+<!--<script src="/saas/dashboard/lib/highcharts/highcharts.js"></script>-->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+
+<script>
+
+
+	Highcharts.setOptions({
+	    lang: {
+	        decimalPoint: ',',
+	        thousandsSep: '.'
+	    }
+	});
+
+
+	// CHARTS
+	var colors = [];
+	
+	
+		
+	Highcharts.setOptions({
+		colors: colors
+	});
+			
+	// oportunidades ganadas, perdidas, vivas
+	var text_ganadas = 'Ganadas';
+	var text_perdidas = 'Perdidas';
+	var text_vivas = 'Vivas';
+	
+	var tganadas = '0';
+	tganadas = parseFloat(tganadas);
+	
+	var tperdidas = '0';
+	tperdidas = parseFloat(tperdidas);
+	
+	var tvivas = '1';
+	tvivas = parseFloat(tvivas);
+
+	var importe_ganadas = '0,00';
+	var importe_perdidas = '0,00';
+	var importe_vivas = '0,00';
+	
+	
+	if (tganadas != 0 || tperdidas != 0 || tvivas != 0){
+	
+		Highcharts.chart('oportunidadesChart', {
+		    chart: {
+		    	type: 'column',
+		        style: {
+		            fontFamily: 'Source Sans Pro',
+		            fontSize:'16px'
+		        },
+		        marginLeft: 40,
+		        spacingTop: 5,
+		        marginTop: 70
+		    },
+		    xAxis: {
+		        categories: [text_ganadas, text_perdidas, text_vivas],
+	            labels: {
+	                style: {
+	                    fontSize:'12px'
+	                }
+	            }
+		    },
+		    yAxis: {
+		        title: {
+		            text: null,
+		        },
+		    },			    
+		    title: {
+				text: 'Oportunidades',		
+		        align: 'left',
+		        style: {'font-size': '18px', 'font-weight' : 700, 'color': '#494a4a', 'margin-bottom': '20px'},
+		    	x: -10
+		    	
+		    },	
+		    legend: {
+		       enabled: false
+		    },
+		    tooltip: {
+		        headerFormat: '',
+		        pointFormat: '<span class="htt-title">{point.name}</span><br> <span class="htt-main">{point.drilldown}' + $("#monedaDefecto").val() + '</span>',
+		        useHTML: true,
+		        borderColor: '#DEDEDE',
+		        padding:15
+		    },
+		    series: [{
+		        data: [{
+		            name: text_ganadas,
+		            color: '#03C85F',
+		            y: tganadas,
+		            drilldown: importe_ganadas,
+		        }, {
+		            name: text_perdidas,
+		            color: '#FF6D62',
+		            y: tperdidas,
+		            drilldown: importe_perdidas,
+		        }, {
+		            name: text_vivas,
+		            color: '#2C64FF',
+		            y: tvivas,
+		            drilldown: importe_vivas,
+		         }]
+		    }]
+	
+		});
+	
+	}
+
+	// actividades
+	
+	
+		$(function () {
+			var filterUsuario = "";
+			var filterYear = "";
+			var filterPeriod = "";
+			var filterCampana = "";
+		    
+			$.ajax({
+				url: pageContext+"/oportunities/get-landing-actividades?filterUsuarioStr=" + filterUsuario + "&filterYear=" + filterYear + "&filterPeriod=" + filterPeriod + "&filterCampana=" + filterCampana,
+				success: function(result) {
+					$(".caja-actividades").html(result);
+				}
+			});
+		});		
+
+	
+	
+	
+	// campañas
+	
+		var campanas_data = [];
+		var otrasCampanasTotal = 0;
+		var otrasCampanasImporte = 0;
+		
+			
+			var importe = "0,00";
+			importe = importe.replace(",",".");
+			importe = parseFloat(importe);
+			
+			var nombre = "";
+			
+			if (nombre.trim() == '')
+				nombre = "Sin campañaa asignada";
+				
+			var color = colors["1"];
+			var total = "1";
+			
+	
+			
+				var jObj = {
+						name : nombre, 
+						y : total*1,
+						color : color,
+						drilldown: importe
+				};
+				
+				campanas_data.push(jObj)
+			
+			
+		
+	
+		
+	
+		Highcharts.chart('campanasChart', {
+		    chart: {
+		        type: 'pie',
+		        style: {
+		            fontFamily: 'Source Sans Pro',
+		        },
+		        marginLeft: 0,
+		        marginRight: 0,
+		        spacingTop: 0,
+		        spacingBottom: 0,
+		    },	    
+		    title: {
+		        text: '<span class="tt-label">Campañas</span><br><span class="tt-total">' + $("#campanasImporteTotal").val() + $("#monedaDefecto").val() + '</span>',
+		        verticalAlign: 'middle',
+		        y:-7,
+		        useHTML: true
+		    },
+		    tooltip: {
+		        headerFormat: '',
+		        pointFormat: '<span class="tt-tooltip text-center"><span class="htt-title">{point.name}</span><br> <span class="htt-main">{point.drilldown:,.2f}' + $("#monedaDefecto").val() + '</span></span>',
+		        useHTML: true,
+		        borderColor: '#DEDEDE',
+		        backgroundColor: "rgba(255,255,255,1)",
+		        padding: 0
+		    },	   
+		    series: [{
+		        name: 'Presupuesto',
+		        data: campanas_data, 
+		        size: '100%',
+		        innerSize: '70%',
+	            dataLabels: {
+	                enabled: false
+	            }	        
+		    }]
+		});
+	
+	
+	// fuentes
+	
+	
+		var fuentes_data = [];
+		var total_fuentes = 0;
+		var otrasFuentesTotal = 0;
+		var otrasFuentesImporte = 0;
+		
+			
+			var importe = "0,00";
+			importe = importe.replace(",",".");
+			importe = parseFloat(importe);
+			
+			var nombre = "";
+			
+			if (nombre.trim() == '')
+				nombre = "Sin fuente asignada";
+			
+			var color = colors["1"];
+			var total = "1";
+			total_fuentes += total*1;
+		
+			
+				var jObj = {
+						name : nombre, 
+						y : total*1,
+						color : color,
+						drilldown: importe
+				};
+				
+				fuentes_data.push(jObj)
+			
+			
+		
+		
+			
+		
+			
+		Highcharts.chart('fuentesChart', {
+		    chart: {
+		        type: 'pie',
+		        style: {
+		            fontFamily: 'Source Sans Pro',
+		        },
+		        marginLeft: 0,
+		        marginRight: 0,
+		        spacingTop: 0,
+		        spacingBottom: 0,	        
+		    },	    
+		    title: {
+		        text: '<span class="tt-label">Fuentes</span><br><span class="tt-total">' + total_fuentes + '</span>',
+		        verticalAlign: 'middle',
+		        y:-7,
+		        useHTML: true
+		    },
+		    tooltip: {
+		        headerFormat: '',
+		        pointFormat: '<span class="tt-tooltip text-center"><span class="htt-title">{point.name}</span><br> <span class="htt-main">{point.drilldown:,.2f}' + $("#monedaDefecto").val() + '</span></span>',
+		        useHTML: true,
+		        borderColor: '#DEDEDE',
+		        backgroundColor: "rgba(255,255,255,1)",
+		        padding: 0
+		    },	    
+		    series: [{
+		        name: 'Oportunidades',
+		        data: fuentes_data,
+		        size: '100%',
+		        innerSize: '70%',
+	            dataLabels: {
+	                enabled: false
+	            }	        
+		    }]
+		});	
+	
+
+	
+	
+	
+	// lista usuarios
+	$(function () {
+		var tableUsuarios = $('#listUsuarios').DataTable( {
+	    	searching: false,
+	    	paging: false,
+	    	info: false,
+	        language: {
+	    	        url: "/saas/dashboard/lib/datatables/language/es.json",
+	    	        thousands: ".",
+	    	        decimal: ","
+    	    },
+   	   		order: [[ 3, "desc" ]],
+            columnDefs: [ {
+                sortable: false,
+                "class": "index",
+                targets: 0
+            } ],
+	    } );
+	    
+
+		tableUsuarios.on( 'order.dt search.dt', function () {
+			tableUsuarios.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+	            cell.innerHTML = i+1;
+	        } );
+	    } ).draw();
+
+		setTimeout(function(){ 
+			$(".kpi-titulo").matchHeight();
+		}, 0);
+	    
+	});
+	
+	
+	// lista usuarios por fecha cierre oportunidades
+	$(function () {
+		var tableUsuarios = $('#listUsuariosOportunidadesFechaCierre').DataTable( {
+	    	searching: false,
+	    	paging: false,
+	    	info: false,
+	        language: {
+	    	        url: "/saas/dashboard/lib/datatables/language/es.json",
+	    	        thousands: ".",
+	    	        decimal: ","
+    	    }
+	    } );
+
+		setTimeout(function(){ 
+			$(".kpi-titulo").matchHeight();
+		}, 0);
+	    
+	});
+	
+	// lista ganancia oportunidades ganadas
+	$(function () {
+		var tableUsuarios = $('#listUsuariosOportunidadesGanadas').DataTable( {
+	    	searching: false,
+	    	paging: false,
+	    	info: false,
+	        language: {
+	    	        url: "/saas/dashboard/lib/datatables/language/es.json",
+	    	        thousands: ".",
+	    	        decimal: ","
+    	    }
+	    } );
+
+		setTimeout(function(){ 
+			$(".kpi-titulo").matchHeight();
+		}, 0);
+	    
+	});
+	
+	// filtro usuarios (tipo tags) : dropdown tags
+	var tags = "".split(",");
+	$("#usuarioDropdown [name='filterUsuarioStr']").each(function() {
+		var inp = $(this);
+
+		$.each(tags, function() {
+			if(inp.val() == parseInt(this)) 
+				inp.prop("checked", true);
+		});
+	});
+	
+</script>
+		</div>
+		<div id="comercialActividad" class="tab-pane fade">
+			
+
+
+
+
+
+
+<div class="caja resumen" style="">Adapta el CRM de billage a tu proceso de venta con los embudos personalizables y organiza tu equipo comercial con el calendario compartido.</div>
+
+<div class="row">
+	<div class="col-md-6">
+		<div class="caja" style="height: 152px;">
+			<h2 class="titulo-alt">
+				Últimas campañas
+				
+					<a class="caja-head-link" href="campanas.html">Ver todas</a>
+				
+				
+			</h2>
+
+			
+				<ul class="list-summary">
+					
+						<li id="campaigns0">
+							<div class="media">
+								
+								<div class="media-left">
+									<a href="/saas/oportunities/../profile.action?idUser=46886" class="avatar avatar30"><span title="Poner nombre" class="avatar-no-image">PN</span></a>
+								</div>
+								<div class="media-body">
+									<p>
+										<a href="/saas/oportunities/../profile.action?idUser=46886">Poner nombre</a>
+										ha creado la campaña
+										<a onclick="dmslib.Widget.verPopup('divNewCampaign',null,'/saas/campaigns/view-edit?id=5795')">dfghj</a>
+									</p>
+									<p class="help-block"><span class="since">hace 13 minutos</span></p>
+								</div>
+								<div class="media-right">
+									<p class="media-object">
+										
+											<span class="state-o stateGreen"></span>
+											Activa
+										
+										
+									</p>
+								</div>
+							</div>
+						</li>
+						<script>
+							$(function () {
+								var mom = moment("21/12/20 10:53:33.000", "DD/MM/YY HH:mm:ss.sss");
+								$("#campaigns0 .since").text(mom.from());
+							});
+						</script>
+					
+				</ul>
+			
+			
+		</div>			
+	</div>
+
+	<div class="col-md-6">
+		<div class="caja" style="height: 152px;">
+			<h2 class="titulo-alt">
+				Últimas oportunidades
+				
+					<a href="/saas/oportunities/list-funnel" class="caja-head-link">Ver todas</a>
+				
+				
+			</h2>				
+		
+			
+				<ul class="list-summary">
+					
+						<li id="oportunity0">
+							<div class="media">
+								<div class="media-left">									
+									
+									<a href="/saas/oportunities/../profile.action?idUser=46886" class="avatar avatar30"><span title="Poner nombre" class="avatar-no-image">PN</span></a>
+								</div>
+								<div class="media-body">
+									<p>
+										<a href="/saas/oportunities/../profile.action?idUser=46886">Poner nombre</a>
+										ha creado la oportunidad
+										
+										<a href="/saas/oportunities/view.action?id=127298">dfsdf</a>
+									</p>
+									<p class="help-block">
+										AriAra | 
+										<span class="since">hace 11 minutos</span>
+									</p>
+								</div>
+								<div class="media-right">
+									<p class="media-object">
+										
+										
+										
+										
+										
+										
+										
+																				
+										<span class="state-o" style="background-color: #f15a24"></span> 
+										Inicio
+									</p>
+								</div>
+							</div>
+						</li>
+						<script>
+							$(function () {
+								var mom = moment("21/12/20 10:55:35.000", "DD/MM/YY HH:mm:ss.sss");
+								$("#oportunity0 .since").text(mom.from());
+							});
+						</script>
+					
+				</ul>
+			
+			
+		</div>
+	</div>
+	
+	<div class="col-md-6">
+		<div class="caja" style="height: 175px;">
+			<h2 class="titulo-alt">
+				Últimas actividades comerciales
+				
+					<a href="/saas/activities/list?entityList.pending=1&amp;entityList.filter_time=4&amp;entityList.filter_owner=46886" class="caja-head-link">Ver todas</a>
+				
+				
+			</h2>				
+
+			
+				<ul class="list-summary">
+					
+						<li id="activities0">
+							<div class="media">
+								<div class="media-left">									
+									
+									<a href="/saas/oportunities/../profile.action?idUser=46886" class="avatar avatar30"><span title="Poner nombre" class="avatar-no-image">PN</span></a>
+								</div>
+								<div class="media-body">
+									<p>
+										<a href="/saas/oportunities/../profile.action?idUser=46886">Poner nombre</a>
+										
+										
+											ha creado <a onclick="dmslib.Widget.verPopup('divEditActividad',null,'/saas/activities/view-edit-activity?idActividad=4614197')">la actividad</a>
+										
+									</p>
+									<p class="help-block">
+										AriAra | 
+										<span class="since">hace 9 minutos</span>
+									</p>
+								</div>
+								<div class="media-right">
+									<p class="media-object">
+										<img title="Llamada" class="i-icon" src="/saas/img/icons/icons/grey/llamada.svg">
+										Llamada
+									</p>
+								</div>
+							</div>
+						</li>
+						<script>
+							$(function () {
+								var mom = moment("21/12/20 10:57:58.000", "DD/MM/YY HH:mm:ss.sss");
+								$("#activities0 .since").text(mom.from());
+							});
+						</script>
+					
+				</ul>
+			
+			
+		</div>			
+	</div>
+
+	<div class="col-md-6">
+		<div class="caja" style="height: 175px;">
+			<h2 class="titulo-alt">
+				Últimos presupuestos
+				
+					<a href="presupuestos.html" class="caja-head-link">Ver todas</a>
+				
+				
+			</h2>
+
+			
+				<ul class="list-summary">
+					
+						<li id="ofertas0">
+							<div class="media">
+								
+								<div class="media-left">
+									<a href="/saas/oportunities/../profile.action?idUser=46886" class="avatar avatar30"><span title="Poner nombre" class="avatar-no-image">PN</span></a>
+								</div>
+								<div class="media-body">
+									<p>
+										<a href="/saas/oportunities/../profile.action?idUser=46886">Poner nombre</a>
+										ha creado el presupuesto
+										
+										<a href="/saas/oportunities/../budgets/edit.action?id=172698">q1q</a>
+										por un importe de
+										<strong>0,00€</strong>
+									</p>
+									<p class="help-block">
+										aaaa | 
+										<span class="since">hace una hora</span>
+									</p>
+								</div>
+								<div class="media-right">
+									<p class="media-object">
+										<span class="state-o stateOrange"></span> Pendiente
+									</p>
+								</div>
+							</div>
+						</li>
+						<script>
+							$(function () {
+								var mom = moment("21/12/20 9:50:18.000", "DD/MM/YY HH:mm:ss.sss");
+								$("#ofertas0 .since").text(mom.from());
+							});
+						</script>
+					
+				</ul>
+			
+			
+		</div>
+	</div>
+</div>
+		</div>
+	</div>	
+
+</div>
+
+<script>
+	$(".caja").matchHeight();
+</script>
+					</div>
+
+				</div>
+				
+				
+			</div>
+	
+			<!--  contenido popover de selección de color -->
+			<div class="select-color-content">
+				
+				<span class="color-sq color-none" data-color="transparent" title="Sin color"></span>
+			</div>
+		
+		</main>
+		
+		
+
+
+
+
+
+
+
+<!-- Div para confirmar eliminar elemento -->
+<div id="dEliminarElemento" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			Atención
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+	<div class="popup-content">
+		<h4 id="divMensajePopup"></h4>
+		<div id="divMensajeImplicaciones"></div>
+    </div>
+	<div class="popup-footer">		
+		<button type="button" id="inputEliminar" class="btn btn-submit" onclick="dmslib.Validation.validate(this, 'form')">Aceptar</button>	
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+<!-- Div para subir imagen productos  -->
+<div id="dpopup_imagen_producto" class="dpopupsubirimagen popup">
+    
+        
+        
+        
+        
+        
+    
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Sube una foto para el servicio o producto.
+		
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+<form id="upload_image_product" action="/saas/products/upload-image" method="post" enctype="multipart/form-data">
+    <input id="image_product" name="id" type="hidden" value="">
+	<div class="popup-content" style="overflow:hidden">
+		<div class="upload-container">
+		    <div class="upload-img">
+		        <i class="fa fa-picture-o" aria-hidden="true"></i>
+		    </div>
+		    <div class="upload-file">
+		        <p>Sube una foto para el servicio o producto.<br><br><b>Formato:</b> jpg, png o gif.<br>	<b>Tamaño máximo:</b> 2 MB.<br><br></p>
+		        <input type="file" name="upload" id="upload">
+		    </div>
+	    </div>
+	</div>
+
+	<div class="popup-footer">		
+		<button type="submit" id="inputUploadFile" class="btn btn-submit" onclick="dmslib.Widget.escondePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>    
+</form>
+</div>
+
+<!-- Div para subir gastos  -->
+<div id="dpopup_doc-preview" class="dpopupsubirgasto popup-div popup">
+    
+        
+		
+        
+        
+		
+    
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Subir documento de gasto
+		
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+<form id="upload_image_gasto" action="/saas/spending/upload-image" method="post" enctype="multipart/form-data">
+    <input id="image_gasto" name="id" type="hidden" value="">
+	<div class="popup-content" style="overflow:hidden">
+		<div class="upload-container">
+		    <div class="upload-img">
+		        <i class="fa fa-picture-o" aria-hidden="true"></i>
+		    </div>
+		    <div class="upload-file">
+		        <p>Selecciona documento de gastos para el gasto</p>
+		        <input type="file" name="upload" id="upload">
+		    </div>
+	    </div>
+	</div>
+
+	<div class="popup-footer">		
+		<button type="submit" id="inputUploadFile" class="btn btn-submit" onclick="dmslib.Widget.escondePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>    
+</form>
+</div>
+
+<!-- Div para popup error  -->
+<div id="div-error" class="popup">
+	<div class="popup-header">
+		<div class="popup-title">
+			<span id="div-cabecera-error"></span>
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<div id="div-mensaje-error" class="popup-content"></div>
+
+	<div class="popup-footer">		
+		<button type="button" class="btn btn-submit" onclick="dmslib.Widget.removePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+<!-- Div para mover un documento o carpeta (des de docs)   -->
+<div id="destinationPopup" class="popup no-remove">
+	
+
+
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Destino
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+
+<div class="popup-content">
+	<div id="treeContainer" class="folder-tree"></div>
+	<div id="carpeta-destination-tree" class="folder-tree"></div>
+
+	<div class="fake-footer">
+		<button type="button" id="carpeta-destination-btn" class="btn btn-submit">Mover</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+
+
+<div id="divValidacionPopup" class="validacion">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Faltan campos requeridos.
+</div>
+
+<div id="divErrorPopup" class="validacion-error">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="span-texto-error-popup"></span>
+</div>
+
+
+</div>
+
+<!-- Div para ir a una carpeta (des de docs)  -->
+<div id="gotoPopup" class="popup no-remove">
+	
+
+
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Ir a
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+
+<div class="popup-content">
+	<div id="carpeta-goto-tree" class="folder-tree"></div>
+	<div id="carpeta-destination-tree" class="folder-tree"></div>
+
+	<div class="fake-footer">
+		<button type="button" id="carpeta-goto-btn" class="btn btn-submit">Confirmar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+
+
+<div id="divValidacionPopup" class="validacion">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Faltan campos requeridos.
+</div>
+
+<div id="divErrorPopup" class="validacion-error">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="span-texto-error-popup"></span>
+</div>
+
+
+</div>
+
+<!-- Div para mostrar mensajes de confirmacion  -->
+<div id="divConfirmacionAccion" class="popup popup-mensaje popup-mensaje-confirmacion">
+	<span id="divConfirmacionAccionTexto" class="popup-mensaje-texto"></span>
+</div>
+
+<!-- Div para mostrar mensajes de alerta  -->
+<div id="divAlertAccion" class="popup popup-mensaje popup-mensaje-alerta">
+    <span id="alertAccionTexto" class="popup-mensaje-texto"></span>
+</div>
+
+<!-- Div para gestionar los conceptos a albaranear -->
+<div id="divConceptosAlbaranes" class="divConceptosAlbaranes popup"></div>
+
+<!-- wigets dashboard-->
+<div id="divAddWidgetPopup" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			Seleccionar widget
+			
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<div class="popup-content">
+		<div class="controls" id="tagsControls"></div>
+		<div id="selectorAddWidget" class="container ps-container ps-active-y"></div>
+	</div>
+	
+	<div class="popup-footer">		
+		<button type="button" class="btn btn-submit" onclick="addWidgetToDashboard()">Agregar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+<!-- filtros wigets dashboard -->
+<div id="divWidgetFiltersPopup" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			<div id="divWidgetFiltersTitle"></div>
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+    <div class="divWidgetFilters">
+        <form id="formWidgetFilters" class="widget_instance_filters_form">
+            <input id="inputWidgetInstanceId" type="hidden" name="widget_instance_id" value="">
+            <div id="divWidgetFiltersArea" class="popup-content"></div>
+			<div class="popup-footer">		
+				<button id="buttonWidgetFiltersOk" type="submit" class="btn btn-submit">Filtrar</button>
+				<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+				<!-- 
+				<button id="buttonWidgetFiltersReset" type="submit" class="btn btn-primary">Limpiar</button>
+				 -->
+			</div>
+        </form>
+    </div>
+</div>
+
+<!-- Popup subir logo a plantilla-->
+<div id="dpopup_imagen_empresa" class="dpopupsubirlogo popup-div popup">
+	<div class="popup-header">
+		<div class="popup-title">
+			Subir logo
+
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<form id="upload_image_empresa" action="/saas/companies/upload-logo" method="post" enctype="multipart/form-data">
+		<input type="hidden" id="image_empresa" name="id" value="">
+
+		<div class="popup-content">
+			<div class="upload-container">
+				<div class="upload-img">
+					<i class="fa fa-picture-o fa-4x" aria-hidden="true"></i>
+				</div>
+
+				<div class="upload-file">
+					
+					<div class="form-group fakeBtn">
+						<label for="upload" class="form-label">Selecciona tu logo</label>
+						<input type="file" name="upload" id="upload">
+						<div class="input-group add-clear-span">
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-primary">
+									<i class="fa fa-folder-open" aria-hidden="true"></i>
+								</button>
+							</span>
+							<input type="text" id="labelFile" class="form-control substring" placeholder="Seleccionar" readonly="">
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+
+		<div class="popup-footer">
+			<button type="submit" id="inputUploadFile" class="btn btn-submit">Aceptar</button>
+			<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+		</div>
+	</form>
+</div>
+
+		<script>
+			// n decimales de la empresa del usuario
+			numberDecimalsInBase10 = "100";
+			decimalesEmpresa = numberDecimalsInBase10.length -1; // num real
+			numberDecimalsInBase10 = numberDecimalsInBase10*1; // string a int
+			//funcion para mostrar mensaje de confirmacion
+			var result = "";
+			//si result = 1, mostramos mensaje confirmación
+			if(result == 1 || false) {
+				dmslib.Widget.prepararAccionConfirmacion("Datos guardados correctamente.");
+			}
+
+			//setesamos valor variable mensajeConfirmacion
+			mensajeConfirmacion = "Datos guardados correctamente.";
+			ningunaLinia = "No se ha añadido ninguna línea";
+
+			if($(location).attr("href").indexOf("contract-plans") == -1 && ""=='true') {
+				document.location = pageContext+"/contract-plans?user=yosmarquebec@gmail.com&company=19546";
+			}
+
+			firstLogin = ("" == "true") ?  1 : 0;
+			activationGoal = ("" == "true") ?  1 : 0;
+
+			//miramos si hay que mostrar popup bienvenida
+			
+				if("" == "true") 
+					dmslib.Widget.verPopup("divRenovarPassword", null, pageContext+"/new-password");
+				else if("" == "true") 
+					dmslib.Widget.verPopup("divRenovarPassword", null, pageContext+"/force-new-password");
+				else if("0" == 0 && firstLogin == 1) 
+					dmslib.Widget.verPopup("divFirstLogin", null, pageContext+"/first-login");
+
+				if("" == "true") {
+					ga("send", "event", "Pro", "activation");
+					dmslib.Ajax.request(pageContext+"/activation-goal");
+				}
+			
+
+			//asociamos evento onclick a divFormulario para saber si se está editando un formulario
+			if(dmslib.DOM.dameElemento("form")) {
+				// IE o FF
+				if(document.all) 
+					dmslib.DOM.dameElemento("form").attachEvent("onclick", activaModifForm);
+				else 
+					dmslib.DOM.dameElemento("form").addEventListener("click", activaModifForm, false);
+			}
+		</script>
+
+		
+
+
+
+
+
+
+
+	<!-- google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		
+		ga('create', 'UA-7323120-25', 'billage.es');
+		
+			ga('set', 'dimension1', 'Pro');
+			ga('set', '&uid', '46886');
+		
+		ga('send', 'pageview');
+	</script>
+	
+	<!-- Google Tag Manager -->
+	<noscript>
+		<iframe src="//www.googletagmanager.com/ns.html?id=GTM-TTXBSX" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+	</noscript>
+	<script>
+		(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+		'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','GTM-TTXBSX');
+	</script>
+	
+
+
+		
+
+
+
+
+
+	
+		
+	
+			
+			<script>				
+		    window.intercomSettings = {
+		        
+		        name: "Poner nombre",
+		        
+		        email: "yosmarquebec@gmail.com",
+		        user_id: "46886",
+		        
+		        created_at: "1607574101000",
+		        signed_up_at: "1607574101000",
+		        rol: "Administrador",
+		        app_id: "sbkq18wo",
+		        company: {
+		            remote_created_at: "1607574101000",
+		            user_count: "1",
+		            plan: "Pro",
+		            activa: "true",
+		            company_id: "19546",
+		            name: "Poner razón social",
+		            periodicidad: ""
+		        }
+		    };
+			</script>
+			<script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/sbkq18wo';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>
+	
+		
+		
+	
+
+
+		<script>
+			$(function() {
+				cookieScreenSize("lg");
+	
+				$("#menuToggle, #backgroundSidebar").click(function(e) {
+					e.preventDefault();
+					$("#mainMenu").toggleClass("toggled");
+					$("#bNavPerfil").collapse("hide");
+				});
+			});
+		</script>
+		<script src="/saas/js/footer.js"></script>
+	
+
+<script type="text/javascript" id="">!function(b,e,f,g,a,c,d){b.fbq||(a=b.fbq=function(){a.callMethod?a.callMethod.apply(a,arguments):a.queue.push(arguments)},b._fbq||(b._fbq=a),a.push=a,a.loaded=!0,a.version="2.0",a.queue=[],c=e.createElement(f),c.async=!0,c.src=g,d=e.getElementsByTagName(f)[0],d.parentNode.insertBefore(c,d))}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");fbq("init","679832448786593");fbq("track","PageView");</script>
+<noscript>
+ <img height="1" width="1" src="https://www.facebook.com/tr?id=679832448786593&amp;ev=PageView&#10;&amp;noscript=1">
+</noscript>
+<iframe id="intercom-frame" style="position: absolute !important; opacity: 0 !important; width: 1px !important; height: 1px !important; top: 0 !important; left: 0 !important; border: none !important; display: block !important; z-index: -1 !important; pointer-events: none;" aria-hidden="true" tabindex="-1" title="Intercom"></iframe><div id="intercom-container" class="intercom-namespace"><style>html.intercom-mobile-messenger-active,html.intercom-mobile-messenger-active > body,html.intercom-modal-open,#intercom-container-body{overflow:hidden !important;}html.intercom-mobile-messenger-active,html.intercom-mobile-messenger-active > body{position:static !important;}html.intercom-mobile-messenger-active > body{height:0 !important;margin:0 !important;}iframe#intercom-frame{position:absolute !important;opacity:0 !important;width:1px !important;height:1px !important;top:0 !important;left:0 !important;border:none !important;display:block !important;z-index:-1 !important;}</style><div class="intercom-app" aria-live="polite"><iframe allowfullscreen="" class="intercom-launcher-frame intercom-1q4irxg e1ur5zlj0" name="intercom-launcher-frame" title="Intercom live chat" data-intercom-frame="true"></iframe><iframe allowfullscreen="" class="intercom-launcher-badge-frame intercom-s06fua e1loc0kc0" name="intercom-launcher-badge-frame" title="Intercom live chat notificación" data-intercom-frame="true"></iframe><div id="intercom-modal-container"></div></div></div><div id="intercom-css-container"><style data-emotion="intercom-global"></style><style data-emotion="intercom"></style></div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/fullcalendar.min.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/locale-all.js"></script>
+</body>
+
+</html>
