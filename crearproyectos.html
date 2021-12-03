@@ -1,0 +1,2515 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billage 20.0</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/empty.css">
+    <link rel="stylesheet" href="assets/css/evol-colorpicker.min.css">
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/fullcalendar.min.css">
+    <link rel="stylesheet" href="assets/css/fullcalendar.print.css">
+    <link rel="stylesheet" href="assets/css/jquery.tagit.css">
+    <link rel="stylesheet" href="assets/css/main.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/tagit.ui-zendesk.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.colors.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.min.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.table.css">
+</head>
+
+<body><main>
+			
+
+<!-- Div para alertas jquery -->
+<div id="billage-utils-alert" class="popup divAlertPopup"></div>
+
+<script>
+	// Usuario
+	var idUsr = "46886";
+	var imgUsr = "";
+	var nameUsr = "Poner nombre";
+	var rolUsr = "1";
+	sessionStorage.setItem('session-user-id', idUsr);
+
+	// Usuario
+	var idEmpresa = "19546";
+
+	var pageContext = '/saas';
+
+	var context = '/saas';
+	queryInit(context);
+	billageUtilsInit(context);
+
+	//29-06-2018
+	//billageUtilsAvoidPasteDefault();
+	billageCombos();
+
+	billageSnippetInit();
+
+	var _alertPopup = function (h, w, data, funcOk) {
+		var t = $('#billage-utils-alert');
+		var l = $('<div/>').height(h).width(w).append(data);
+		t.empty().append(l);
+
+		console.log(data+':'+ t.attr('id'));
+		dmslib.Widget.verPopup(t.attr('id'), null, context +'/session-expired');
+	};
+
+	var _alertSessionExpiredPopup = function (data) {
+		window.location = context;
+	};
+
+	var _alertAjaxErrorPopup = function (e,jqXHR,ajaxSettings,thrownError) {
+		_alertPopup(200, 300, $('<span/>').append(data), function () {
+			window.location = context;
+		});
+	};
+
+	var interval = 31 * 60;	//1 minuto mas q el timeout de session
+	//interval = 1;			//para hacer pruebas desmarcar
+
+	var timer = billageUtilsCheckSessionExpired(function () {
+		try {
+			_alertSessionExpiredPopup();
+		} catch (e) { }
+		clearInterval(timer);
+	},
+	interval);
+
+	(function ($) {
+		$.fn.extend({
+			limiter: function (limit, elem) {
+				$(this).on("change keyup focus", function () {
+					setCount(this, elem);
+				});
+				function setCount(src, elem) {
+					var chars = src.value.length;
+
+					if (chars > limit) {
+						src.value = src.value.substr(0, limit);
+						chars = limit;
+					}
+					elem.html(limit - chars);
+				}
+
+				setCount($(this)[0], elem);
+			}
+		});
+	})(jQuery);
+</script>
+	
+			<!-- CAPA GRIS -->
+			<div id="dgris"></div>
+	
+			<!-- MENU TOP -->
+			
+
+
+
+
+
+
+
+<nav id="navbarTop" class="navbar navbar-fixed-top navbar-billage">
+	<!-- USER TRIAL -->
+	
+
+	<!-- Brand and toggle get grouped for better mobile display -->
+	<div class="navbar-header">
+		<a href="#" class="avatar navbar-btn collapsed" data-toggle="collapse" data-target="#bNavPerfil" aria-expanded="false">
+			
+			
+				<span title="Poner nombre" class="avatar-no-image">PN</span>
+			
+			<i class="fa fa-angle-down" aria-hidden="true"></i>
+		</a>
+		
+		<a class="navbar-recompensas-link ml5" href="/saas/partner/partner-panel">
+			Saldo <strong> €</strong><span class="hidden-xs">&nbsp;| 80€ por amigo</span>
+		</a>
+		
+		<button type="button" class="navbar-btn btn-transparent topBuscador" data-container="body" data-toggle="popover" data-original-title="" title=""><i class="fa fa-search"></i></button>
+
+		<a class="navbar-btn navbar-shortcut" href="index.html#onboarding"><i class="fa fa-plus"></i></a>
+
+		<a class="navbar-brand" href="index.html">
+			<img src="/saas/img/logo/billage.svg">
+		</a>
+		
+			<a id="menuToggle" class="navbar-brand toggle-btn" href="#menu-toggle"></a>
+		
+		
+		
+	</div>
+
+	<div id="bNavbar" class="collapse navbar-collapse">
+
+		<ul class="nav navbar-nav navbar-center">
+			<li>
+				<a id="accDirecto" class="navbar-shortcut">
+					<img title="Accesos directos" class="i-icon" src="/saas/img/icons/icons/white/plus.svg">
+				</a>
+			</li>
+		</ul>
+
+		<ul class="nav navbar-nav navbar-right">
+			
+ 				<li>
+					<button type="button" class="btn btn-search topBuscador" data-container="body" data-toggle="popover" data-original-title="" title="">
+						<img src="/saas/img/icons/icons/white/search.svg">
+					</button>
+				</li>
+				
+				<li class="navbar-recompensas">
+					<a class="navbar-recompensas-link" href="/saas/partner/partner-panel">
+						Saldo <strong>€</strong><span class="hidden-xs hidden-sm hidden-md">&nbsp;| 80€ por amigo</span>
+					</a>
+				</li>					
+
+				<li class="separador hidden-sm"></li>
+			 	<li>
+					<a id="mailMenu" title="Mensajes" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+						<img title="Mensajes" src="/saas/img/icons/icons/white/mail.svg">
+						<sup class="badge"></sup>
+					</a>
+				</li>
+				<li class="separador hidden-sm"></li>
+				
+					<li class="hidden-sm">
+						<a target="_blank" href="https://help.getbillage.com">
+							<img title="Ayuda" src="/saas/img/icons/menu/ayuda.svg">
+						</a>
+					</li>
+					
+
+			
+
+			<li class="dropdown">
+				<a href="#" class="avatar dropdown-toggle toggle-ajustes" data-toggle="dropdown">
+					
+					
+						<span title="Poner nombre" class="avatar-no-image">PN</span>
+					
+					<i class="fa fa-angle-down" aria-hidden="true"></i>
+				</a>
+				<ul class="dropdown-menu dropdown-menu-right dropdown-arrow">
+					
+
+
+
+
+
+
+
+
+
+	<li class="nav-perfil ">
+		<a href="/saas/my-profile">
+			Mi Perfil
+		</a>	
+	</li>
+	
+	
+		<li class="nav-empresa ">
+			<a onclick="dmslib.Widget.verPopup('divEditEmpresa',null,'/saas/companies/view-edit?id=19546')">
+				Datos de mi negocio
+				
+				
+			</a>
+		</li>
+		
+		
+		
+		<li class="nav-contratacion hidden-xs ">
+			<a href="/saas/companies/view-company-contract?id=19546">Mi suscripción</a>
+		</li>			
+	
+	
+	
+
+	
+	
+	
+	<li class="divider"></li>	
+	
+	
+	
+	
+		
+			<li class="nav-usuarios hidden-xs ">
+				<a href="/saas/users/list">Usuarios</a>
+			</li>
+		
+	
+	
+	<li class="nav-ajustes" onclick="dmslib.Widget.verPopup(&quot;divMenuAjustes&quot;, null, pageContext + &quot;/menu-settings&quot;);">
+		<a>Ajustes e importaciones</a>
+	</li>
+	
+ 	<li class="nav-mail visible-xs-block">
+		<a id="mailMenuResponsive" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+			Mensajes
+		</a>
+	</li>	
+	
+			
+		<li class="nav-integraciones">
+			<a href="/saas/integrations">Integraciones</a>
+		</li>
+		
+		<li class="nav-store">
+			<a href="/saas/store/billage-store">Billage store</a>
+		</li>
+	
+	
+	
+		<li class="nav-invita ">
+			<a href="/saas/partner/partner-panel">
+				Saldo <strong>€</strong>
+			</a>
+		</li>
+	
+
+	<li class="divider"></li>						
+
+
+<li class="nav-logout">
+	<a id="perfil" class="aMainMenu" href="/saas/logout">Cerrar sesión</a>
+</li>		
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<div id="bNavPerfil" class="collapse navbar-collapse" aria-expanded="false">
+		<ul class="nav navbar-nav">
+			
+				<li class="nav-help">
+					<a target="_blank" href="https://help.getbillage.com">Ayuda</a>
+				</li>
+			
+			
+
+
+
+
+
+
+
+
+
+	<li class="nav-perfil ">
+		<a href="/saas/my-profile">
+			Mi Perfil
+		</a>	
+	</li>
+	
+	
+		<li class="nav-empresa ">
+			<a onclick="dmslib.Widget.verPopup('divEditEmpresa',null,'/saas/companies/view-edit?id=19546')">
+				Datos de mi negocio
+				
+				
+			</a>
+		</li>
+		
+		
+		
+		<li class="nav-contratacion hidden-xs ">
+			<a href="/saas/companies/view-company-contract?id=19546">Mi suscripción</a>
+		</li>			
+	
+	
+	
+
+	
+	
+	
+	<li class="divider"></li>	
+	
+	
+	
+	
+		
+			<li class="nav-usuarios hidden-xs ">
+				<a href="/saas/users/list">Usuarios</a>
+			</li>
+		
+	
+	
+	<li class="nav-ajustes" onclick="dmslib.Widget.verPopup(&quot;divMenuAjustes&quot;, null, pageContext + &quot;/menu-settings&quot;);">
+		<a>Ajustes e importaciones</a>
+	</li>
+	
+ 	<li class="nav-mail visible-xs-block">
+		<a id="mailMenuResponsive" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+			Mensajes
+		</a>
+	</li>	
+	
+			
+		<li class="nav-integraciones">
+			<a href="/saas/integrations">Integraciones</a>
+		</li>
+		
+		<li class="nav-store">
+			<a href="/saas/store/billage-store">Billage store</a>
+		</li>
+	
+	
+	
+		<li class="nav-invita ">
+			<a href="/saas/partner/partner-panel">
+				Saldo <strong>€</strong>
+			</a>
+		</li>
+	
+
+	<li class="divider"></li>						
+
+
+<li class="nav-logout">
+	<a id="perfil" class="aMainMenu" href="/saas/logout">Cerrar sesión</a>
+</li>
+		</ul>
+	</div>
+</nav>
+
+<div id="divAccDirecto" class="fast-call" hidden="">
+	<div class="container">
+		<header>
+			<h1>Crear una nueva oportunidad, proyecto, factura y más</h1>
+			<button type="button" id="closeDiv" class="btn-icon btn-close"></button>
+		</header>
+
+		<section>
+			<div class="media media-comercial">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/vender.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Comercial</h4>
+			       		
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearoportunidad.html'">Oportunidad</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearcampanas.html';">Campaña</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearactividades.html'">Actividad comercial</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpresupuestos.html">Presupuesto</a>
+	</p>
+
+					
+				</div>
+			</div>
+
+			<div class="media media-project">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/organizar.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Proyectos</h4>
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearproyectos.html'">Proyecto</p>
+
+
+					
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='creartareas.html'">Tarea de proyecto</p>
+
+
+					
+					
+					<p class="fast-call-caller a fast-call-popup timetracking-play">
+						Registro de tiempos
+					</p>
+				</div>
+			</div>
+
+			<div class="media media-biling">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/cobrar.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Facturación</h4>
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearfacturas.html">Factura de venta</a>
+	</p>
+
+					
+
+						
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearalbaran.html">Albarán de venta</a>
+	</p>
+
+					
+
+						
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpedidosVentas.html">Pedido de venta</a>
+	</p>
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="creargastos.html">Gasto</a>
+	</p>
+
+					
+
+					    
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpedidosCompras.html">Pedido de compra</a>
+	</p>
+
+					
+				</div>
+			</div>
+
+			<div class="media">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/general.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">General</h4>
+				
+				
+					
+					
+					
+				
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNewAccount',null,'/saas/accounts/ver-alta')">Empresa</p>
+
+
+			
+	       		
+				
+					
+					
+					
+				
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNuevoContacto',null,'/saas/contacts/ver-alta')">Contacto</p>
+
+
+			
+			
+		        
+		            
+		            
+		        	
+		        
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNewDoc',null,'/saas/documents/edit-popup')">Documentos</p>
+
+
+			
+			
+		        
+		            
+		            
+		            
+		        
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNuevoProducto',null,'/saas/products/ver-alta')">Producto</p>
+
+
+			
+				</div>
+			</div>
+		</section>
+	</div>
+</div>
+
+
+<div id="popover-top-search" class="hide">
+	<form action="/saas/search">
+		<div class="input-group search-input ">
+			<input type="text" name="cadena" class="form-control input-sm disable-clear" placeholder="Buscar" value="" pattern=".{4,}" autocomplete="off" oninvalid="setCustomValidity('Debes introducir al menos 4 carácteres para realizar la búsqueda')" oninput="setCustomValidity('')" required="">
+			<span class="input-group-addon">
+				<button type="submit" id="serachBtn" class="btn btn-search">
+					<img src="/saas/img/icons/icons/white/search.svg">
+				</button>
+			</span>
+		</div>
+	</form>
+ </div>
+
+<script>
+	$(function() {
+		
+		
+		$(document).on("click", ".toggle-ajustes", function(e) {
+			var obj = $("#sidebarAjustes");
+			
+			if (obj.is(":visible")) {
+				$(".nav-ajustes").hide();
+			}
+			else{
+				$(".nav-ajustes").show();
+			}
+		});		
+		
+		$(document).on("click", ".menu-configuracion .dropdown-submenu", function(e) {
+			var li = $(this);
+			
+			if(!li.hasClass("li-submenu")) {
+				e.stopImmediatePropagation();
+				if (li.hasClass("active")) {
+					li.parents(".menu-configuracion").find(".dropdown-menu").slideUp(350);
+					setTimeout(function() {
+						li.removeClass("active");
+					}, 400);
+				}
+				else {
+					//if
+					li.parents(".menu-configuracion").find(".dropdown-menu").slideUp(350);
+					setTimeout(function() {
+						li.parents(".menu-configuracion").find(".active").removeClass("active");
+						li.addClass("active").find(".dropdown-menu").slideDown();
+					}, 400);
+				}
+			}
+		});
+
+		// search
+		$(document).on("focus", "#inpSearch", function(e) {
+			$(this).closest(".search-input").addClass("focus");
+		}).on("blur", "#inpSearch", function(e) {
+			if( $(this).val() == "" ) 
+				$(this).closest(".search-input").removeClass("focus");
+		});
+
+		// popover buscador
+		$(".topBuscador").popover({
+			trigger: "manual",
+			placement: "bottom",
+			html: true,
+			content: function() {
+				return $('#popover-top-search').html();
+			},
+			template: '<div class="popover popover-topBuscador popover-xs"><div class="arrow arrow-dark"></div><div class="popover-content"></div></div>'
+		}).click(function(e){
+		    $(this).popover('toggle');
+		    $(".popover-topBuscador .form-control").focus();
+		    e.preventDefault();
+		});
+
+		$('body').click(function(e) {
+			var target = $(e.target);
+			if(!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+				$(".popover-topBuscador").hide();
+			}
+		});
+
+	});
+
+	$(".navbar-shortcut").click(function() {
+		if( $("#divAccDirecto").is(":visible") ) 
+			$("#divAccDirecto").hide();
+		else 
+			$("#divAccDirecto").show();
+	});
+
+	$("#closeDiv, .fast-call-popup").click(function() {
+		$("#divAccDirecto").hide();
+	});
+
+	$("body").click(function(e) {
+		if( $("#divAccDirecto").is(":visible") && !$(e.target).is(".navbar-shortcut") && !$(e.target).parents().is(".navbar-shortcut") && !$(e.target).is("#divAccDirecto") && !$(e.target).parents().is("#divAccDirecto")) {
+			$("#divAccDirecto").hide();
+		}
+	});
+
+    $(".alert-partner").on("closed.bs.alert", function(){
+    	$(document.body).removeClass("user-trial");
+    });
+</script>
+			
+			
+			
+				
+			
+
+
+
+			
+			<div id="mainMenu" class="main-menu   toggled">
+				<!-- SIDE BAR -->
+				
+
+
+
+
+
+
+<div id="backgroundSidebar"></div>
+
+<div id="sidebarWrapper" class="sidebar-wrapper">
+	<button type="button" class="btn-transparent sidebar-toggle "></button>
+	
+	<ul id="accordionSidebar" class="menu-list menu-tree">
+		
+
+
+
+
+
+
+<!-- INICIO -->
+<li class="menu-analisis menu-header ">
+	<a href="index.html"><i class="fa fa-bar-chart"></i> Análisis</a>
+</li>
+
+<!-- FACTURACION -->
+
+	
+	
+		
+		
+		
+	
+	<div class="panel">
+		<li class="menu-header menu-facturacion ">
+			<a href="#menuFacturacion" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				<i class="fa fa-file-text"></i>				
+				Facturación
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+		</li>
+		<ul id="menuFacturacion" class="panel-collapse collapse ">
+			<!-- ventas -->
+			
+			
+				
+				
+				
+					
+					
+				
+			
+
+			<div class="panel">
+				<li class="tree-lv0">
+					<a href="#menuVentas" data-toggle="collapse" data-parent="#menuFacturacion" aria-expanded="false">
+						Ventas
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+				</li>
+				<ul id="menuVentas" class="menu-submenu panel-collapse collapse">
+					
+						<li class="tree-lv1 ">
+							<a href="facturas.html">Facturas</a>
+							
+								<a title="Crear factura" class="btn btn-icon btn-add" href="crearfacturas.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					
+					<li class="tree-lv1 ">
+						<a href="alabaranesVentas.html">Albaranes</a>
+						
+							<a title="Crear albarán" class="btn btn-icon btn-add" href="crearalbaran.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="pedidosVentas.html">Pedidos</a>
+						
+							<a title="Crear pedido" class="btn btn-icon btn-add" href="crearpedidosVentas.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="presupuestos.html">Presupuestos</a>
+						
+							<a title="Crear presupuesto" class="btn btn-icon btn-add" href="crearpresupuestos.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					
+						<li class="tree-lv1 ">
+							<a href="facturasperiodicas.html">Facturas Periódicas</a>
+							
+								<a title="Crear factura periódica" class="btn btn-icon btn-add" href="crearfacturasperiodicas.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					
+				</ul>
+			</div>
+			<!-- compras -->
+			
+				 
+				
+					
+					
+				
+
+				<div class="panel">
+					<li class="tree-lv0">
+						<a class="collapsed" href="#menuCompras" data-toggle="collapse" data-parent="#menuFacturacion" aria-expanded="false">
+							Compras
+							<i class="fa fa-angle-down" aria-hidden="true"></i>
+						</a>
+					</li>
+					<ul id="menuCompras" class="menu-submenu panel-collapse collapse ">
+						<li class="tree-lv1 ">
+							<a href="gastos.html">Gastos</a>
+							
+								<a title="Crear gasto" class="btn btn-icon btn-add" href="creargastos.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+						<li class="tree-lv1 ">
+							<a href="alabaranesVentas.html">Albaranes</a>
+						</li>
+						<li class="tree-lv1 ">
+							<a href="pedidosCompras.html">Pedidos</a>
+							
+								<a title="Crear pedido" class="btn btn-icon btn-add" href="crearpedidosCompras.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+						<li class="tree-lv1 ">
+							<a href="gastosperiodicos.html">Gastos periódicos</a>
+							
+								<a title="Crear gasto periódico" class="btn btn-icon btn-add" href="creargastosperiodicos.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					</ul>
+				</div>
+			
+		</ul>
+	</div>
+
+
+
+<!-- tesoreria -->
+
+	
+	
+		
+		
+		
+	
+
+	<div class="panel">
+		<li class="menu-header menu-tesoreria ">
+			<a class="collapsed" href="#menuTesoreria" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				<i class="fa fa-money"></i>	Tesorería		
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuTesoreria" class="menu-submenu panel-collapse collapse ">
+			<li class="tree-lv1 ">
+				<a href="cobrosypagos.html">Cobros y pagos</a>
+			</li>
+			
+			<li class="tree-lv1 ">
+				<a href="cuentasdetesoreria.html">Cuentas de tesorería</a>
+			</li>
+			
+			<li class="tree-lv1 ">
+				<a href="remesas.html">Remesas</a>
+			</li>
+		</ul>
+	</div>
+
+
+
+<!-- PROYECTOS -->
+
+	
+		
+		
+		
+	
+	
+	<div class="panel">
+		<li class="menu-header menu-proyectos active">
+			<a href="#menuProyectos" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="true">				
+				<i class="fa fa-tasks"></i>
+				Proyectos
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuProyectos" class="panel-collapse collapse in">
+			<li class="tree-lv1 selected">
+				<a href="proyectos.html">Proyectos</a>
+				
+					<button type="button" title="Crear proyecto" class="btn btn-icon btn-add" onclick="location.href='crearproyectos.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="tareas.html">Tareas</a>
+				
+					<button title="Crear tarea" class="btn btn-icon btn-add" onclick="location.href='creartareas.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="tiempos.html">Tiempos</a>
+				
+					<button title="Registrar tiempo" class="btn btn-icon btn-add" onclick="location.href='registrartiempo.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			
+				<li class="tree-lv1 ">
+					<a id="informes" onclick="checkModifForm(event)" href="informes.html">Informes</a>
+				</li>
+			
+		</ul>
+	</div>
+
+
+
+<!-- COMERCIAL -->
+
+	
+	
+		
+		
+		
+	
+	<div class="panel">
+		<li class="menu-header menu-comercial ">
+			<a href="#menuComercial" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				Comercial
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuComercial" class="panel-collapse collapse ">
+			<li class="tree-lv1 ">
+				<a href="campanas.html">Campañas</a>
+				
+					<button title="Crear Campaña" class="btn btn-icon btn-add" onclick="location.href='crearcampanas.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="oportunidades.html">Oportunidades</a>
+				
+					<button title="Crear oportunidad" class="btn btn-icon btn-add" onclick="location.href='crearoportunidad.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="actividades.html">Actividades</a>
+				
+					<button title="Crear actividad comercial" class="btn btn-icon btn-add" onclick="location.href='crearactividades.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			
+			<li class="tree-lv1">
+				<a href="presupuestos.html">Presupuestos</a>
+				
+					<a title="Crear presupuesto" class="btn btn-icon btn-add" href="crearpresupuestos.html"><i class="fa fa-plus-circle"></i></a>
+				
+			</li>
+		</ul>
+	</div>
+
+
+	</ul>
+			
+	<ul class="menu-list favoritos-list">
+		<li class="separador"></li>
+		<li class="menu-header">Favoritos</li>
+
+		<!-- FASVORITOS GESTOR PROJCTS-->
+		
+
+		
+			<!-- LIST FAVORITOS -->
+			
+			<!-- LIST NO FAVORITOS -->
+			<ul id="menuNoFavorites" class="menu-submenu collapse">
+				<li class="separador"></li>
+				
+			</ul>
+			<li class="show-more" data-toggle="collapse" data-target="#menuNoFavorites" aria-expanded="false" style="display: none;">
+				<a href="#">
+					<span class="text-more">Ver más</span>
+					<span class="text-less">Ver menos</span>
+					<i class="fa fa-angle-down" aria-hidden="true"></i>
+				</a>
+			</li>
+		
+	</ul>
+
+	<ul class="menu-list favoritos-list">
+		<li class="separador"></li>
+	</ul>
+
+	<div class="menu-other">
+		<ul id="timetracking" class="menu-content">
+			<li class="trakingTask" style="display: none;">
+				<div class="media">
+					<div class="media-body">
+						<h4 id="trakingProject" class="media-heading"></h4>
+						<p id="trakingTask"></p>
+					</div>
+				</div>
+			</li>
+			<li class="trakingController">
+				<div class="media">
+					<div class="media-left">
+						<button id="timetracking-play" class="timetracking-play media-object btn-transparent" style="display: block;">
+							<img title="Clic para registrar tiempo" src="/saas/img/icons/icons/grey/play.svg">
+						</button>
+						<button id="timetracking-stop" class="media-object btn-transparent" style="display: none;">
+							<img title="Clic para guardar tiempo" src="/saas/img/icons/icons/red/stop.svg">
+						</button>
+					</div>
+					<div class="media-body">
+						<p id="timetracking-counter">00:00:00</p>
+					</div>
+					<div id="timetracking-discard" class="media-right" style="display: none;">
+						<button class="media-object btn-transparent">
+							<img title="Clic para guardar tiempo" src="/saas/img/icons/icons/white/delete.svg">
+						</button>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<script>
+	$(function() {
+		if( $("#menuNoFavorites").children().length < 2 ) 
+			$("#sidebarWrapper .favoritos-list .show-more").hide();
+	});
+
+	$(document).on("click", ".favoritos-list .btn-fav", function() {
+		var li = $(this).closest("li");
+		var newLi;
+		var id = $(this).data("id");
+		var esFav = $(this).closest("#menuNoFavorites").length;
+		
+		esFav = (esFav == 0) ? true : false;
+
+		if(esFav) {
+			li.clone().appendTo("#menuNoFavorites");
+			li.remove();
+			if( $("#menuNoFavorites:visible") ) 
+				$("#sidebarWrapper .favoritos-list .show-more").show();
+		}
+		else {
+			li.clone().insertBefore("#menuNoFavorites");
+			li.remove();
+			if( $("#menuNoFavorites").children().length < 2 ){
+				$("#menuNoFavorites").collapse("hide");
+				$("#sidebarWrapper .favoritos-list .show-more").hide();
+			}
+		}
+
+ 		$.ajax({
+			url: "/saas/users/set-favorite-menu",
+			data: {
+				favorite: !esFav,
+				idOptionMenu: id
+			}
+		});
+	});
+	
+	$(document).on("click", ".sidebar-toggle", function() {
+		var isActive = $(this).hasClass("active");
+		
+		$(this).toggleClass("active");
+		
+ 		$.ajax({
+			url: "/saas/pin-side-bar",
+			method: "POST",
+		});
+
+	});
+</script>
+
+				<div id="divCentral" class="page-content-wrapper">	
+				
+				
+					
+					
+					
+					
+
+					<div class="page list container-fluid">
+						
+						
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		<h2>Nuevo proyecto</h2>
+		<button type="button" class="btn-transparent popup-btn-close"><img src="/saas/img/icons/icons/grey/close.svg"></button>
+	</div>
+</div>
+
+<div class="popup-content popup-content-divided">
+	<ul class="nav nav-tabs nav-billage hidden-xs">
+		<li class="active">
+			<a href="#formProject" data-toggle="tab">Datos del proyecto</a>
+		</li>
+		<li>
+			<a href="#viewCustomFields" data-toggle="tab">Campos personalizados</a>
+		</li>
+	</ul>
+
+	<form id="form_workspace" name="form_workspace" action="/saas/projects/create-multiple.action" method="post" autocomplete="off"><input type="hidden" class="sure-val" value="true">
+		<div class="tab-content">
+			<div id="formProject" class="tab-pane fade in active">
+				
+
+
+
+
+
+
+
+<input type="hidden" name="id" value="" id="form_workspace_id">
+
+<div class="row row-bloques">
+	<div class="col-sm-6 bloque" style="min-height: 355px;">
+	<!-- NOMBRE -->
+		<div class="form-group">
+			<label id="label-entity.alias" for="input-inicial" class="form-label">Nombre del proyecto <span class="required">*</span></label>
+			<div class="add-clear-span "><input type="text" name="entity.alias" maxlength="64" value="" id="input-inicial" class="form-control" placeholder="Introduce el nombre del proyecto"><span class="add-clear-x fa fa-times" style="display: none; cursor: pointer; text-decoration: none; overflow: hidden; position: absolute; pointer-events: auto; right: 10px; top: 12px; z-index: 10;"></span></div>
+			
+		</div>
+
+	<!-- DESCRIPCIO -->
+		<div class="form-group">
+			<label for="text" class="form-label">Descripción</label>
+			<div class="inpTextarea">
+				<div class="expanding-wrapper" style="position: relative;"><textarea name="entity.descripcion" cols="" rows="1" id="text" class="form-control expanding" autocomplete="off" placeholder="Introduce la descripción del proyecto" style="margin: 0px; box-sizing: border-box; width: 100%; position: absolute; top: 0px; left: 0px; height: 100%; resize: none; overflow: auto;"></textarea><pre class="expanding-clone" style="min-height: 40px; margin: 0px; box-sizing: border-box; width: 100%; display: block; border: 0.666667px solid; visibility: hidden; overflow-x: hidden; white-space: pre-wrap; direction: ltr; font-family: Source Sans Pro, sans-serif; font-size: 15px; font-size-adjust: none; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 21.4333px; max-height: 250px; padding: 7px 12px; text-align: start; text-decoration: rgb(54, 62, 68); text-transform: none; word-break: normal; word-spacing: 0px; overflow-wrap: break-word;"><span></span><br></pre></div>
+				<label for="text" class="infoTextarea"><span id="chars">1000</span></label>
+			</div>
+		</div>
+
+	<!-- FACTURABLE -->
+		<div class="form-group combo-advanced">
+			<label class="form-label">Facturable</label>
+			<input type="hidden" name="entity.paymentMethode" value="0">
+			<input type="hidden" name="tipo" value="1">
+			<div class="btn-group">
+				
+					<button type="button" class="btn fake-select">
+						<span class="pago0-texto active">			
+							No facturable
+						</span>
+						<span class="pago1-texto ">
+							Tarifa usuario
+						</span>
+						<span class="pago2-texto ">
+							Tarifa fija
+							<span class="price"></span>
+						</span>
+						<span class="pago3-texto ">
+							Precio fijo
+							<span class="price"></span>
+						</span>										
+					</button>
+				
+
+				<ul class="dropdown-menu">
+					<!-- NO FACTURABLE -->
+					
+						<li class="pago0 active" data-pago="0">
+							<span class="combo-texto">
+								<strong>No facturable</strong>
+							</span>
+						</li>
+					
+					<!-- PRECIO-HORA USUARIO -->
+					
+						<li class="pago1 " data-pago="1">
+							<span class="combo-texto">
+								<strong>Tarifa usuario</strong>
+								<br>A la hora de facturar se cogerá el precio por hora que tenga asignado cada usuario dentro de este proyecto.
+							</span>
+						</li>
+					
+					<!--  PRECIO HORA FIJO -->
+					
+						<li class="pago2 " data-pago="2">
+							<span class="combo-texto">
+								<strong>Tarifa fija</strong>
+								<br>A la hora de facturar se cogerá el mismo precio por hora para todos los usuarios.
+
+								<div class="input-group add-clear-span">
+									
+										<input type="text" name="entity.precioHoraFijo" id="entity.precioHoraFijo" class="form-control" data-type="number" maxlength="9" value=""><span class="add-clear-x fa fa-times" style="display: none; cursor: pointer; text-decoration: none; overflow: hidden; position: absolute; pointer-events: auto; right: 10px; top: 12px; z-index: 10;"></span>
+										<span class="input-group-addon updateMoneda">
+											Euro (€)
+										</span>
+									 
+								</div>
+																
+							</span>
+						</li>
+							
+					<!--  PRECIO FIJO -->
+					
+						<li class="pago3 " data-pago="3">						
+							<span class="combo-texto">
+								<strong>Precio fijo</strong>
+								<br>Escoge esta opción si quieres definir un precio de venta fijo independientemente de las horas dedicadas.
+								<div class="input-group add-clear-span">
+									
+										<input type="text" name="entity.precioFijo" id="entity.precioFijo" class="form-control" data-type="number" maxlength="9" value=""><span class="add-clear-x fa fa-times" style="display: none; cursor: pointer; text-decoration: none; overflow: hidden; position: absolute; pointer-events: auto; right: 10px; top: 12px; z-index: 10;"></span>
+										<span class="input-group-addon updateMoneda">
+											Euro (€)
+										</span> 
+									
+								</div>
+																
+							</span>
+						</li>						
+					
+				</ul>					
+			</div>
+		</div>		
+
+	<!-- CUENTA -->
+		<div class="form-group">
+			
+			
+			<label class="form-label">Cliente vinculado por defecto</label>
+			<div class="input-group inputImg popover-wrap">						
+				<input type="text" name="cadena" id="cuentasAC" class="form-control inpCuenta popover-value-wrap" value="" placeholder="Introduce el cliente a facturar" maxlength="64" data-completer-context="accounts" data-completer-action="budget-account-name.action" data-completer-tipo="11" data-adder="true">																																														
+				
+				
+					<span class="input-group-addon addon-add addCuenta" data-toggle="popover" data-placement="right" data-param="" data-original-title="" title="">
+						<label for="cuentasAC"></label>
+					</span>
+				
+			</div>
+		</div>				
+		
+		
+	</div>
+
+	<div class="col-sm-6 bloque bg-light hidden-xs" style="min-height: 355px;">
+		<!-- ESTADO -->
+		
+		
+			<input type="hidden" name="entity.estado.id" value="85593">			
+		
+
+		<div class="row">
+			<!-- C�DIGO -->
+			<div class="col-sm-5">
+				<div class="form-group">
+					<label for="input-codigo" class="form-label">Crear un código</label>
+					
+					
+						<div class="add-clear-span "><input type="text" name="entity.codigo" maxlength="64" value="" id="input-codigo" class="form-control"><span class="add-clear-x fa fa-times" style="display: none; cursor: pointer; text-decoration: none; overflow: hidden; position: absolute; pointer-events: auto; right: 10px; top: 12px; z-index: 10;"></span></div>
+					
+				</div>			
+			</div>
+			<!-- SERIES -->
+			<div class="col-sm-4">
+				<div class="form-group">
+					<label class="form-label">Serie</label>
+					<select name="serieId" id="form_entity_serie_id" class="form-control">
+    <option value="-1"></option>
+
+
+</select>
+
+
+				</div>				
+			</div>
+			<!-- MONEDA -->
+			<div class="col-sm-3">
+				<div class="form-group">
+					<label id="label-entity.moneda.id" class="form-label">Moneda</label>
+					<select name="entity.moneda.id" id="form_entity_moneda_id" class="form-control myMoneda">
+    <option value="4">Bolívar (Bs)</option>
+    <option value="22">Corona Sueca (SKr)</option>
+    <option value="11">Dirham (D)</option>
+    <option value="10">Dirham (?.?)</option>
+    <option value="2">Dolar USA ($)</option>
+    <option value="1" selected="selected">Euro (€)</option>
+    <option value="20">Florín Hungaro (Ft)</option>
+    <option value="15">Franco CFA (FCFA)</option>
+    <option value="6">Libra esterlina (£)</option>
+    <option value="9">Peso Argentino ($)</option>
+    <option value="8">Peso Chileno ($)</option>
+    <option value="19">Peso Colombiano ($)</option>
+    <option value="16">Peso dominicano (RD$)</option>
+    <option value="3">Peso Mexicano ($)</option>
+    <option value="5">Peso Uruguayo ($U)</option>
+    <option value="21">Real brasileño (R$)</option>
+    <option value="7">Sol Peruano (S/.)</option>
+    <option value="18">Swiss Franc (CHF)</option>
+    <option value="17">Yen (¥)</option>
+    <option value="12">Z?oty (Z?)</option>
+    <option value="14">Zloty (Zl)</option>
+    <option value="13">Zloty (Z?)</option>
+
+
+</select>
+
+
+				</div>				
+			</div>
+			<!-- TIPOS DE PROYECTOS -->
+			<div class="col-xs-10">
+				<div class="form-group b-tagit">
+					<label for="tiposProyectos" class="form-label">Etiquetas</label>
+					<input type="hidden" name="tiposProyectos" value="" id="tiposProyectos">
+					<ul id="tagsTipoProyectos" class="tagit-custom tagit ui-widget ui-widget-content ui-corner-all"><li class="tagit-new"><input placeholder="Introduce etiquetas" type="text" class="ui-widget-content ui-autocomplete-input" autocomplete="off"><div class="divAutocomplete"><ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content tagit-autocomplete ulAutocomplete" id="ui-id-2" tabindex="0" style="display: none;"></ul></div></li></ul>
+				</div>
+			</div>
+			<!-- COLOR -->
+			<div class="col-xs-2">
+				<div class="form-group">
+					<label class="form-label">Color</label>
+					<div class="dropdown dropdown-color" data-inp="#colorId">
+						<button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+							
+							
+								<span title="Selecciona un color" class="color color-none"></span>
+							
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu dropdown-menu-right">
+							
+								<li title="#D83C12" class="color " data-val="1" style="background-color:#D83C12"></li>
+							
+								<li title="#F15A24" class="color " data-val="2" style="background-color:#F15A24"></li>
+							
+								<li title="#F7931E" class="color " data-val="3" style="background-color:#F7931E"></li>
+							
+								<li title="#ED1E79" class="color " data-val="4" style="background-color:#ED1E79"></li>
+							
+								<li title="#EB7C6B" class="color " data-val="5" style="background-color:#EB7C6B"></li>
+							
+								<li title="#D9E021" class="color " data-val="6" style="background-color:#D9E021"></li>
+							
+								<li title="#36E836" class="color " data-val="7" style="background-color:#36E836"></li>
+							
+								<li title="#39B54A" class="color " data-val="8" style="background-color:#39B54A"></li>
+							
+								<li title="#1963CE" class="color " data-val="9" style="background-color:#1963CE"></li>
+							
+								<li title="#662D91" class="color " data-val="10" style="background-color:#662D91"></li>
+							
+								<li title="" class="color  color-none active" data-val=""></li>
+						</ul>
+					</div>
+					<input type="hidden" name="colorId" id="colorId" class="entityColor" value="">
+				</div>
+			</div>
+		</div>
+		
+		
+		<div class="row">
+			<!-- FECHA INICIO PREVISTA -->
+			<div class="col-sm-4">
+				<div class="form-group">
+					<label for="fechaInicio" class="form-label">Fecha inicio</label>
+					<input type="text" name="entity.fechaInicio" value="23/12/20" id="fechaInicio" class="form-control inpFecha" readonly="">
+				</div>
+			</div>
+		
+	
+			<!-- FECHA FIN PREVISTA-->
+			<div class="col-sm-4">
+				<div class="form-group">
+					<label for="fechaFinPrevista" class="form-label">Fin estimado</label>
+					<input type="text" name="entity.fechaFinPrevista" id="fechaFinPrevista" class="form-control inpFecha" value="" readonly="">
+				</div>
+			</div>
+	
+
+			<!-- FECHA FIN -->
+			<div id="divFechaFin" class="row" style="display: none">
+				<div class="col-sm-4">
+					<div class="form-group">
+						<label for="fechaFin" class="form-label">Fin real</label>
+						<input type="text" name="entity.fechaFin" id="fechaFin" class="form-control inpFecha" value="" readonly="">
+					</div>
+				</div>
+			</div>
+		</div>
+
+	<!-- VINCULAR -->
+		<div id="displayVincular" class="form-group" style="display:none">
+			<label class="form-label">Vincular a</label>
+			<div class="btn-group btn-group-justified" data-toggle="buttons">			
+				<label id="labelVinculacion1" class="btn btn-radio active" onclick="gestionaVinculacionProyectos(1,false)">
+   					<input type="radio" name="vinculacion" id="vinculacion1" value="1" checked="">
+					Sin vincular
+				</label>
+				<label id="labelVinculacion2" class="btn btn-radio " onclick="gestionaVinculacionProyectos(2,false)">
+					<input type="radio" name="vinculacion" id="vinculacion2" value="2">
+					Presupuesto
+				</label>
+				<label id="labelVinculacion3" class="btn btn-radio " onclick="gestionaVinculacionProyectos(3,false)">
+					<input type="radio" name="vinculacion" id="vinculacion3" value="3">
+					Oportunidad
+				</label>
+			</div>
+		</div>
+	<!-- OFERTA -->
+		<div id="displayOferta" class="form-group" style="display:none">
+			
+			
+				<select name="entity.oferta.id" id="selectPresupuestos" class="form-control" style="display: none;"></select>
+			
+		</div>
+	<!-- OPORTUNIDAD -->
+		<div id="displayOportunidad" class="form-group" style="display:none">
+			
+			
+				<select name="entity.oportunidad.id" id="selectOportunidades" class="form-control" style="display: none;"></select>
+			
+		</div>
+	</div>					
+</div>
+
+
+	
+	<div id="miembrosProyecto">
+
+
+
+
+
+
+
+<h3 class="subtitle">Miembros</h3>
+<p class="bloque-ayuda">Selecciona los usuarios que participan en el proyecto. Para todos los que participen es obligatorio escoger un rol y una tarifa. La tarifa secundaria es opcional.<br>La tarifa sirve para saber a qué precio pagas y facturas las horas de los usuarios que participan en el proyecto. <br>El rol define qué podrá hacer cada usuario. El responsable podrá modificar y eliminar todo lo que se cree y el miembro solo podrá hacerlo con lo que haya creado él. </p>
+
+<table id="tableMiembrosProyecto" class="table table-lst">
+	<thead>
+		<tr>
+			<th class="col-sm-1 col-xs-1"><span class="hidden-xs">Participa</span></th>
+			<th class="col-sm-5 col-xs-1">Usuario</th>
+			<th class="col-sm-3 col-xs-5">Rol</th>
+			<th class="col-sm-3 col-xs-5">Tarifa</th>
+		</tr>
+	</thead>
+	<tbody>
+		
+			<input type="hidden" name="miembro1" value="1" id="miembro1">
+			<tr class="table-row active">
+				<td class="only-check">
+					<div class="checkbox">
+						<input type="checkbox" name="check_1" id="check_1" class="chk-row" checked="">
+						<label for="check_1"></label>
+					</div>
+				</td>
+				<td>
+		          	<span class="avatar avatar30 hidden-xs">
+		          		
+		          		
+		          			<span title="Poner nombre" class="avatar-no-image">PN</span>
+		          		
+					</span>
+					<abbr title="Poner nombre" class="visible-xs-inline">PN</abbr>
+					<span class="hidden-xs">Poner nombre</span>
+					<input type="hidden" name="miembroProyecto.id_1" value="46886" id="miembroProyecto.id_1">								
+				</td>
+				<td>
+					
+						<select name="rol.id_1" id="rol.id_1" class="form-control">
+    <option value="-1"></option>
+    <option value="4">Miembro</option>
+    <option value="1" selected="selected">Responsable del espacio de trabajo</option>
+
+
+</select>
+
+
+					
+					
+				</td>
+				<td>
+					<div class="input-group inputImg">
+						<select name="perfil.id_1" id="perfil.id_1" class="form-control selectPerfiles">
+    <option value="-1"></option>
+    <option value="3627">dfdsfds</option>
+
+
+</select>
+
+
+						<div class="input-group-addon addon-add addon-select addTarifa" data-project="" data-placement="bottom" data-toggle="popover" data-id="perfil.id_1" title="" data-original-title="Crear tarifa">
+							<label for="perfil.id_%{#status.index+1}"></label>
+						</div>
+					</div>
+				</td>
+			</tr>	
+		
+	</tbody>
+</table>
+
+
+
+<script>
+	initAddTarifa();
+
+	$(function() {
+		$(document).on("click", ".chk-row", function(){
+			var activo = $(this).is(':checked');
+			if (activo)
+				$(this).parents(".table-row").addClass("active");
+			else
+				$(this).parents(".table-row").removeClass("active");
+		});
+		
+		$(document).on("click", ".table-row", function(e){
+			// con el if se evita que se seleccione la fila al hacer click sobre los select
+			if (e.target.tagName.toLowerCase()=="td"){
+				if ($(this).hasClass("active")){
+					$(this).removeClass("active");
+					$(this).find(".chk-row").removeAttr("checked");
+				}
+				else{
+					$(this).addClass("active");
+					$(this).find(".chk-row").prop("checked", true);
+				}
+			}
+		});
+	});    
+</script></div>
+	
+	<script>
+	
+		$(function () {
+			// carga ajax listado de miembros
+			$.ajax({
+				url: pageContext+"/projects/get-miembros-proyecto-nuevo",
+				success: function(result) {
+					$("#miembrosProyecto").html(result);
+				}
+			});			
+		});
+	
+	</script>
+
+
+<script>
+	initAddCuenta();
+
+	var datepicker = new Pikaday({
+		field: document.getElementById("fechaInicio"),
+		firstDay: 1,
+		format: "DD/MM/YY",
+		i18n: getCalendarLabels(),
+		onSelect: function() {
+			$("#fechaInicio").val(this.getMoment().format("DD/MM/YY"));
+		}
+	});
+	
+	var datepicker = new Pikaday({
+		field: document.getElementById("fechaFinPrevista"),
+		firstDay: 1,
+		format: "DD/MM/YY",
+		i18n: getCalendarLabels(),
+		onSelect: function() {
+			$("#fechaFinPrevista").val(this.getMoment().format("DD/MM/YY"));
+		}
+	});
+	
+	var datepicker = new Pikaday({
+		field: document.getElementById("fechaFin"),
+		firstDay: 1,
+		format: "DD/MM/YY",
+		i18n: getCalendarLabels(),
+		onSelect: function() {
+			$("#fechaFin").val(this.getMoment().format("DD/MM/YY"));
+		}
+	});
+	
+	$(function() {
+		$(document).on("click", ".estados .estado-editable", function(e){
+			var click = $(this);
+			var inp, newVal = "";
+			if(click.data("show") !== undefined) {
+				inp = click.data("show");
+				newVal = moment().format("DD/MM/YY");
+			}
+			else inp = click.data("hide");
+
+			$(inp).find(".form-control").val(newVal);
+		});
+
+		$('.bloque').matchHeight({ property: 'min-height' });
+		
+		// limitador descripci?n
+		var elem = $(".popup #chars");
+		$(".popup #text").limiter(1000, elem);	
+		
+		// cambio de moneda
+		$("html").on("change", ".popup #form_entity_moneda_id", function(){
+			var moneda = $(".popup #form_entity_moneda_id option:selected").text();
+			$(".popup .updateMoneda").html(moneda);
+		});
+	});
+
+
+	<!-- SCRIPT ETIQUETAS DE CATEGORIA DE CUENTA -->
+	var $avaliableTags = [
+		
+		"",
+		
+	];
+	
+	//gruposCuentas
+	$(".popup #tagsTipoProyectos").tagit({
+	    fieldName: "tipos",
+	    availableTags: [],
+	    autocomplete: {delay: 0, minLength: 2},
+	    showAutocompleteOnFocus: false,
+	    removeConfirmation: false,
+	    caseSensitive: true,
+	    allowDuplicates: false,
+	    allowSpaces: true,
+	    readOnly: false,
+	    tagLimit: null,
+	    singleField: true,
+	    singleFieldDelimiter: ',',
+	    singleFieldNode: $('.popup #tiposProyectos'),
+	    tabIndex: null,
+	    placeholderText: billageUtilsLiteral('tipoProyecto.anadir-tipo')
+	});
+   
+    
+    
+    $('.fake-select').on('click', function (event) {
+        $(this).parent().toggleClass('open');
+    });
+
+    $(document).on("click", ".combo-advanced li:not('.disabled')", function(e){
+    	e.stopImmediatePropagation();
+
+    	var cObj = $(this).parents(".combo-advanced");
+    	var valor = $(this).attr("data-pago");
+   	
+		
+    	// mostramos el item seleccionado
+    	cObj.find(".fake-select span").removeClass("active");
+    	cObj.find(".pago" + valor + "-texto").addClass("active");
+    	
+    	// marcamos el li seleccionado
+    	cObj.find(".dropdown-menu li").removeClass("active");
+    	$(this).addClass("active");
+    	
+    	// colocamos valor en hiddens 
+    	if (valor > 0){
+    		// facturable con tipo
+    		cObj.find("[name='entity.paymentMethode']").val(valor);
+    		cObj.find("[name='tipo']").val(2);
+    	}
+    	else{
+    		// no facturable
+    		cObj.find("[name='entity.paymentMethode']").val(valor);
+    		cObj.find("[name='tipo']").val(1);
+    	}
+    	
+    	// comportamientos
+		if (valor > 1) $(this).find(".form-control").focus();
+		else {
+			cObj.find(".btn-group").removeClass('open');
+			cObj.find(".form-control").val("");
+			cObj.find(".price").html("");
+		}
+    });
+    
+    // detecta click fuera para cerrar desplegable
+    $('body').on('click', function (e) {
+        if (!$('.combo-advanced').is(e.target) 
+            && $('.combo-advanced').has(e.target).length === 0 
+            && $('.open').has(e.target).length === 0
+            && 'false'!='true'
+        	) {
+        	
+        	// cierra
+            $('.combo-advanced .btn-group').removeClass('open');
+            
+            // si tiene que rellenar precio...
+            var valor = $(".combo-advanced [name='entity.paymentMethode']").val();
+			var fieldHora = $(".combo-advanced [name='entity.precioHoraFijo']").val();
+			var fieldFijo = $(".combo-advanced [name='entity.precioFijo']").val();
+
+			
+			$(".combo-advanced").removeClass("noerror");
+			
+			if (valor == 2 && (fieldHora == undefined || fieldHora == "" || fieldHora <= 0)){
+				$(".combo-advanced").addClass("form-error");
+				$(".combo-advanced [name='entity.precioFijo']").addClass("noerror");
+			}
+			else if (valor == 3 && (fieldFijo == undefined || fieldFijo == "" || fieldFijo <= 0)){
+				$(".combo-advanced").addClass("form-error");
+				$(".combo-advanced [name='entity.precioHoraFijo']").addClass("noerror");
+			}
+			else{
+				$(".combo-advanced").removeClass("form-error");
+				
+				if(valor == 2){
+					$(".combo-advanced .pago2-texto .price").html(fieldHora + " &euro;");
+				}
+				else if(valor == 3){
+					$(".combo-advanced .pago3-texto .price").html(fieldFijo + " &euro;");
+				}				
+				else{
+					$(".combo-advanced .price").html("");
+				}
+			}
+        }
+    });
+    
+    
+    $("#form_entity_serie_id").on('change', function() {
+		$.ajax({
+			url: pageContext+"/projectSeries/get-numero",
+			data: {
+				idSerie: $("#form_entity_serie_id").val()
+			},
+		}).done(function(data) {
+			$("#input-codigo").val(data.code);
+			$("#serieCode").text(data.serieCode);
+		});
+	});
+    
+</script>
+			</div>
+			<div id="viewCustomFields" class="tab-pane fade">
+				
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+		<p>No se ha creado ningún campo personalizado</p>
+	
+
+
+
+
+
+<script>
+	for(i=1;i<='';i++) setLimiterTextarea(i);
+
+	function setLimiterTextarea(i){
+		var elem = $("#chars"+i);
+		$("#campoPersonalizadoTextarea_"+i).limiter(2000, elem);
+	}
+	
+	//prepare dropdowns
+	for(i=1;i<='';i++) setPropuestos(i);
+
+	function setPropuestos(i){
+		var elem = $("#campoPersonalizadoDropdown_propuestos_"+i).val();
+		
+		var options = [];
+
+		
+			$.each(elem.split(";"), function(){
+				options.push($.trim(this));
+			});
+		
+		
+		$.each(options, function(key, value) {   
+		     $('#campoPersonalizadoDropdown_'+i)
+		         .append($("<option></option>")
+		                    .attr("value",value)
+		                    .text(value)); 
+		});
+		var value = $("#valorDropdown_"+i).val();
+		$("#campoPersonalizadoDropdown_"+i).val(value);
+	}
+	
+	//prepare tags
+	for(i=1;i<='';i++) setTags(i);
+	
+	function setTags(i){
+		var elem = $("#campoPersonalizadoTags_propuestos_"+i).val();
+		
+		var options = [];
+
+		
+			$.each(elem.split(";"), function(){
+				options.push($.trim(this));
+			});
+		
+		
+		var value = $("#valorTags_"+i).val();
+		$("#campoPersonalizadoTags_"+i).val(value);
+	
+		$("#tagitCampoPersonalizadoTags_"+i).tagit({
+			fieldName: "gruposCuentas",
+			availableTags: options,
+			autocomplete: {delay: 0, minLength: 2},
+			showAutocompleteOnFocus: false,
+			removeConfirmation: false,
+			caseSensitive: true,
+			allowDuplicates: false,
+			allowSpaces: true,
+			readOnly: false,
+			tagLimit: null,
+			singleField: true,
+			singleFieldDelimiter: ",",
+			singleFieldNode: $("#campoPersonalizadoTags_"+i),
+			tabIndex: null,
+			placeholderText: billageUtilsLiteral("campo-personalizado-cuentas.anadir-tag"),
+		});
+	}
+
+
+	//carga labels calendarios
+	var i18n = getCalendarLabels('1');
+	
+	for(i=0;i<='';i++) setCalendar(i);
+	
+	function setCalendar(i){
+		var datepicker = new Pikaday({
+	       	field: document.getElementById('campoPersonalizadoFecha_'+i),
+	       	firstDay: 1,
+	       	format: "DD/MM/YY",
+	       	i18n: i18n,
+	       	onSelect: function() {
+	       		$('#campoPersonalizadoFecha_'+i).val(this.getMoment().format('DD/MM/YY'));
+	        }
+	   	});
+	}
+
+	//eliminar accounts
+	for(i = 0; i <= ''; i++) setLimiterAcounts(i);
+	function setLimiterAcounts(i) {
+		$(document).on("change", "#campoPersonalizadoEmpresa"+i, function() {
+			if( $(this).val() == "") $(this).closest(".form-group").find(".help-block").remove();
+		});
+	}
+</script>
+			</div>
+		</div>
+	</form>
+
+
+
+</div>
+
+<div class="popup-footer">		
+	<button type="button" id="submit" class="btn btn-submit" onclick="dmslib.Validation.validate(this,'form_workspace');return false;">Guardar datos</button>
+<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	
+
+
+<div id="divValidacionPopup" class="validacion">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Faltan campos requeridos.
+</div>
+
+<div id="divErrorPopup" class="validacion-error">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="span-texto-error-popup"></span>
+</div>
+</div>
+
+<script>
+	dmslib.DOM.dameElemento("input-inicial").focus();
+	
+	$('.nav-tabs a').on('shown.bs.tab', function(event){
+		initExpandings();
+	});
+</script>
+
+
+
+
+				</div>
+				
+				
+			</div>
+	
+			<!--  contenido popover de selección de color -->
+			<div class="select-color-content">
+				
+				<span class="color-sq color-none" data-color="transparent" title="Sin color"></span>
+			</div>
+		
+		</main>
+		
+		
+
+
+
+
+
+
+
+<!-- Div para confirmar eliminar elemento -->
+<div id="dEliminarElemento" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			Atención
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+	<div class="popup-content">
+		<h4 id="divMensajePopup"></h4>
+		<div id="divMensajeImplicaciones"></div>
+    </div>
+	<div class="popup-footer">		
+		<button type="button" id="inputEliminar" class="btn btn-submit" onclick="dmslib.Validation.validate(this, 'form')">Aceptar</button>	
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+<!-- Div para subir imagen productos  -->
+<div id="dpopup_imagen_producto" class="dpopupsubirimagen popup">
+    
+        
+        
+        
+        
+        
+    
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Sube una foto para el servicio o producto.
+		
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+<form id="upload_image_product" action="/saas/products/upload-image" method="post" enctype="multipart/form-data">
+    <input id="image_product" name="id" type="hidden" value="">
+	<div class="popup-content" style="overflow:hidden">
+		<div class="upload-container">
+		    <div class="upload-img">
+		        <i class="fa fa-picture-o" aria-hidden="true"></i>
+		    </div>
+		    <div class="upload-file">
+		        <p>Sube una foto para el servicio o producto.<br><br><b>Formato:</b> jpg, png o gif.<br>	<b>Tamaño máximo:</b> 2 MB.<br><br></p>
+		        <input type="file" name="upload" id="upload">
+		    </div>
+	    </div>
+	</div>
+
+	<div class="popup-footer">		
+		<button type="submit" id="inputUploadFile" class="btn btn-submit" onclick="dmslib.Widget.escondePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>    
+</form>
+</div>
+
+<!-- Div para subir gastos  -->
+<div id="dpopup_doc-preview" class="dpopupsubirgasto popup-div popup">
+    
+        
+		
+        
+        
+		
+    
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Subir documento de gasto
+		
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+<form id="upload_image_gasto" action="/saas/spending/upload-image" method="post" enctype="multipart/form-data">
+    <input id="image_gasto" name="id" type="hidden" value="">
+	<div class="popup-content" style="overflow:hidden">
+		<div class="upload-container">
+		    <div class="upload-img">
+		        <i class="fa fa-picture-o" aria-hidden="true"></i>
+		    </div>
+		    <div class="upload-file">
+		        <p>Selecciona documento de gastos para el gasto</p>
+		        <input type="file" name="upload" id="upload">
+		    </div>
+	    </div>
+	</div>
+
+	<div class="popup-footer">		
+		<button type="submit" id="inputUploadFile" class="btn btn-submit" onclick="dmslib.Widget.escondePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>    
+</form>
+</div>
+
+<!-- Div para popup error  -->
+<div id="div-error" class="popup">
+	<div class="popup-header">
+		<div class="popup-title">
+			<span id="div-cabecera-error"></span>
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<div id="div-mensaje-error" class="popup-content"></div>
+
+	<div class="popup-footer">		
+		<button type="button" class="btn btn-submit" onclick="dmslib.Widget.removePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+<!-- Div para mover un documento o carpeta (des de docs)   -->
+<div id="destinationPopup" class="popup no-remove">
+	
+
+
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Destino
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+
+<div class="popup-content">
+	<div id="treeContainer" class="folder-tree"></div>
+	<div id="carpeta-destination-tree" class="folder-tree"></div>
+
+	<div class="fake-footer">
+		<button type="button" id="carpeta-destination-btn" class="btn btn-submit">Mover</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+
+
+<div id="divValidacionPopup" class="validacion">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Faltan campos requeridos.
+</div>
+
+<div id="divErrorPopup" class="validacion-error">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="span-texto-error-popup"></span>
+</div>
+
+
+</div>
+
+<!-- Div para ir a una carpeta (des de docs)  -->
+<div id="gotoPopup" class="popup no-remove">
+	
+
+
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Ir a
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+
+<div class="popup-content">
+	<div id="carpeta-goto-tree" class="folder-tree"></div>
+	<div id="carpeta-destination-tree" class="folder-tree"></div>
+
+	<div class="fake-footer">
+		<button type="button" id="carpeta-goto-btn" class="btn btn-submit">Confirmar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+
+
+<div id="divValidacionPopup" class="validacion">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Faltan campos requeridos.
+</div>
+
+<div id="divErrorPopup" class="validacion-error">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="span-texto-error-popup"></span>
+</div>
+
+
+</div>
+
+<!-- Div para mostrar mensajes de confirmacion  -->
+<div id="divConfirmacionAccion" class="popup popup-mensaje popup-mensaje-confirmacion" style="display: none; opacity: 0; top: 0px;">
+	<span id="divConfirmacionAccionTexto" class="popup-mensaje-texto">Datos guardados correctamente.</span>
+</div>
+
+<!-- Div para mostrar mensajes de alerta  -->
+<div id="divAlertAccion" class="popup popup-mensaje popup-mensaje-alerta">
+    <span id="alertAccionTexto" class="popup-mensaje-texto">Datos guardados correctamente.</span>
+</div>
+
+<!-- Div para gestionar los conceptos a albaranear -->
+<div id="divConceptosAlbaranes" class="divConceptosAlbaranes popup"></div>
+
+<!-- wigets dashboard-->
+<div id="divAddWidgetPopup" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			Seleccionar widget
+			
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<div class="popup-content">
+		<div class="controls" id="tagsControls"></div>
+		<div id="selectorAddWidget" class="container ps-container ps-active-y"></div>
+	</div>
+	
+	<div class="popup-footer">		
+		<button type="button" class="btn btn-submit" onclick="addWidgetToDashboard()">Agregar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+<!-- filtros wigets dashboard -->
+<div id="divWidgetFiltersPopup" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			<div id="divWidgetFiltersTitle"></div>
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+    <div class="divWidgetFilters">
+        <form id="formWidgetFilters" class="widget_instance_filters_form">
+            <input id="inputWidgetInstanceId" type="hidden" name="widget_instance_id" value="">
+            <div id="divWidgetFiltersArea" class="popup-content"></div>
+			<div class="popup-footer">		
+				<button id="buttonWidgetFiltersOk" type="submit" class="btn btn-submit">Filtrar</button>
+				<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+				<!-- 
+				<button id="buttonWidgetFiltersReset" type="submit" class="btn btn-primary">Limpiar</button>
+				 -->
+			</div>
+        </form>
+    </div>
+</div>
+
+<!-- Popup subir logo a plantilla-->
+<div id="dpopup_imagen_empresa" class="dpopupsubirlogo popup-div popup">
+	<div class="popup-header">
+		<div class="popup-title">
+			Subir logo
+
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<form id="upload_image_empresa" action="/saas/companies/upload-logo" method="post" enctype="multipart/form-data">
+		<input type="hidden" id="image_empresa" name="id" value="">
+
+		<div class="popup-content">
+			<div class="upload-container">
+				<div class="upload-img">
+					<i class="fa fa-picture-o fa-4x" aria-hidden="true"></i>
+				</div>
+
+				<div class="upload-file">
+					
+					<div class="form-group fakeBtn">
+						<label for="upload" class="form-label">Selecciona tu logo</label>
+						<input type="file" name="upload" id="upload">
+						<div class="input-group add-clear-span">
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-primary">
+									<i class="fa fa-folder-open" aria-hidden="true"></i>
+								</button>
+							</span>
+							<input type="text" id="labelFile" class="form-control substring" placeholder="Seleccionar" readonly="">
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+
+		<div class="popup-footer">
+			<button type="submit" id="inputUploadFile" class="btn btn-submit">Aceptar</button>
+			<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+		</div>
+	</form>
+</div>
+
+		<script>
+			// n decimales de la empresa del usuario
+			numberDecimalsInBase10 = "100";
+			decimalesEmpresa = numberDecimalsInBase10.length -1; // num real
+			numberDecimalsInBase10 = numberDecimalsInBase10*1; // string a int
+			//funcion para mostrar mensaje de confirmacion
+			var result = "1";
+			//si result = 1, mostramos mensaje confirmación
+			if(result == 1 || false) {
+				dmslib.Widget.prepararAccionConfirmacion("Datos guardados correctamente.");
+			}
+
+			//setesamos valor variable mensajeConfirmacion
+			mensajeConfirmacion = "Datos guardados correctamente.";
+			ningunaLinia = "No se ha añadido ninguna línea";
+
+			if($(location).attr("href").indexOf("contract-plans") == -1 && ""=='true') {
+				document.location = pageContext+"/contract-plans?user=yosmarquebec@gmail.com&company=19546";
+			}
+
+			firstLogin = ("" == "true") ?  1 : 0;
+			activationGoal = ("" == "true") ?  1 : 0;
+
+			//miramos si hay que mostrar popup bienvenida
+			
+				if("" == "true") 
+					dmslib.Widget.verPopup("divRenovarPassword", null, pageContext+"/new-password");
+				else if("" == "true") 
+					dmslib.Widget.verPopup("divRenovarPassword", null, pageContext+"/force-new-password");
+				else if("0" == 0 && firstLogin == 1) 
+					dmslib.Widget.verPopup("divFirstLogin", null, pageContext+"/first-login");
+
+				if("" == "true") {
+					ga("send", "event", "Pro", "activation");
+					dmslib.Ajax.request(pageContext+"/activation-goal");
+				}
+			
+
+			//asociamos evento onclick a divFormulario para saber si se está editando un formulario
+			if(dmslib.DOM.dameElemento("form")) {
+				// IE o FF
+				if(document.all) 
+					dmslib.DOM.dameElemento("form").attachEvent("onclick", activaModifForm);
+				else 
+					dmslib.DOM.dameElemento("form").addEventListener("click", activaModifForm, false);
+			}
+		</script>
+
+		
+
+
+
+
+
+
+
+	<!-- google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		
+		ga('create', 'UA-7323120-25', 'billage.es');
+		
+			ga('set', 'dimension1', 'Pro');
+			ga('set', '&uid', '46886');
+		
+		ga('send', 'pageview');
+	</script>
+	
+	<!-- Google Tag Manager -->
+	<noscript>
+		<iframe src="//www.googletagmanager.com/ns.html?id=GTM-TTXBSX" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+	</noscript>
+	<script>
+		(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+		'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','GTM-TTXBSX');
+	</script>
+	
+
+
+		
+
+
+
+
+
+	
+		
+	
+			
+			<script>				
+		    window.intercomSettings = {
+		        
+		        name: "Poner nombre",
+		        
+		        email: "yosmarquebec@gmail.com",
+		        user_id: "46886",
+		        
+		        created_at: "1607574101000",
+		        signed_up_at: "1607574101000",
+		        rol: "Administrador",
+		        app_id: "sbkq18wo",
+		        company: {
+		            remote_created_at: "1607574101000",
+		            user_count: "1",
+		            plan: "Pro",
+		            activa: "true",
+		            company_id: "19546",
+		            name: "Poner razón social",
+		            periodicidad: ""
+		        }
+		    };
+			</script>
+			<script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/sbkq18wo';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>
+	
+		
+		
+	
+
+
+		<script>
+			$(function() {
+				cookieScreenSize("lg");
+	
+				$("#menuToggle, #backgroundSidebar").click(function(e) {
+					e.preventDefault();
+					$("#mainMenu").toggleClass("toggled");
+					$("#bNavPerfil").collapse("hide");
+				});
+			});
+		</script>
+		<script src="/saas/js/footer.js"></script>
+	
+<div class="daterangepicker dropdown-menu ltr show-calendar opensright"><div class="dt-filtrar"><label>Filtrar por:</label><ul class="dt-filtrar-lista radio"><li><input name="entityList.filter_date" id="dt_create" value="create" type="radio"> <label for="dt_create">Fecha creación</label></li><li><input name="entityList.filter_date" id="dt_start" value="start" type="radio"> <label for="dt_start">Fecha de inicio</label></li><li><input name="entityList.filter_date" id="dt_end" value="end" type="radio"> <label for="dt_end">Fecha fin</label></li></ul></div><div class="ranges"><ul><li data-range-key="Hoy">Hoy</li><li data-range-key="Esta semana">Esta semana</li><li data-range-key="Este mes">Este mes</li><li data-range-key="Este año">Este año</li><li data-range-key="Todos">Todos</li><li class="visible-xs-inline">Seleccionar fecha</li></ul><div class="range_inputs"><button class="applyBtn btn btn-primary" disabled="disabled" type="button">Filtrar</button> <button class="cancelBtn btn btn-default" type="button">Cancel</button></div></div><div class="calendar left"><div class="daterangepicker_input"><input class="form-control inpFecha input-sm" type="text" name="daterangepicker_start" value=""><div class="calendar-time" style="display: none;"><div></div><i class="fa fa-clock-o glyphicon glyphicon-time"></i></div></div><div class="calendar-table"></div></div><div class="calendar right"><div class="daterangepicker_input"><input class="form-control inpFecha input-sm" type="text" name="daterangepicker_end" value=""><div class="calendar-time" style="display: none;"><div></div><i class="fa fa-clock-o glyphicon glyphicon-time"></i></div></div><div class="calendar-table"></div></div></div>
+<script type="text/javascript" id="">!function(b,e,f,g,a,c,d){b.fbq||(a=b.fbq=function(){a.callMethod?a.callMethod.apply(a,arguments):a.queue.push(arguments)},b._fbq||(b._fbq=a),a.push=a,a.loaded=!0,a.version="2.0",a.queue=[],c=e.createElement(f),c.async=!0,c.src=g,d=e.getElementsByTagName(f)[0],d.parentNode.insertBefore(c,d))}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");fbq("init","679832448786593");fbq("track","PageView");</script>
+<noscript>
+ <img height="1" width="1" src="https://www.facebook.com/tr?id=679832448786593&amp;ev=PageView&#10;&amp;noscript=1">
+</noscript>
+<iframe id="intercom-frame" style="position: absolute !important; opacity: 0 !important; width: 1px !important; height: 1px !important; top: 0 !important; left: 0 !important; border: none !important; display: block !important; z-index: -1 !important; pointer-events: none;" aria-hidden="true" tabindex="-1" title="Intercom"></iframe><div id="intercom-container" class="intercom-namespace"><style>html.intercom-mobile-messenger-active,html.intercom-mobile-messenger-active > body,html.intercom-modal-open,#intercom-container-body{overflow:hidden !important;}html.intercom-mobile-messenger-active,html.intercom-mobile-messenger-active > body{position:static !important;}html.intercom-mobile-messenger-active > body{height:0 !important;margin:0 !important;}iframe#intercom-frame{position:absolute !important;opacity:0 !important;width:1px !important;height:1px !important;top:0 !important;left:0 !important;border:none !important;display:block !important;z-index:-1 !important;}</style><div class="intercom-app" aria-live="polite"><iframe allowfullscreen="" class="intercom-launcher-frame intercom-1q4irxg e1ur5zlj0" name="intercom-launcher-frame" title="Intercom live chat" data-intercom-frame="true"></iframe><iframe allowfullscreen="" class="intercom-launcher-badge-frame intercom-s06fua e1loc0kc0" name="intercom-launcher-badge-frame" title="Intercom live chat notificación" data-intercom-frame="true"></iframe><div id="intercom-modal-container"></div></div></div><div id="intercom-css-container"><style data-emotion="intercom-global"></style><style data-emotion="intercom"></style></div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/fullcalendar.min.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/locale-all.js"></script>
+</body>
+
+</html>

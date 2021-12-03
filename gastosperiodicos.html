@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billage 20.0</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/empty.css">
+    <link rel="stylesheet" href="assets/css/evol-colorpicker.min.css">
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/fullcalendar.min.css">
+    <link rel="stylesheet" href="assets/css/fullcalendar.print.css">
+    <link rel="stylesheet" href="assets/css/jquery.tagit.css">
+    <link rel="stylesheet" href="assets/css/main.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/tagit.ui-zendesk.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.colors.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.min.css">
+    <link rel="stylesheet" href="assets/css/trumbowyg.table.css">
+</head>
+
+<body><main>
+			
+
+<!-- Div para alertas jquery -->
+<div id="billage-utils-alert" class="popup divAlertPopup"></div>
+
+<script>
+	// Usuario
+	var idUsr = "46886";
+	var imgUsr = "";
+	var nameUsr = "Poner nombre";
+	var rolUsr = "1";
+	sessionStorage.setItem('session-user-id', idUsr);
+
+	// Usuario
+	var idEmpresa = "19546";
+
+	var pageContext = '/saas';
+
+	var context = '/saas';
+	queryInit(context);
+	billageUtilsInit(context);
+
+	//29-06-2018
+	//billageUtilsAvoidPasteDefault();
+	billageCombos();
+
+	billageSnippetInit();
+
+	var _alertPopup = function (h, w, data, funcOk) {
+		var t = $('#billage-utils-alert');
+		var l = $('<div/>').height(h).width(w).append(data);
+		t.empty().append(l);
+
+		console.log(data+':'+ t.attr('id'));
+		dmslib.Widget.verPopup(t.attr('id'), null, context +'/session-expired');
+	};
+
+	var _alertSessionExpiredPopup = function (data) {
+		window.location = context;
+	};
+
+	var _alertAjaxErrorPopup = function (e,jqXHR,ajaxSettings,thrownError) {
+		_alertPopup(200, 300, $('<span/>').append(data), function () {
+			window.location = context;
+		});
+	};
+
+	var interval = 31 * 60;	//1 minuto mas q el timeout de session
+	//interval = 1;			//para hacer pruebas desmarcar
+
+	var timer = billageUtilsCheckSessionExpired(function () {
+		try {
+			_alertSessionExpiredPopup();
+		} catch (e) { }
+		clearInterval(timer);
+	},
+	interval);
+
+	(function ($) {
+		$.fn.extend({
+			limiter: function (limit, elem) {
+				$(this).on("change keyup focus", function () {
+					setCount(this, elem);
+				});
+				function setCount(src, elem) {
+					var chars = src.value.length;
+
+					if (chars > limit) {
+						src.value = src.value.substr(0, limit);
+						chars = limit;
+					}
+					elem.html(limit - chars);
+				}
+
+				setCount($(this)[0], elem);
+			}
+		});
+	})(jQuery);
+</script>
+	
+			<!-- CAPA GRIS -->
+			<div id="dgris"></div>
+	
+			<!-- MENU TOP -->
+			
+
+
+
+
+
+
+
+<nav id="navbarTop" class="navbar navbar-fixed-top navbar-billage">
+	<!-- USER TRIAL -->
+	
+
+	<!-- Brand and toggle get grouped for better mobile display -->
+	<div class="navbar-header">
+		<a href="#" class="avatar navbar-btn collapsed" data-toggle="collapse" data-target="#bNavPerfil" aria-expanded="false">
+			
+			
+				<span title="Poner nombre" class="avatar-no-image">PN</span>
+			
+			<i class="fa fa-angle-down" aria-hidden="true"></i>
+		</a>
+		
+		<a class="navbar-recompensas-link ml5" href="/saas/partner/partner-panel">
+			Saldo <strong> €</strong><span class="hidden-xs">&nbsp;| 80€ por amigo</span>
+		</a>
+		
+		<button type="button" class="navbar-btn btn-transparent topBuscador" data-container="body" data-toggle="popover" data-original-title="" title=""><i class="fa fa-search"></i></button>
+
+		<a class="navbar-btn navbar-shortcut" href="index.html#onboarding"><i class="fa fa-plus"></i></a>
+
+		<a class="navbar-brand" href="index.html">
+			<img src="/saas/img/logo/billage.svg">
+		</a>
+		
+			<a id="menuToggle" class="navbar-brand toggle-btn" href="#menu-toggle"></a>
+		
+		
+		
+	</div>
+
+	<div id="bNavbar" class="collapse navbar-collapse">
+
+		<ul class="nav navbar-nav navbar-center">
+			<li>
+				<a id="accDirecto" class="navbar-shortcut">
+					<img title="Accesos directos" class="i-icon" src="/saas/img/icons/icons/white/plus.svg">
+				</a>
+			</li>
+		</ul>
+
+		<ul class="nav navbar-nav navbar-right">
+			
+ 				<li>
+					<button type="button" class="btn btn-search topBuscador" data-container="body" data-toggle="popover" data-original-title="" title="">
+						<img src="/saas/img/icons/icons/white/search.svg">
+					</button>
+				</li>
+				
+				<li class="navbar-recompensas">
+					<a class="navbar-recompensas-link" href="/saas/partner/partner-panel">
+						Saldo <strong>€</strong><span class="hidden-xs hidden-sm hidden-md">&nbsp;| 80€ por amigo</span>
+					</a>
+				</li>					
+
+				<li class="separador hidden-sm"></li>
+			 	<li>
+					<a id="mailMenu" title="Mensajes" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+						<img title="Mensajes" src="/saas/img/icons/icons/white/mail.svg">
+						<sup class="badge"></sup>
+					</a>
+				</li>
+				<li class="separador hidden-sm"></li>
+				
+					<li class="hidden-sm">
+						<a target="_blank" href="https://help.getbillage.com">
+							<img title="Ayuda" src="/saas/img/icons/menu/ayuda.svg">
+						</a>
+					</li>
+					
+
+			
+
+			<li class="dropdown">
+				<a href="#" class="avatar dropdown-toggle toggle-ajustes" data-toggle="dropdown">
+					
+					
+						<span title="Poner nombre" class="avatar-no-image">PN</span>
+					
+					<i class="fa fa-angle-down" aria-hidden="true"></i>
+				</a>
+				<ul class="dropdown-menu dropdown-menu-right dropdown-arrow">
+					
+
+
+
+
+
+
+
+
+
+	<li class="nav-perfil ">
+		<a href="/saas/my-profile">
+			Mi Perfil
+		</a>	
+	</li>
+	
+	
+		<li class="nav-empresa ">
+			<a onclick="dmslib.Widget.verPopup('divEditEmpresa',null,'/saas/companies/view-edit?id=19546')">
+				Datos de mi negocio
+				
+				
+			</a>
+		</li>
+		
+		
+		
+		<li class="nav-contratacion hidden-xs ">
+			<a href="/saas/companies/view-company-contract?id=19546">Mi suscripción</a>
+		</li>			
+	
+	
+	
+
+	
+	
+	
+	<li class="divider"></li>	
+	
+	
+	
+	
+		
+			<li class="nav-usuarios hidden-xs ">
+				<a href="/saas/users/list">Usuarios</a>
+			</li>
+		
+	
+	
+	<li class="nav-ajustes" onclick="dmslib.Widget.verPopup(&quot;divMenuAjustes&quot;, null, pageContext + &quot;/menu-settings&quot;);">
+		<a>Ajustes e importaciones</a>
+	</li>
+	
+ 	<li class="nav-mail visible-xs-block">
+		<a id="mailMenuResponsive" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+			Mensajes
+		</a>
+	</li>	
+	
+			
+		<li class="nav-integraciones">
+			<a href="/saas/integrations">Integraciones</a>
+		</li>
+		
+		<li class="nav-store">
+			<a href="/saas/store/billage-store">Billage store</a>
+		</li>
+	
+	
+	
+		<li class="nav-invita ">
+			<a href="/saas/partner/partner-panel">
+				Saldo <strong>€</strong>
+			</a>
+		</li>
+	
+
+	<li class="divider"></li>						
+
+
+<li class="nav-logout">
+	<a id="perfil" class="aMainMenu" href="/saas/logout">Cerrar sesión</a>
+</li>		
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<div id="bNavPerfil" class="collapse navbar-collapse" aria-expanded="false">
+		<ul class="nav navbar-nav">
+			
+				<li class="nav-help">
+					<a target="_blank" href="https://help.getbillage.com">Ayuda</a>
+				</li>
+			
+			
+
+
+
+
+
+
+
+
+
+	<li class="nav-perfil ">
+		<a href="/saas/my-profile">
+			Mi Perfil
+		</a>	
+	</li>
+	
+	
+		<li class="nav-empresa ">
+			<a onclick="dmslib.Widget.verPopup('divEditEmpresa',null,'/saas/companies/view-edit?id=19546')">
+				Datos de mi negocio
+				
+				
+			</a>
+		</li>
+		
+		
+		
+		<li class="nav-contratacion hidden-xs ">
+			<a href="/saas/companies/view-company-contract?id=19546">Mi suscripción</a>
+		</li>			
+	
+	
+	
+
+	
+	
+	
+	<li class="divider"></li>	
+	
+	
+	
+	
+		
+			<li class="nav-usuarios hidden-xs ">
+				<a href="/saas/users/list">Usuarios</a>
+			</li>
+		
+	
+	
+	<li class="nav-ajustes" onclick="dmslib.Widget.verPopup(&quot;divMenuAjustes&quot;, null, pageContext + &quot;/menu-settings&quot;);">
+		<a>Ajustes e importaciones</a>
+	</li>
+	
+ 	<li class="nav-mail visible-xs-block">
+		<a id="mailMenuResponsive" href="/saas/emails/warn-server?serverStatus=imap_server_not_found">
+			Mensajes
+		</a>
+	</li>	
+	
+			
+		<li class="nav-integraciones">
+			<a href="/saas/integrations">Integraciones</a>
+		</li>
+		
+		<li class="nav-store">
+			<a href="/saas/store/billage-store">Billage store</a>
+		</li>
+	
+	
+	
+		<li class="nav-invita ">
+			<a href="/saas/partner/partner-panel">
+				Saldo <strong>€</strong>
+			</a>
+		</li>
+	
+
+	<li class="divider"></li>						
+
+
+<li class="nav-logout">
+	<a id="perfil" class="aMainMenu" href="/saas/logout">Cerrar sesión</a>
+</li>
+		</ul>
+	</div>
+</nav>
+
+<div id="divAccDirecto" class="fast-call" hidden="">
+	<div class="container">
+		<header>
+			<h1>Crear una nueva oportunidad, proyecto, factura y más</h1>
+			<button type="button" id="closeDiv" class="btn-icon btn-close"></button>
+		</header>
+
+		<section>
+			<div class="media media-comercial">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/vender.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Comercial</h4>
+			       		
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearoportunidad.html'">Oportunidad</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearcampanas.html';">Campaña</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearactividades.html'">Actividad comercial</p>
+
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpresupuestos.html">Presupuesto</a>
+	</p>
+
+					
+				</div>
+			</div>
+
+			<div class="media media-project">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/organizar.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Proyectos</h4>
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='crearproyectos.html'">Proyecto</p>
+
+
+					
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="location.href='creartareas.html'">Tarea de proyecto</p>
+
+
+					
+					
+					<p class="fast-call-caller a fast-call-popup timetracking-play">
+						Registro de tiempos
+					</p>
+				</div>
+			</div>
+
+			<div class="media media-biling">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/cobrar.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">Facturación</h4>
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearfacturas.html">Factura de venta</a>
+	</p>
+
+					
+
+						
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearalbaran.html">Albarán de venta</a>
+	</p>
+
+					
+
+						
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpedidosVentas.html">Pedido de venta</a>
+	</p>
+
+					
+
+					
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="creargastos.html">Gasto</a>
+	</p>
+
+					
+
+					    
+						
+							
+							
+							
+						
+
+
+
+
+
+
+
+
+	<p class="fast-call-caller">
+		<a href="crearpedidosCompras.html">Pedido de compra</a>
+	</p>
+
+					
+				</div>
+			</div>
+
+			<div class="media">
+				<div class="media-left media-top">
+					<div class="media-object">
+						<img src="/saas/img/icons/menu/general.svg">
+					</div>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">General</h4>
+				
+				
+					
+					
+					
+				
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNewAccount',null,'/saas/accounts/ver-alta')">Empresa</p>
+
+
+			
+	       		
+				
+					
+					
+					
+				
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNuevoContacto',null,'/saas/contacts/ver-alta')">Contacto</p>
+
+
+			
+			
+		        
+		            
+		            
+		        	
+		        
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNewDoc',null,'/saas/documents/edit-popup')">Documentos</p>
+
+
+			
+			
+		        
+		            
+		            
+		            
+		        
+
+
+
+
+
+
+
+	<p class="fast-call-caller a fast-call-popup" onclick="dmslib.Widget.verPopup('divNuevoProducto',null,'/saas/products/ver-alta')">Producto</p>
+
+
+			
+				</div>
+			</div>
+		</section>
+	</div>
+</div>
+
+
+<div id="popover-top-search" class="hide">
+	<form action="/saas/search">
+		<div class="input-group search-input ">
+			<input type="text" name="cadena" class="form-control input-sm disable-clear" placeholder="Buscar" value="" pattern=".{4,}" autocomplete="off" oninvalid="setCustomValidity('Debes introducir al menos 4 carácteres para realizar la búsqueda')" oninput="setCustomValidity('')" required="">
+			<span class="input-group-addon">
+				<button type="submit" id="serachBtn" class="btn btn-search">
+					<img src="/saas/img/icons/icons/white/search.svg">
+				</button>
+			</span>
+		</div>
+	</form>
+ </div>
+
+<script>
+	$(function() {
+		
+		
+		$(document).on("click", ".toggle-ajustes", function(e) {
+			var obj = $("#sidebarAjustes");
+			
+			if (obj.is(":visible")) {
+				$(".nav-ajustes").hide();
+			}
+			else{
+				$(".nav-ajustes").show();
+			}
+		});		
+		
+		$(document).on("click", ".menu-configuracion .dropdown-submenu", function(e) {
+			var li = $(this);
+			
+			if(!li.hasClass("li-submenu")) {
+				e.stopImmediatePropagation();
+				if (li.hasClass("active")) {
+					li.parents(".menu-configuracion").find(".dropdown-menu").slideUp(350);
+					setTimeout(function() {
+						li.removeClass("active");
+					}, 400);
+				}
+				else {
+					//if
+					li.parents(".menu-configuracion").find(".dropdown-menu").slideUp(350);
+					setTimeout(function() {
+						li.parents(".menu-configuracion").find(".active").removeClass("active");
+						li.addClass("active").find(".dropdown-menu").slideDown();
+					}, 400);
+				}
+			}
+		});
+
+		// search
+		$(document).on("focus", "#inpSearch", function(e) {
+			$(this).closest(".search-input").addClass("focus");
+		}).on("blur", "#inpSearch", function(e) {
+			if( $(this).val() == "" ) 
+				$(this).closest(".search-input").removeClass("focus");
+		});
+
+		// popover buscador
+		$(".topBuscador").popover({
+			trigger: "manual",
+			placement: "bottom",
+			html: true,
+			content: function() {
+				return $('#popover-top-search').html();
+			},
+			template: '<div class="popover popover-topBuscador popover-xs"><div class="arrow arrow-dark"></div><div class="popover-content"></div></div>'
+		}).click(function(e){
+		    $(this).popover('toggle');
+		    $(".popover-topBuscador .form-control").focus();
+		    e.preventDefault();
+		});
+
+		$('body').click(function(e) {
+			var target = $(e.target);
+			if(!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+				$(".popover-topBuscador").hide();
+			}
+		});
+
+	});
+
+	$(".navbar-shortcut").click(function() {
+		if( $("#divAccDirecto").is(":visible") ) 
+			$("#divAccDirecto").hide();
+		else 
+			$("#divAccDirecto").show();
+	});
+
+	$("#closeDiv, .fast-call-popup").click(function() {
+		$("#divAccDirecto").hide();
+	});
+
+	$("body").click(function(e) {
+		if( $("#divAccDirecto").is(":visible") && !$(e.target).is(".navbar-shortcut") && !$(e.target).parents().is(".navbar-shortcut") && !$(e.target).is("#divAccDirecto") && !$(e.target).parents().is("#divAccDirecto")) {
+			$("#divAccDirecto").hide();
+		}
+	});
+
+    $(".alert-partner").on("closed.bs.alert", function(){
+    	$(document.body).removeClass("user-trial");
+    });
+</script>
+			
+			
+			
+				
+			
+
+
+
+			
+			<div id="mainMenu" class="main-menu   toggled">
+				<!-- SIDE BAR -->
+				
+
+
+
+
+
+
+<div id="backgroundSidebar"></div>
+
+<div id="sidebarWrapper" class="sidebar-wrapper">
+	<button type="button" class="btn-transparent sidebar-toggle "></button>
+	
+	<ul id="accordionSidebar" class="menu-list menu-tree">
+		
+
+
+
+
+
+
+<!-- INICIO -->
+<li class="menu-analisis menu-header ">
+	<a href="index.html"><i class="fa fa-bar-chart"></i> Análisis</a>
+</li>
+
+<!-- FACTURACION -->
+
+	
+		
+		
+		
+	
+	
+	<div class="panel">
+		<li class="menu-header menu-facturacion active">
+			<a href="#menuFacturacion" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				<i class="fa fa-file-text"></i>				
+				Facturación
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+		</li>
+		<ul id="menuFacturacion" class="panel-collapse collapse in">
+			<!-- ventas -->
+			
+			
+				
+				
+					
+					
+				
+				
+			
+
+			<div class="panel">
+				<li class="tree-lv0">
+					<a href="#menuVentas" data-toggle="collapse" data-parent="#menuFacturacion" aria-expanded="false">
+						Ventas
+						<i class="fa fa-angle-down" aria-hidden="true"></i>
+					</a>
+				</li>
+				<ul id="menuVentas" class="menu-submenu panel-collapse collapse ">
+					
+						<li class="tree-lv1 ">
+							<a href="facturas.html">Facturas</a>
+							
+								<a title="Crear factura" class="btn btn-icon btn-add" href="crearfacturas.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					
+					<li class="tree-lv1 ">
+						<a href="alabaranesVentas.html">Albaranes</a>
+						
+							<a title="Crear albarán" class="btn btn-icon btn-add" href="crearalbaran.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="pedidosVentas.html">Pedidos</a>
+						
+							<a title="Crear pedido" class="btn btn-icon btn-add" href="crearpedidosVentas.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					<li class="tree-lv1 ">
+						<a href="presupuestos.html">Presupuestos</a>
+						
+							<a title="Crear presupuesto" class="btn btn-icon btn-add" href="crearpresupuestos.html"><i class="fa fa-plus-circle"></i></a>
+						
+					</li>
+					
+						<li class="tree-lv1 ">
+							<a href="facturasperiodicas.html">Facturas Periódicas</a>
+							
+								<a title="Crear factura periódica" class="btn btn-icon btn-add" href="crearfacturasperiodicas.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					
+				</ul>
+			</div>
+			<!-- compras -->
+			
+				 
+					
+					
+				
+				
+
+				<div class="panel">
+					<li class="tree-lv0">
+						<a class="collapsed" href="#menuCompras" data-toggle="collapse" data-parent="#menuFacturacion" aria-expanded="true">
+							Compras
+							<i class="fa fa-angle-down" aria-hidden="true"></i>
+						</a>
+					</li>
+					<ul id="menuCompras" class="menu-submenu panel-collapse collapse in">
+						<li class="tree-lv1 ">
+							<a href="gastos.html">Gastos</a>
+							
+								<a title="Crear gasto" class="btn btn-icon btn-add" href="creargastos.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+						<li class="tree-lv1 ">
+							<a href="alabaranesVentas.html">Albaranes</a>
+						</li>
+						<li class="tree-lv1 ">
+							<a href="pedidosCompras.html">Pedidos</a>
+							
+								<a title="Crear pedido" class="btn btn-icon btn-add" href="crearpedidosCompras.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+						<li class="tree-lv1 selected">
+							<a href="gastosperiodicos.html">Gastos periódicos</a>
+							
+								<a title="Crear gasto periódico" class="btn btn-icon btn-add" href="creargastosperiodicos.html"><i class="fa fa-plus-circle"></i></a>
+							
+						</li>
+					</ul>
+				</div>
+			
+		</ul>
+	</div>
+
+
+
+<!-- tesoreria -->
+
+	
+	
+		
+		
+		
+	
+
+	<div class="panel">
+		<li class="menu-header menu-tesoreria ">
+			<a class="collapsed" href="#menuTesoreria" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				<i class="fa fa-money"></i>	Tesorería		
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuTesoreria" class="menu-submenu panel-collapse collapse ">
+			<li class="tree-lv1 ">
+				<a href="cobrosypagos.html">Cobros y pagos</a>
+			</li>
+			
+			<li class="tree-lv1 ">
+				<a href="cuentasdetesoreria.html">Cuentas de tesorería</a>
+			</li>
+			
+			<li class="tree-lv1 ">
+				<a href="remesas.html">Remesas</a>
+			</li>
+		</ul>
+	</div>
+
+
+
+<!-- PROYECTOS -->
+
+	
+	
+		
+		
+		
+	
+	<div class="panel">
+		<li class="menu-header menu-proyectos ">
+			<a href="#menuProyectos" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">				
+				<i class="fa fa-tasks"></i>
+				Proyectos
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuProyectos" class="panel-collapse collapse ">
+			<li class="tree-lv1 ">
+				<a href="proyectos.html">Proyectos</a>
+				
+					<button type="button" title="Crear proyecto" class="btn btn-icon btn-add" onclick="location.href='crearproyectos.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="tareas.html">Tareas</a>
+				
+					<button title="Crear tarea" class="btn btn-icon btn-add" onclick="location.href='creartareas.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="tiempos.html">Tiempos</a>
+				
+					<button title="Registrar tiempo" class="btn btn-icon btn-add" onclick="location.href='registrartiempo.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			
+				<li class="tree-lv1 ">
+					<a id="informes" onclick="checkModifForm(event)" href="informes.html">Informes</a>
+				</li>
+			
+		</ul>
+	</div>
+
+
+
+<!-- COMERCIAL -->
+
+	
+	
+		
+		
+		
+	
+	<div class="panel">
+		<li class="menu-header menu-comercial ">
+			<a href="#menuComercial" data-toggle="collapse" data-parent="#accordionSidebar" aria-expanded="false">
+				Comercial
+				<i class="fa fa-angle-down" aria-hidden="true"></i>
+			</a>
+		</li>
+		<ul id="menuComercial" class="panel-collapse collapse ">
+			<li class="tree-lv1 ">
+				<a href="campanas.html">Campañas</a>
+				
+					<button title="Crear Campaña" class="btn btn-icon btn-add" onclick="location.href='crearcampanas.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="oportunidades.html">Oportunidades</a>
+				
+					<button title="Crear oportunidad" class="btn btn-icon btn-add" onclick="location.href='crearoportunidad.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			<li class="tree-lv1 ">
+				<a href="actividades.html">Actividades</a>
+				
+					<button title="Crear actividad comercial" class="btn btn-icon btn-add" onclick="location.href='crearactividades.html'"><i class="fa fa-plus-circle"></i></button>
+				
+			</li>
+			
+			<li class="tree-lv1">
+				<a href="presupuestos.html">Presupuestos</a>
+				
+					<a title="Crear presupuesto" class="btn btn-icon btn-add" href="crearpresupuestos.html"><i class="fa fa-plus-circle"></i></a>
+				
+			</li>
+		</ul>
+	</div>
+
+
+	</ul>
+			
+	<ul class="menu-list favoritos-list">
+		<li class="separador"></li>
+		<li class="menu-header">Favoritos</li>
+
+		<!-- FASVORITOS GESTOR PROJCTS-->
+		
+
+		
+			<!-- LIST FAVORITOS -->
+			
+			<!-- LIST NO FAVORITOS -->
+			<ul id="menuNoFavorites" class="menu-submenu collapse">
+				<li class="separador"></li>
+				
+			</ul>
+			<li class="show-more" data-toggle="collapse" data-target="#menuNoFavorites" aria-expanded="false" style="display: none;">
+				<a href="#">
+					<span class="text-more">Ver más</span>
+					<span class="text-less">Ver menos</span>
+					<i class="fa fa-angle-down" aria-hidden="true"></i>
+				</a>
+			</li>
+		
+	</ul>
+
+	<ul class="menu-list favoritos-list">
+		<li class="separador"></li>
+	</ul>
+
+	<div class="menu-other">
+		<ul id="timetracking" class="menu-content">
+			<li class="trakingTask" style="display: none;">
+				<div class="media">
+					<div class="media-body">
+						<h4 id="trakingProject" class="media-heading"></h4>
+						<p id="trakingTask"></p>
+					</div>
+				</div>
+			</li>
+			<li class="trakingController">
+				<div class="media">
+					<div class="media-left">
+						<button id="timetracking-play" class="timetracking-play media-object btn-transparent" style="display: block;">
+							<img title="Clic para registrar tiempo" src="/saas/img/icons/icons/grey/play.svg">
+						</button>
+						<button id="timetracking-stop" class="media-object btn-transparent" style="display: none;">
+							<img title="Clic para guardar tiempo" src="/saas/img/icons/icons/red/stop.svg">
+						</button>
+					</div>
+					<div class="media-body">
+						<p id="timetracking-counter">00:00:00</p>
+					</div>
+					<div id="timetracking-discard" class="media-right" style="display: none;">
+						<button class="media-object btn-transparent">
+							<img title="Clic para guardar tiempo" src="/saas/img/icons/icons/white/delete.svg">
+						</button>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<script>
+	$(function() {
+		if( $("#menuNoFavorites").children().length < 2 ) 
+			$("#sidebarWrapper .favoritos-list .show-more").hide();
+	});
+
+	$(document).on("click", ".favoritos-list .btn-fav", function() {
+		var li = $(this).closest("li");
+		var newLi;
+		var id = $(this).data("id");
+		var esFav = $(this).closest("#menuNoFavorites").length;
+		
+		esFav = (esFav == 0) ? true : false;
+
+		if(esFav) {
+			li.clone().appendTo("#menuNoFavorites");
+			li.remove();
+			if( $("#menuNoFavorites:visible") ) 
+				$("#sidebarWrapper .favoritos-list .show-more").show();
+		}
+		else {
+			li.clone().insertBefore("#menuNoFavorites");
+			li.remove();
+			if( $("#menuNoFavorites").children().length < 2 ){
+				$("#menuNoFavorites").collapse("hide");
+				$("#sidebarWrapper .favoritos-list .show-more").hide();
+			}
+		}
+
+ 		$.ajax({
+			url: "/saas/users/set-favorite-menu",
+			data: {
+				favorite: !esFav,
+				idOptionMenu: id
+			}
+		});
+	});
+	
+	$(document).on("click", ".sidebar-toggle", function() {
+		var isActive = $(this).hasClass("active");
+		
+		$(this).toggleClass("active");
+		
+ 		$.ajax({
+			url: "/saas/pin-side-bar",
+			method: "POST",
+		});
+
+	});
+</script>
+
+				<div id="divCentral" class="page-content-wrapper">	
+				
+				
+					
+					
+					
+					
+
+					<div class="page list container-fluid">
+						
+						
+
+
+
+
+
+
+	<div class="page-header">
+		<div class="first-line">
+			<h1>Gastos periódicos</h1>
+			
+				
+
+
+
+<div class="summary">
+	<span class="value hidden-xs">
+		<strong>0,00€</strong>
+		Base
+	</span>
+	<span class="value">
+		<strong>0,00€</strong>
+		Total
+	</span>
+</div>
+			
+		</div>
+
+		<div class="second-line">
+			
+
+<div class="filters-list">
+	<!-- FILTROS PROPIETARIO -->
+	
+           
+           
+           
+        			
+       
+
+
+
+
+
+
+
+
+
+
+
+
+	<div class="filter-dropdown hidden-xs">
+		<div id="filterUser" class="dropdown">
+			<button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+				
+					
+					
+						<span class="hidden-xs">Gastos de todos</span>
+						<span class="visible-xs-inline">De todos</span>
+					
+					
+				
+							
+				<span class="caret"></span>
+			</button>		
+			<ul class="dropdown-menu" role="menu">
+				<li id="listMio">
+					
+					
+						<a href="/saas/recurringSpendings/search.action?entityList.filter_owner=46886">
+							Mis gastos
+						</a>
+					
+				</li>
+
+				<li id="listTodos">
+					
+					
+						<a href="/saas/recurringSpendings/search.action?entityList.filter_owner=-1">
+							Gastos de todos
+						</a>
+						
+				</li>
+				
+				
+			</ul>
+		</div>
+	</div>
+
+
+        <!-- FILTROS TIEMPO -->
+	
+
+
+
+<div class="filter-btn">
+	<button type="button" id="filterDateRange" class="btn">
+		Fecha
+		
+		
+		
+		
+		<span class="caret"></span>
+	</button>
+</div>
+
+<script>
+	// DATE RANGE PIKER
+	$(function() {
+		var initDTP = false;
+		var i18n = getCalendarLabels('1');
+		var local = {
+			"format": "DD/MM/YY",
+			"separator": "/",
+			"daysOfWeek": i18n.weekdaysShort,
+			"monthNames": i18n.months,
+			"firstDay": 1,
+            "applyLabel":  billageUtilsLiteral("general.filtrar"),
+		};
+
+		$("#filterDateRange").daterangepicker({
+			"locale": local,
+			"ranges": ranges = {
+				"Hoy": [moment(), moment()],
+				"Esta semana": [moment().startOf("isoweek"), moment().endOf("isoweek")],
+				"Este mes": [moment().startOf("month"), moment().endOf("month")],
+				"Este año": [moment().startOf("year"), moment().endOf("year")],
+				"Todos": ['', ''],
+			},
+			"linkedCalendars": false,
+			"showDropdowns": true,
+			"showCustomRangeLabel": false,
+			"alwaysShowCalendars": true,
+			"buttonClasses": "btn",
+			"applyClass": "btn-primary",
+		}).on('apply.daterangepicker', function(ev, picker) {
+			var desde = "";
+			var hasta = "";
+			var filter_time = "5"; // periodo
+
+			if(picker.startDate._isValid) 
+				desde = picker.startDate.format("DD/MM/YY");
+			if(picker.endDate._isValid) 
+				hasta = picker.endDate.format("DD/MM/YY");
+			
+			//todos
+			if(desde == "" || hasta == "") 
+				filter_time = "4";
+			
+			//hoy
+			if(desde != "" && desde != "" && desde == hasta && desde == moment().format("DD/MM/YY"))
+				filter_time = "0";		
+
+
+		  	var url = pageContext+"/recurringSpendings/search.action?entityList.filter_time=" + filter_time + "&entityList.startDate="+desde+"&entityList.endDate="+hasta;
+		  	location.href = url;
+		});
+
+		var liShowCalendar = $("<li>").addClass("visible-xs-inline").text( billageUtilsLiteral("general.seleccionarFecha") ).click(function() {
+			$(this).closest(".daterangepicker").find(".range_inputs, .calendar.left").toggle();
+		});
+		$(".daterangepicker .ranges ul").append(liShowCalendar);
+
+		// aplica fechas iniciales si viene de una b�squeda
+		var startDate = '';
+		var endDate = '';
+		
+		if("" != "") 
+			startDate = "";
+		if("" != "") 
+			endDate = "";
+			
+		if(startDate != "" && startDate == endDate) {
+			$("#filterDateRange").data("daterangepicker").setStartDate(startDate);
+			$("#filterDateRange").data("daterangepicker").setEndDate(startDate);
+		}
+		if(startDate != "" && startDate != endDate) 
+			$("#filterDateRange").data("daterangepicker").setStartDate(startDate);
+		if(endDate != "" && startDate != endDate) 
+			$('#filterDateRange').data('daterangepicker').setEndDate(endDate);
+
+		$(".daterangepicker .calendar .form-control").removeClass("input-mini").addClass("inpFecha input-sm").next().remove();
+	});
+</script>
+
+	<!-- FILTRO MESES -->
+	
+		
+	
+
+
+<div class="filter-dropdown hidden-xs">
+	<div class="dropdown">
+		<button type="button" id="filterActive" class="btn dropdown-toggle" data-toggle="dropdown">
+			
+			Mes de creación
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+			<li>
+				<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=-1">
+					Mes de creación
+				</a>
+			</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=1">
+						Enero
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=2">
+						Febrero
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=3">
+						Marzo
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=4">
+						Abril
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=5">
+						Mayo
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=6">
+						Junio
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=7">
+						Julio
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=8">
+						Agosto
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=9">
+						Septiembre
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=10">
+						Octubre
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=11">
+						Noviembre
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.month=12">
+						Diciembre
+					</a>
+				</li>
+			
+		</ul>
+	</div>	
+</div>	
+
+	<!-- FILTRO PERIODICIDAD -->
+	
+		
+		
+	
+
+
+
+
+	
+	
+	
+
+
+
+<div class="filter-dropdown hidden-xs">
+	<div class="dropdown">
+		<button type="button" id="filterActive" class="btn dropdown-toggle" data-toggle="dropdown">
+			
+			Periodicidad
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+			<li>
+				<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.periodicity=-1">
+					Todos
+				</a>
+			</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.periodicity=1">
+						Mensual
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.periodicity=2">
+						Bimestral
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.periodicity=3">
+						Trimestral
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.periodicity=4">
+						Semestral
+					</a>
+				</li>
+			
+				<li>
+					<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.periodicity=5">
+						Anual
+					</a>
+				</li>
+			
+		</ul>
+	</div>	
+</div>
+
+	<!-- FILTROS ESTADO -->
+	
+		
+		
+	
+
+
+
+
+	
+	
+	
+
+
+
+<div class="filter-dropdown hidden-xs">
+	<div class="dropdown">
+		<button type="button" id="filterActive" class="btn dropdown-toggle" data-toggle="dropdown">
+			Activos
+			
+			
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+			<li>
+				<a id="filtros.todos" href="/saas/recurringSpendings/search.action?entityList.active=-1">
+					Todos
+				</a>
+			</li>
+			<li>
+				<a id="general.activo" href="/saas/recurringSpendings/search.action?entityList.active=1">
+					Activos
+				</a>
+			</li>
+			<li>
+				<a id="general.inactivo" href="/saas/recurringSpendings/search.action?entityList.active=0">
+					Inactivos
+				</a>
+			</li>
+		</ul>
+	</div>	
+</div>
+
+	<!-- FILTROS ALIAS + COLOR  -->
+	<div class="filter-popover">
+		<button type="button" id="recurringgastosFilters" class="btn" data-toggle="popover" data-original-title="" title="">
+			Más filtros
+			
+		</button>
+	</div>
+
+	<!-- FILTROS LIMPIAR -->
+	
+</div>
+
+<div id="filterRecurringgastosPopover" class="filterPopover hide">
+	<form action="search" method="post" autocomplete="off">
+	<!-- ESTADO -->
+		<div class="form-group visible-xs-block">
+			<select name="entityList.active" class="form-control">
+				<option selected="" value="1">Todos</option>
+				<option value="0">Activos</option>
+				<option value="-1">Inactivos</option>
+			</select>
+		</div>
+		<!-- PROPIETARIO -->
+		<div class="form-group visible-xs-block">
+			<select name="entityList.filter_owner" id="ownerResponsive" class="form-control">
+				<option value="46886">Mis gastos</option>
+				<option value="-1" selected="">Gastos de todos</option>
+			</select>
+		</div>
+		<!-- ALIAS -->
+		<div class="form-group">
+			<input type="text" name="entityList.filter" class="form-control form-control-popover" placeholder="Buscar por Nombre corto" value="">
+		</div>
+		<!-- COLORES -->
+		
+
+
+<div class="form-group">
+	<div class="dropdown dropdown-color" data-inp="#entityList_color">
+		<button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+			
+			
+				<span title="Selecciona un color" class="color color-all"></span>
+								
+			
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu dropdown-menu-right">
+			
+				<li title="Sin color" class="color color-none " data-val=""></li>
+				<li title="Todos los colores" class="color color-all active" data-val="-1"></li> 
+		</ul>
+	</div>
+	<input type="hidden" name="entityList.color" id="entityList_color" class="entityColor" value="-1">
+</div>
+		<button type="submit" class="btn btn-default btn-block">Filtrar</button>
+	</form>
+</div>
+
+<script>
+	$(function() {
+		// POPOVER GASTOS ACTIVIDADES
+	 	$("#recurringgastosFilters").popover({
+			trigger: "manual",
+			placement: "bottom",
+			html: true,
+			template: '<div class="popover filterPopover"><h3 class="popover-title"></h3><div class="popover-content"></div></div>',
+			content: function() {
+				return $('#filterRecurringgastosPopover').html();
+			}
+		}).click(function(e){
+			$(this).popover('show');
+			e.preventDefault();
+		});
+	});
+</script>
+			
+			<form id="orderForm">
+				<input type="hidden" class="form-order" name="entityList.order" value="creado">
+				<input type="hidden" class="form-orderDesc" name="entityList.orderDesc" value="true">
+			</form>
+			
+			
+				<div class="page-actions actions-lg">
+					<a class="btn btn-primary btn-plus" id="id-btn-create" href="creargastosperiodicos.html">
+						<span class="icon-plus"></span>
+						<span class="hidden-xs">Crear gasto periódico</span>
+					</a>
+					<div class="dropdown">
+						<button type="button" class="btn btn-icon btn-dropmore dropdown-toggle hidden-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+						<ul class="dropdown-menu dropdown-menu-right">
+							<li onclick="dmslib.Widget.verPopup('exportXLS',null,'/saas/recurringSpendings/show-popup-export-facturas')">
+								Exportar gastos periódicas a Excel
+							</li>
+							
+
+
+<li class="divider"></li>
+<li>
+	<a id="categorias" href="/saas/spendingCategories/list">Categorías de gastos</a>
+</li>
+<li>
+	<a id="series" href="/saas/spendingSerie/list">Series</a>
+</li>
+<li>
+	<a id="spendings" href="/saas/spendingTag/list">Etiquetas de gastos</a>
+</li>
+						</ul>
+					</div>
+				</div>
+			
+		</div>
+	</div>
+	
+	
+		<table id="tableRecurringSpendings" class="table table-list table-sort hidden-xs">
+			<thead>
+				<tr>
+					<th class="col-xs-3 order" data-order="alias">Nombre corto</th>
+					<th class="col-xs-2 order" data-order="periodicidad">Periodicidad</th>
+					<th class="col-xs-1 hidden-sm order" data-order="activo">Activa</th>
+					<th class="col-xs-3 order" data-order="cuenta">Proveedor</th>
+					<th class="col-xs-3 text-right order" data-order="total">Total</th>
+					<th class="list-carets"></th>
+				</tr>
+			</thead>
+			<tbody>
+				
+					<tr class="list-element" data-context="recurringSpendings" data-id="3111">
+						<td class="">
+							
+							<a href="/saas/recurringSpendings/edit.action?id=3111" class="substring" title="qw">qw</a>
+						</td>
+						<td>Bimestral</td>
+						<td class="hidden-sm">
+							Sí
+							
+						</td>
+						<td>
+							<a title="wqer" href="/saas/accounts/view.action?id=1086211">wqer</a>
+						</td>
+						<td class="text-right">
+							<span class="a toolConceptos" data-retencion="true" data-id="3111" data-toggle="popover" title="" data-original-title="Conceptos">0,00RD$</span>
+						</td>
+						<td class="list-actions">
+							
+
+
+
+
+		
+<div class="dropdown">
+	<button class="btn btn-more hoverAction" type="button" data-toggle="dropdown"></button>
+	<ul class="dropdown-menu menu-desplegable dropdown-menu-right" role="menu">
+		<li>
+			
+			<a href="/saas/recurringSpendings/edit.action?id=3111">Editar</a>
+		</li>
+		<li class="menu-desplegable-option menu-color menu-option-icon color-trigger pickColor-wrap" data-original-title="" title="">
+			<span class="menu-option-text">Asignar color</span>
+			<div class="menu-icon">
+				<span class="pickColor" title="Selecciona un color"></span>
+			</div>
+		</li>
+		
+			<li>
+				<a onclick="eliminarElementoListado('recurringSpendings',3111,'Eliminar gasto periódico','No se puede eliminar un gasto periódico si ya se han generado gastos a partir de ellos.')">Eliminar</a>
+			</li>
+		
+	</ul>
+</div>
+						</td>
+					</tr>
+				
+			</tbody>
+		</table>
+
+		<!-- versi�n movil -->
+		<div class="table-list-xs visible-xs">
+			
+				<article class="list-element " data-context="recurringSpendings" data-id="3111" data-url="/saas/recurringSpendings/edit.action?id=3111">
+					<div class="bloque bloque-ref bloque-cut">
+						<span class="ref bloque-alias">qw</span>
+						<span class="bloque-alias">wqer</span>
+					</div>
+					<div class="bloque bloque-recurrente">
+						Bimestral<br>
+						<span class="activa">Activo</span>
+						
+					</div>
+					<div class="bloque bloque-importe">
+						0,00RD$
+						<br>
+					</div>
+					<div class="list-actions">
+						
+
+
+
+
+		
+<div class="dropdown">
+	<button class="btn btn-more hoverAction" type="button" data-toggle="dropdown"></button>
+	<ul class="dropdown-menu menu-desplegable dropdown-menu-right" role="menu">
+		<li>
+			
+			<a href="/saas/recurringSpendings/edit.action?id=3111">Editar</a>
+		</li>
+		<li class="menu-desplegable-option menu-color menu-option-icon color-trigger pickColor-wrap" data-original-title="" title="">
+			<span class="menu-option-text">Asignar color</span>
+			<div class="menu-icon">
+				<span class="pickColor" title="Selecciona un color"></span>
+			</div>
+		</li>
+		
+			<li>
+				<a onclick="eliminarElementoListado('recurringSpendings',3111,'Eliminar gasto periódico','No se puede eliminar un gasto periódico si ya se han generado gastos a partir de ellos.')">Eliminar</a>
+			</li>
+		
+	</ul>
+</div>
+					</div>
+				</article>
+			
+		</div>
+
+		
+
+<div class="paginador">
+	<div class="page-block page-block-resultados">
+		<strong>1</strong> <span>resultados</span>
+	</div>
+
+	<div class="page-block page-block-elementos">
+		Mostrar
+		<select name="entityList.maxResults" id="entityList_maxResults" class="paginador-select" onchange="document.location='search?entityList.maxResults=' + this.options[this.selectedIndex].value">
+    <option value="25" selected="selected">25</option>
+    <option value="50">50</option>
+    <option value="100">100</option>
+    <option value="500">500</option>
+
+
+</select>
+
+
+		<span class="hidden-xs">elementos<span class="hidden-xs"> por página</span></span>
+	</div>
+
+	<div class="page-block page-block-paginas">
+		<span>Página</span> <strong>1</strong> de <strong>1</strong>
+	</div>
+
+	<div class="page-block page-block-flechas">
+		
+
+<div class="list-navi">
+	
+	
+</div>
+	</div>
+</div>	
+	
+	
+
+
+<script>
+	$(function() {
+		$(".toolConceptos").popover({		
+			placement: "bottom",
+			html: true, 
+			trigger: "manual",
+			content: function() {	
+				var id = $(this).attr("data-id");
+				var ret = $(this).attr("data-retencion");
+				var bRetencion = false;
+				if (ret != undefined && ret == "true") bRetencion = true;
+	
+				var html = getRowsConceptos(id, "spendings/recurringSpendings", bRetencion);
+				return html;
+			},
+			template: '<div class="popover popover-conceptos"><div class="arrow arrow-white"></div><div class="popover-content"></div></div>'
+		}).click(function(e){
+			$(this).popover('show');
+			e.preventDefault();
+		});
+	});
+</script>
+					</div>
+
+				</div>
+				
+				
+			</div>
+	
+			<!--  contenido popover de selección de color -->
+			<div class="select-color-content">
+				
+				<span class="color-sq color-none" data-color="transparent" title="Sin color"></span>
+			</div>
+		
+		</main>
+		
+		
+
+
+
+
+
+
+
+<!-- Div para confirmar eliminar elemento -->
+<div id="dEliminarElemento" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			Atención
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+	<div class="popup-content">
+		<h4 id="divMensajePopup"></h4>
+		<div id="divMensajeImplicaciones"></div>
+    </div>
+	<div class="popup-footer">		
+		<button type="button" id="inputEliminar" class="btn btn-submit" onclick="dmslib.Validation.validate(this, 'form')">Aceptar</button>	
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+<!-- Div para subir imagen productos  -->
+<div id="dpopup_imagen_producto" class="dpopupsubirimagen popup">
+    
+        
+        
+        
+        
+        
+    
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Sube una foto para el servicio o producto.
+		
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+<form id="upload_image_product" action="/saas/products/upload-image" method="post" enctype="multipart/form-data">
+    <input id="image_product" name="id" type="hidden" value="">
+	<div class="popup-content" style="overflow:hidden">
+		<div class="upload-container">
+		    <div class="upload-img">
+		        <i class="fa fa-picture-o" aria-hidden="true"></i>
+		    </div>
+		    <div class="upload-file">
+		        <p>Sube una foto para el servicio o producto.<br><br><b>Formato:</b> jpg, png o gif.<br>	<b>Tamaño máximo:</b> 2 MB.<br><br></p>
+		        <input type="file" name="upload" id="upload">
+		    </div>
+	    </div>
+	</div>
+
+	<div class="popup-footer">		
+		<button type="submit" id="inputUploadFile" class="btn btn-submit" onclick="dmslib.Widget.escondePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>    
+</form>
+</div>
+
+<!-- Div para subir gastos  -->
+<div id="dpopup_doc-preview" class="dpopupsubirgasto popup-div popup">
+    
+        
+		
+        
+        
+		
+    
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Subir documento de gasto
+		
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+<form id="upload_image_gasto" action="/saas/spending/upload-image" method="post" enctype="multipart/form-data">
+    <input id="image_gasto" name="id" type="hidden" value="">
+	<div class="popup-content" style="overflow:hidden">
+		<div class="upload-container">
+		    <div class="upload-img">
+		        <i class="fa fa-picture-o" aria-hidden="true"></i>
+		    </div>
+		    <div class="upload-file">
+		        <p>Selecciona documento de gastos para el gasto</p>
+		        <input type="file" name="upload" id="upload">
+		    </div>
+	    </div>
+	</div>
+
+	<div class="popup-footer">		
+		<button type="submit" id="inputUploadFile" class="btn btn-submit" onclick="dmslib.Widget.escondePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>    
+</form>
+</div>
+
+<!-- Div para popup error  -->
+<div id="div-error" class="popup">
+	<div class="popup-header">
+		<div class="popup-title">
+			<span id="div-cabecera-error"></span>
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<div id="div-mensaje-error" class="popup-content"></div>
+
+	<div class="popup-footer">		
+		<button type="button" class="btn btn-submit" onclick="dmslib.Widget.removePopup()">Aceptar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+<!-- Div para mover un documento o carpeta (des de docs)   -->
+<div id="destinationPopup" class="popup no-remove">
+	
+
+
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Destino
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+
+<div class="popup-content">
+	<div id="treeContainer" class="folder-tree"></div>
+	<div id="carpeta-destination-tree" class="folder-tree"></div>
+
+	<div class="fake-footer">
+		<button type="button" id="carpeta-destination-btn" class="btn btn-submit">Mover</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+
+
+<div id="divValidacionPopup" class="validacion">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Faltan campos requeridos.
+</div>
+
+<div id="divErrorPopup" class="validacion-error">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="span-texto-error-popup"></span>
+</div>
+
+
+</div>
+
+<!-- Div para ir a una carpeta (des de docs)  -->
+<div id="gotoPopup" class="popup no-remove">
+	
+
+
+
+
+
+
+<div class="popup-header">
+	<div class="popup-title">
+		Ir a
+		<button type="button" class="btn-transparent popup-btn-close">
+			<img src="/saas/img/icons/icons/grey/close.svg">
+		</button>
+	</div>
+</div>
+
+
+
+<div class="popup-content">
+	<div id="carpeta-goto-tree" class="folder-tree"></div>
+	<div id="carpeta-destination-tree" class="folder-tree"></div>
+
+	<div class="fake-footer">
+		<button type="button" id="carpeta-goto-btn" class="btn btn-submit">Confirmar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+
+
+<div id="divValidacionPopup" class="validacion">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Faltan campos requeridos.
+</div>
+
+<div id="divErrorPopup" class="validacion-error">
+	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="span-texto-error-popup"></span>
+</div>
+
+
+</div>
+
+<!-- Div para mostrar mensajes de confirmacion  -->
+<div id="divConfirmacionAccion" class="popup popup-mensaje popup-mensaje-confirmacion">
+	<span id="divConfirmacionAccionTexto" class="popup-mensaje-texto"></span>
+</div>
+
+<!-- Div para mostrar mensajes de alerta  -->
+<div id="divAlertAccion" class="popup popup-mensaje popup-mensaje-alerta">
+    <span id="alertAccionTexto" class="popup-mensaje-texto"></span>
+</div>
+
+<!-- Div para gestionar los conceptos a albaranear -->
+<div id="divConceptosAlbaranes" class="divConceptosAlbaranes popup"></div>
+
+<!-- wigets dashboard-->
+<div id="divAddWidgetPopup" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			Seleccionar widget
+			
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<div class="popup-content">
+		<div class="controls" id="tagsControls"></div>
+		<div id="selectorAddWidget" class="container ps-container ps-active-y"></div>
+	</div>
+	
+	<div class="popup-footer">		
+		<button type="button" class="btn btn-submit" onclick="addWidgetToDashboard()">Agregar</button>
+		<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+	</div>
+</div>
+
+
+<!-- filtros wigets dashboard -->
+<div id="divWidgetFiltersPopup" class="popup no-remove">
+	<div class="popup-header">
+		<div class="popup-title">
+			<div id="divWidgetFiltersTitle"></div>
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+    <div class="divWidgetFilters">
+        <form id="formWidgetFilters" class="widget_instance_filters_form">
+            <input id="inputWidgetInstanceId" type="hidden" name="widget_instance_id" value="">
+            <div id="divWidgetFiltersArea" class="popup-content"></div>
+			<div class="popup-footer">		
+				<button id="buttonWidgetFiltersOk" type="submit" class="btn btn-submit">Filtrar</button>
+				<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+				<!-- 
+				<button id="buttonWidgetFiltersReset" type="submit" class="btn btn-primary">Limpiar</button>
+				 -->
+			</div>
+        </form>
+    </div>
+</div>
+
+<!-- Popup subir logo a plantilla-->
+<div id="dpopup_imagen_empresa" class="dpopupsubirlogo popup-div popup">
+	<div class="popup-header">
+		<div class="popup-title">
+			Subir logo
+
+			<button type="button" class="btn-transparent popup-btn-close">
+				<img src="/saas/img/icons/icons/grey/close.svg">
+			</button>
+		</div>
+	</div>
+
+	<form id="upload_image_empresa" action="/saas/companies/upload-logo" method="post" enctype="multipart/form-data">
+		<input type="hidden" id="image_empresa" name="id" value="">
+
+		<div class="popup-content">
+			<div class="upload-container">
+				<div class="upload-img">
+					<i class="fa fa-picture-o fa-4x" aria-hidden="true"></i>
+				</div>
+
+				<div class="upload-file">
+					
+					<div class="form-group fakeBtn">
+						<label for="upload" class="form-label">Selecciona tu logo</label>
+						<input type="file" name="upload" id="upload">
+						<div class="input-group add-clear-span">
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-primary">
+									<i class="fa fa-folder-open" aria-hidden="true"></i>
+								</button>
+							</span>
+							<input type="text" id="labelFile" class="form-control substring" placeholder="Seleccionar" readonly="">
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+
+		<div class="popup-footer">
+			<button type="submit" id="inputUploadFile" class="btn btn-submit">Aceptar</button>
+			<button type="button" class="btn popup-btn-close btn-cancel-link">Cancelar</button>
+		</div>
+	</form>
+</div>
+
+		<script>
+			// n decimales de la empresa del usuario
+			numberDecimalsInBase10 = "100";
+			decimalesEmpresa = numberDecimalsInBase10.length -1; // num real
+			numberDecimalsInBase10 = numberDecimalsInBase10*1; // string a int
+			//funcion para mostrar mensaje de confirmacion
+			var result = "";
+			//si result = 1, mostramos mensaje confirmación
+			if(result == 1 || false) {
+				dmslib.Widget.prepararAccionConfirmacion("Datos guardados correctamente.");
+			}
+
+			//setesamos valor variable mensajeConfirmacion
+			mensajeConfirmacion = "Datos guardados correctamente.";
+			ningunaLinia = "No se ha añadido ninguna línea";
+
+			if($(location).attr("href").indexOf("contract-plans") == -1 && ""=='true') {
+				document.location = pageContext+"/contract-plans?user=yosmarquebec@gmail.com&company=19546";
+			}
+
+			firstLogin = ("" == "true") ?  1 : 0;
+			activationGoal = ("" == "true") ?  1 : 0;
+
+			//miramos si hay que mostrar popup bienvenida
+			
+				if("" == "true") 
+					dmslib.Widget.verPopup("divRenovarPassword", null, pageContext+"/new-password");
+				else if("" == "true") 
+					dmslib.Widget.verPopup("divRenovarPassword", null, pageContext+"/force-new-password");
+				else if("0" == 0 && firstLogin == 1) 
+					dmslib.Widget.verPopup("divFirstLogin", null, pageContext+"/first-login");
+
+				if("" == "true") {
+					ga("send", "event", "Pro", "activation");
+					dmslib.Ajax.request(pageContext+"/activation-goal");
+				}
+			
+
+			//asociamos evento onclick a divFormulario para saber si se está editando un formulario
+			if(dmslib.DOM.dameElemento("form")) {
+				// IE o FF
+				if(document.all) 
+					dmslib.DOM.dameElemento("form").attachEvent("onclick", activaModifForm);
+				else 
+					dmslib.DOM.dameElemento("form").addEventListener("click", activaModifForm, false);
+			}
+		</script>
+
+		
+
+
+
+
+
+
+
+	<!-- google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		
+		ga('create', 'UA-7323120-25', 'billage.es');
+		
+			ga('set', 'dimension1', 'Pro');
+			ga('set', '&uid', '46886');
+		
+		ga('send', 'pageview');
+	</script>
+	
+	<!-- Google Tag Manager -->
+	<noscript>
+		<iframe src="//www.googletagmanager.com/ns.html?id=GTM-TTXBSX" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+	</noscript>
+	<script>
+		(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+		'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','GTM-TTXBSX');
+	</script>
+	
+
+
+		
+
+
+
+
+
+	
+		
+	
+			
+			<script>				
+		    window.intercomSettings = {
+		        
+		        name: "Poner nombre",
+		        
+		        email: "yosmarquebec@gmail.com",
+		        user_id: "46886",
+		        
+		        created_at: "1607574101000",
+		        signed_up_at: "1607574101000",
+		        rol: "Administrador",
+		        app_id: "sbkq18wo",
+		        company: {
+		            remote_created_at: "1607574101000",
+		            user_count: "1",
+		            plan: "Pro",
+		            activa: "true",
+		            company_id: "19546",
+		            name: "Poner razón social",
+		            periodicidad: ""
+		        }
+		    };
+			</script>
+			<script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/sbkq18wo';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>
+	
+		
+		
+	
+
+
+		<script>
+			$(function() {
+				cookieScreenSize("lg");
+	
+				$("#menuToggle, #backgroundSidebar").click(function(e) {
+					e.preventDefault();
+					$("#mainMenu").toggleClass("toggled");
+					$("#bNavPerfil").collapse("hide");
+				});
+			});
+		</script>
+		<script src="/saas/js/footer.js"></script>
+	
+<div class="daterangepicker dropdown-menu ltr show-calendar opensright"><div class="ranges"><ul><li data-range-key="Hoy">Hoy</li><li data-range-key="Esta semana">Esta semana</li><li data-range-key="Este mes">Este mes</li><li data-range-key="Este año">Este año</li><li data-range-key="Todos">Todos</li><li class="visible-xs-inline">Seleccionar fecha</li></ul><div class="range_inputs"><button class="applyBtn btn btn-primary" disabled="disabled" type="button">Filtrar</button> <button class="cancelBtn btn btn-default" type="button">Cancel</button></div></div><div class="calendar left"><div class="daterangepicker_input"><input class="form-control inpFecha input-sm" type="text" name="daterangepicker_start" value=""><div class="calendar-time" style="display: none;"><div></div><i class="fa fa-clock-o glyphicon glyphicon-time"></i></div></div><div class="calendar-table"></div></div><div class="calendar right"><div class="daterangepicker_input"><input class="form-control inpFecha input-sm" type="text" name="daterangepicker_end" value=""><div class="calendar-time" style="display: none;"><div></div><i class="fa fa-clock-o glyphicon glyphicon-time"></i></div></div><div class="calendar-table"></div></div></div>
+<script type="text/javascript" id="">!function(b,e,f,g,a,c,d){b.fbq||(a=b.fbq=function(){a.callMethod?a.callMethod.apply(a,arguments):a.queue.push(arguments)},b._fbq||(b._fbq=a),a.push=a,a.loaded=!0,a.version="2.0",a.queue=[],c=e.createElement(f),c.async=!0,c.src=g,d=e.getElementsByTagName(f)[0],d.parentNode.insertBefore(c,d))}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");fbq("init","679832448786593");fbq("track","PageView");</script>
+<noscript>
+ <img height="1" width="1" src="https://www.facebook.com/tr?id=679832448786593&amp;ev=PageView&#10;&amp;noscript=1">
+</noscript>
+<iframe id="intercom-frame" style="position: absolute !important; opacity: 0 !important; width: 1px !important; height: 1px !important; top: 0 !important; left: 0 !important; border: none !important; display: block !important; z-index: -1 !important; pointer-events: none;" aria-hidden="true" tabindex="-1" title="Intercom"></iframe><div id="intercom-container" class="intercom-namespace"><style>html.intercom-mobile-messenger-active,html.intercom-mobile-messenger-active > body,html.intercom-modal-open,#intercom-container-body{overflow:hidden !important;}html.intercom-mobile-messenger-active,html.intercom-mobile-messenger-active > body{position:static !important;}html.intercom-mobile-messenger-active > body{height:0 !important;margin:0 !important;}iframe#intercom-frame{position:absolute !important;opacity:0 !important;width:1px !important;height:1px !important;top:0 !important;left:0 !important;border:none !important;display:block !important;z-index:-1 !important;}</style><div class="intercom-app" aria-live="polite"><iframe allowfullscreen="" class="intercom-launcher-frame intercom-1q4irxg e1ur5zlj0" name="intercom-launcher-frame" title="Intercom live chat" data-intercom-frame="true"></iframe><iframe allowfullscreen="" class="intercom-launcher-badge-frame intercom-s06fua e1loc0kc0" name="intercom-launcher-badge-frame" title="Intercom live chat notificación" data-intercom-frame="true"></iframe><div id="intercom-modal-container"></div></div></div><div id="intercom-css-container"><style data-emotion="intercom-global"></style><style data-emotion="intercom"></style></div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/fullcalendar.min.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/locale-all.js"></script>
+</body>
+
+</html>
